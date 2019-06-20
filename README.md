@@ -13,6 +13,9 @@ Repository for social influence on pain/vicarious pain/cognitive difficulty
 * CANlab publication: 
 * CANlab github: https://github.com/canlab/Paradigms_Public/tree/master/inprep_Lanlan_Perceived_pain_gender_bias
 
+3. stimuli in CANlab google drive
+* https://drive.google.com/open?id=1w6wBWPvWoPUGIM22g2jW7ynzeiy3S5oB
+
 ## cognitive difficulty
 * MSIT?
 * Feedback
