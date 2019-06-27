@@ -1,0 +1,15 @@
+,stimuli_num,degree,match,cue_type,random_order,trial_type,condition_name,condition_num_filled_in_during_exper,block_num,cB_version,image_filename
+0,18,50,same,high,4,2,cognitive,99,2,5,18_50.jpg
+1,45,100,different,high,22,4,cognitive,99,2,5,45_100_R.jpg
+2,15,100,same,high,20,4,cognitive,99,2,5,15_100.jpg
+3,15,100,different,low,27,3,cognitive,99,2,5,15_100_R.jpg
+4,17,50,different,low,9,1,cognitive,99,2,5,17_50_R.jpg
+5,8,50,different,low,7,1,cognitive,99,2,5,8_50_R.jpg
+6,42,50,same,low,3,1,cognitive,99,2,5,42_50.jpg
+7,7,100,different,high,26,4,cognitive,99,2,5,7_100_R.jpg
+8,8,50,same,high,0,2,cognitive,99,2,5,8_50.jpg
+9,17,50,same,high,2,2,cognitive,99,2,5,17_50.jpg
+10,31,100,different,low,25,3,cognitive,99,2,5,31_100_R.jpg
+11,6,50,same,low,1,1,cognitive,99,2,5,6_50.jpg
+12,35,100,different,low,23,3,cognitive,99,2,5,35_100_R.jpg
+13,23,100,different,low,21,3,cognitive,99,2,5,23_100_R.jpg
