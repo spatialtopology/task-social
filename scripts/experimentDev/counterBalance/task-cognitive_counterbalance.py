@@ -25,6 +25,7 @@ def noConsecutiveShuffle(list_key, list_dict, consec_num):
         trialList.append(list_dict[thisKey].pop())
 
     return trialList #this can be deleted, just for debugging purposes
+    # https://discourse.psychopy.org/t/force-trial-order-reshuffle-until-a-constraint-is-met/2101
 def generateListKey(trial_freq):
     list_stim1 = range(1,trial_freq+1) #+ range(15,22)
     list_stim2 = range(trial_freq+1,trial_freq*2+1) #+ range(22,29)
