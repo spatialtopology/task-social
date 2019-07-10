@@ -72,9 +72,9 @@ countBalMat = readtable(counterbalancefile);
 % image_scale_filename = ['task-', taskname, '_scale.jpg'];
 % image_scale = fullfile(image_filepath, filesep, image_scale_filename);
 
-image_filepath = fullfile(main_dir, filesep, 'sandbox');
+image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
 image_scale_filename = ['task-', taskname, '_scale.jpg'];
-image_scale = fullfile(image_filepath, filesep, image_scale_filename);
+image_scale = fullfile(image_filepath, image_scale_filename);
 
 %----------------------------------------------------------------------
 %                       Load Jitter Matrix
@@ -145,11 +145,11 @@ p1_jitter(trl) = fEnd1 - fStart1;
 %-------------------------------------------------------------------------------
 
 if string(countBalMat.cue_type{trl}) == 'low'
-  cue_low_dir = fullfile(main_dir,'stimuli','cue','scl')
-  cueImage = fullfile(main_dir,'sandbox',countBalMat.cue_image{trl});
-elseif string(countBalMat.cue_image{trl}) == 'high'
-  cue_high_dir = fullfile(main_dir,'stimuli','cue','sch')
-  cueImage = fullfile(main_dir,'sandbox',countBalMat.cue_image{trl});
+  cue_low_dir = fullfile(main_dir,'stimuli','cue','scl');
+  cueImage = which(fullfile(cue_low_dir,countBalMat.image_filename{trl}));
+elseif string(countBalMat.cue_type{trl}) == 'high'
+  cue_high_dir = fullfile(main_dir,'stimuli','cue','sch');
+  cueImage = which(fullfile(cue_high_dir,countBalMat.image_filename{trl}));
 
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
@@ -210,8 +210,8 @@ p4_jitter(trl) = fEnd2 - fStart2;
 respToBeMade = true;
 
 image_filepath = strcat([main_dir '/stimuli/cognitive']);
-image_filename = char(countBalMat.image_filename(trl))
-image_rotation = strcat([image_filepath filesep image_filename])
+image_filename = char(countBalMat.image_filename(trl));
+image_rotation = strcat([image_filepath filesep image_filename]);
 
 while respToBeMade == true
 % present rotate image ---------------------------------------------------------
@@ -290,6 +290,7 @@ p6_ratingDecideOnset(trl) = buttonPressOnset;
 rating_Trajectory{trl,2} = trajectory;
 p6_decisionRT(trl) = RT;
 
+end
 end
 
 %-------------------------------------------------------------------------------
