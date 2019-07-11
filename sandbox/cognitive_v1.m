@@ -145,10 +145,10 @@ p1_jitter(trl) = fEnd1 - fStart1;
 %-------------------------------------------------------------------------------
 
 if string(countBalMat.cue_type{trl}) == 'low'
-  cue_low_dir = fullfile(main_dir,'stimuli','cue','scl')
+  cue_low_dir = fullfile(main_dir,'stimuli','cue','scl');
   cueImage = fullfile(main_dir,'sandbox',countBalMat.cue_image{trl});
 elseif string(countBalMat.cue_image{trl}) == 'high'
-  cue_high_dir = fullfile(main_dir,'stimuli','cue','sch')
+  cue_high_dir = fullfile(main_dir,'stimuli','cue','sch');
   cueImage = fullfile(main_dir,'sandbox',countBalMat.cue_image{trl});
 
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
@@ -210,8 +210,8 @@ p4_jitter(trl) = fEnd2 - fStart2;
 respToBeMade = true;
 
 image_filepath = strcat([main_dir '/stimuli/cognitive']);
-image_filename = char(countBalMat.image_filename(trl))
-image_rotation = strcat([image_filepath filesep image_filename])
+image_filename = char(countBalMat.image_filename(trl));
+image_rotation = strcat([image_filepath filesep image_filename]);
 
 while respToBeMade == true
 % present rotate image ---------------------------------------------------------
