@@ -21,6 +21,7 @@ SAMPLERATE = .001; % used in continuous ratings
 TRACKBALL_MULTIPLIER=1;
 RT = NaN;
 buttonPressOnset = NaN;
+
 % AssertOpenGL;
 
 
@@ -55,13 +56,13 @@ dspl.cscale.w = Screen('OpenOffscreenWindow',p.ptb.screenNumber);
 % paint black
 Screen('FillRect',dspl.cscale.w,0);
 % add scale image
-dspl.cscale.imagefile = which(image_scale);
+% dspl.cscale.imagefile = which(image_scale);
 % dspl.cscale.imagefile = '/Users/h/Dropbox/Projects/socialPain/scale.png';
-dspl.cscale.texture = Screen('MakeTexture',p.ptb.window,imread(dspl.cscale.imagefile));
+dspl.cscale.texture = Screen('MakeTexture',p.ptb.window, imread(image_scale));
 % placement
 dspl.cscale.rect = [...
     [dspl.xcenter dspl.ycenter]-[0.5*dspl.cscale.width 0.5*dspl.cscale.height] ...
-    [dspl.xcenter dspl.ycenter]+[0.5*dspl.cscale.width 0.5*dspl.cscale.height]]
+    [dspl.xcenter dspl.ycenter]+[0.5*dspl.cscale.width 0.5*dspl.cscale.height]];
 % dspl.cscale.rect = [dspl.xcenter dspl.ycenter dspl.xcenter dspl.ycenter];
 % shiftdown = ceil(dspl.screenHeight*0);
 % dspl.cscale.rect = dspl.cscale.rect + [0 shiftdown 0 shiftdown];
@@ -141,12 +142,24 @@ while GetSecs < timing.initialized + duration
     % produce screen
     Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
     % add rating indicator ball
-    Screen('FillOval',p.ptb.window,[255 1 1],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
+    Screen('FillOval',p.ptb.window,[255 0 0],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
     Screen('Flip',p.ptb.window);
+
     elseif any(buttonpressed)
        RT = GetSecs - timing.initialized;
        buttonPressOnset = GetSecs;
        buttonpressed = [0 0 0];
+       WaitSecs(0.5)
+
+
+       Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+          p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+       % fStart1 = GetSecs;
+       % Flip to the screen
+       Screen('Flip', p.ptb.window);
+       remainder_time = duration-0.5-RT;
+       WaitSecs(remainder_time);
+
     end
 end
 

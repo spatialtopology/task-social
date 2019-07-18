@@ -146,16 +146,16 @@ p1_jitter(trl) = fEnd1 - fStart1;
 
 if string(countBalMat.cue_type{trl}) == 'low'
   cue_low_dir = fullfile(main_dir,'stimuli','cue','scl');
-  cueImage = which(fullfile(cue_low_dir,countBalMat.image_filename{trl}));
+  cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
 elseif string(countBalMat.cue_type{trl}) == 'high'
   cue_high_dir = fullfile(main_dir,'stimuli','cue','sch');
-  cueImage = which(fullfile(cue_high_dir,countBalMat.image_filename{trl}));
+  cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
 
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 Screen('Flip',p.ptb.window);
 p2_cue(trl) = GetSecs; % save output
-WaitSecs(1);
+WaitSecs(2);
 % 10 random social bars
 
 %-------------------------------------------------------------------------------
@@ -171,6 +171,28 @@ WaitSecs(1);
 % 2) log rat ing decision time
 % 3) log rating decision RT time
 % 4) remove onscreen after 4 sec
+
+% present rating screen "expect" for 350ms
+%-------------------------------------------------------------------------------
+
+% 1) get jitter
+jitter2 = 1;
+% 2) Draw the fixation cross in white, set it to the center of our screen and
+% set good quality antialiasing
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+Screen('Flip', p.ptb.window);
+fStart2 = GetSecs;
+WaitSecs(jitter2);
+fEnd2 = GetSecs;
+% save Parameters
+p4_fixationPresent(trl) = fStart2;
+p4_jitter(trl) = fEnd2 - fStart2;
+
+%-------------------------------------------------------------------------------
+DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
+Screen('Flip',p.ptb.window);
+WaitSecs(0.35);
 
 p3_ratingPresent(trl) = GetSecs;
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale);
@@ -283,6 +305,25 @@ WaitSecs(0.5);
 % 2) log rat ing decision time
 % 3) log rating decision RT time
 % 4) remove onscreen after 4 sec
+%-------------------------------------------------------------------------------
+% 1) get jitter
+jitter2 = 1;
+% 2) Draw the fixation cross in white, set it to the center of our screen and
+% set good quality antialiasing
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+Screen('Flip', p.ptb.window);
+fStart2 = GetSecs;
+WaitSecs(jitter2);
+fEnd2 = GetSecs;
+% save Parameters
+p4_fixationPresent(trl) = fStart2;
+p4_jitter(trl) = fEnd2 - fStart2;
+%-------------------------------------------------------------------------------
+
+DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
+Screen('Flip',p.ptb.window);
+WaitSecs(0.35);
 
 p6_ratingPresent(trl) = GetSecs;
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale);
