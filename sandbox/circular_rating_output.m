@@ -1,4 +1,4 @@
-function [trajectory, RT, buttonPressOnset] = circular_rating_output(duration, p, image_scale)
+function [trajectory, RT, buttonPressOnset] = circular_rating_output(duration, p, image_scale, rating_type)
 % global screenNumber window windowRect xCenter yCenter screenXpixels screenYpixels
 % shows a circular rating scale and records mouse position
 %
@@ -17,7 +17,7 @@ function [trajectory, RT, buttonPressOnset] = circular_rating_output(duration, p
 %
 % Phil Kragel 6/20/2019
 
-SAMPLERATE = .001; % used in continuous ratings
+SAMPLERATE = .01; % used in continuous ratings
 TRACKBALL_MULTIPLIER=1;
 RT = NaN;
 buttonPressOnset = NaN;
@@ -89,6 +89,10 @@ RATINGTITLES = {'INTENSITY'};
 
 % initialize
 Screen('TextSize',p.ptb.window,72);
+if rating_type == 'expect'
+  DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
+elseif rating_type == 'expect'
+    DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
 DrawFormattedText(p.ptb.window,'.','center','center',255);
 timing.initialized = Screen('Flip',p.ptb.window);
 
@@ -113,6 +117,7 @@ while GetSecs < timing.initialized + duration
         nextsample = nextsample+SAMPLERATE;
         sample = sample+1;
     end
+
 
     if ~buttonpressed
     % measure mouse movement
@@ -156,9 +161,13 @@ while GetSecs < timing.initialized + duration
           p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
        % fStart1 = GetSecs;
        % Flip to the screen
+       % add rating indicator ball
+       Screen('CopyWindow',dspl.cscale.w,window);
+       Screen('FillOval',window,[1 1 1],[[cursor.x cursor.y]-			cursor.size [cursor.x cursor.y]+cursor.size]);
        Screen('Flip', p.ptb.window);
        remainder_time = duration-0.5-RT;
        WaitSecs(remainder_time);
+    end
 
     end
 end
