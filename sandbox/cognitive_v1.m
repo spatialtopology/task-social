@@ -6,7 +6,7 @@
 %----------------------------------------------------------------------
 
 % Clear the workspace and the screen
-sca;
+sca;jjj
 close all;
 clearvars;
 %Initial
