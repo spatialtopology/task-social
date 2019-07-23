@@ -150,6 +150,11 @@ while GetSecs < timing.initialized + duration
 
     % produce screen
     Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
+    if strcmp(rating_type, 'expect')
+        DrawFormattedText(p.ptb.window,'expect','center','center',255);
+    elseif strcmp(rating_type, 'actual')
+        DrawFormattedText(p.ptb.window,'actual','center','center',255);
+    end
     % add rating indicator ball
     Screen('FillOval',p.ptb.window,[255 0 0],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
     Screen('Flip',p.ptb.window);
@@ -158,16 +163,16 @@ while GetSecs < timing.initialized + duration
        RT = GetSecs - timing.initialized;
        buttonPressOnset = GetSecs;
        buttonpressed = [0 0 0];
-       WaitSecs(0.5)
 
-
-       Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-          p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-       % fStart1 = GetSecs;
-       % Flip to the screen
-       % add rating indicator ball
-       Screen('CopyWindow',dspl.cscale.w,window);
-       Screen('FillOval',window,[1 1 1],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
+%        Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+%           p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+       Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
+       if strcmp(rating_type, 'expect') 
+           DrawFormattedText(p.ptb.window,'expect','center','center',255);
+       elseif strcmp(rating_type, 'actual')
+           DrawFormattedText(p.ptb.window,'actual','center','center',255);
+       end
+       Screen('FillOval',p.ptb.window,[1 1 1],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
        Screen('Flip', p.ptb.window);
        remainder_time = duration-0.5-RT;
        WaitSecs(remainder_time);
@@ -176,4 +181,4 @@ while GetSecs < timing.initialized + duration
     end
 end
 
-% Screen('CloseAll')
+Screen('CloseAll')
