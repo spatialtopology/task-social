@@ -9,8 +9,17 @@
 sca;
 close all;
 clearvars;
-
+%Initial
+debug     = 1;   % PTB Debugging
+AssertOpenGL;
+commandwindow;
+ListenChar(2);
+if debug
+    ListenChar(0);
+    PsychDebugWindowConfiguration;
+end
 global p
+
 % Here we call some default settings  for setting up Psychtoolbox
 PsychDefaultSetup(2);
 
@@ -60,7 +69,8 @@ p.fix.lineWidthPix = 4;
 %----------------------------------------------------------------------
 %                       Load Design Matrix Parameters
 %----------------------------------------------------------------------
-main_dir = '/Users/h/Dropbox/Projects/socialPain';
+% main_dir = '/Users/h/Dropbox/Projects/socialPain';
+main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
 taskname = 'cognitive';
 counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
 countBalMat = readtable(counterbalancefile);
@@ -145,19 +155,11 @@ p1_jitter(trl) = fEnd1 - fStart1;
 %-------------------------------------------------------------------------------
 
 if string(countBalMat.cue_type{trl}) == 'low'
-<<<<<<< HEAD
-  cue_low_dir = fullfile(main_dir,'stimuli','cue','scl');
-  cueImage = fullfile(main_dir,'sandbox',countBalMat.cue_image{trl});
-elseif string(countBalMat.cue_image{trl}) == 'high'
-  cue_high_dir = fullfile(main_dir,'stimuli','cue','sch');
-  cueImage = fullfile(main_dir,'sandbox',countBalMat.cue_image{trl});
-=======
   cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
   cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
 elseif string(countBalMat.cue_type{trl}) == 'high'
   cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
   cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
->>>>>>> 08751b5ccbfb474e3518cd8ad555df95dcdd8560
 
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);

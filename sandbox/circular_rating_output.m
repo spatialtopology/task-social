@@ -89,11 +89,15 @@ RATINGTITLES = {'INTENSITY'};
 
 % initialize
 Screen('TextSize',p.ptb.window,72);
-if rating_type == 'expect'
-  DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
-elseif rating_type == 'expect'
-    DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
-DrawFormattedText(p.ptb.window,'.','center','center',255);
+if strcmp(rating_type, 'expect')
+    DrawFormattedText(p.ptb.window,'expect','center','center',255);
+%     DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
+elseif strcmp(rating_type, 'actual')
+    DrawFormattedText(p.ptb.window,'actual','center','center',255);
+%     DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
+
+end
+% DrawFormattedText(p.ptb.window,'.','center','center',255);
 timing.initialized = Screen('Flip',p.ptb.window);
 
 cursor.x = cursor.xcenter-4;
@@ -163,7 +167,7 @@ while GetSecs < timing.initialized + duration
        % Flip to the screen
        % add rating indicator ball
        Screen('CopyWindow',dspl.cscale.w,window);
-       Screen('FillOval',window,[1 1 1],[[cursor.x cursor.y]-			cursor.size [cursor.x cursor.y]+cursor.size]);
+       Screen('FillOval',window,[1 1 1],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
        Screen('Flip', p.ptb.window);
        remainder_time = duration-0.5-RT;
        WaitSecs(remainder_time);
