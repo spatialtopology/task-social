@@ -70,10 +70,13 @@ countBalMat = readtable(counterbalancefile);
 %----------------------------------------------------------------------
 %                       Load Circular scale
 %----------------------------------------------------------------------
-image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
-image_scale_filename = ['task-', countBalMat.condition_name{1}, '_scale.jpg'];
-image_scale = fullfile(image_filepath, image_scale_filename);
+% image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
+% image_scale_filename = ['task-', countBalMat.condition_name{1}, '_scale.jpg'];
+% image_scale = fullfile(image_filepath, image_scale_filename);
 
+image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
+image_scale_filename = ['task-', taskname, '_scale.png'];
+image_scale = fullfile(image_filepath, image_scale_filename);
 
 %----------------------------------------------------------------------
 %                       Load Jitter Matrix
@@ -171,11 +174,12 @@ WaitSecs(1);
 % 3) log rating decision RT time
 % 4) remove onscreen after 4 sec
 
+imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 p3_ratingPresent(trl) = GetSecs;
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale);
+[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
 
 p3_ratingDecideOnset(trl) = buttonPressOnset;
-% p3_behavioralDecision(trl) = trajectory;
+rating_Trajectory{trl,1} = trajectory;
 p3_decisionRT(trl) = RT;
 
 %-------------------------------------------------------------------------------
@@ -212,7 +216,7 @@ video_file = fullfile(dir_video, video_filename);
 
 % videoFile = strcat([main_dir filesep 'vw121t1aeaff_1-180_.mp4']);
 movie_time = video_Xiaochun(video_file , p );
-p5_video(trl) = movie_time
+p5_video(trl) = movie_time;
 
 %-------------------------------------------------------------------------------
 %                                6. post evaluation rating
@@ -227,11 +231,10 @@ p5_video(trl) = movie_time
 % 3) log rating decision RT time
 % 4) remove onscreen after 4 sec
 
-p6_ratingPresent = GetSecs;
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale);
-
+p6_ratingPresent(trl) = GetSecs;
+[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
 p6_ratingDecideOnset(trl) = buttonPressOnset;
-% p6_behavioralDecision(trl) = trajectory;
+rating_Trajectory{trl,2} = trajectory;
 p6_decisionRT(trl) = RT;
 
 end
