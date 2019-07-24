@@ -130,9 +130,6 @@ for trl = 1:size(countBalMat,1)
 %-------------------------------------------------------------------------------
 %                             1. Fixtion Jitter 0-4 sec
 %-------------------------------------------------------------------------------
-% #############
-% FORLOOPSTART
-% ##############
 % 1) get jitter
 jitter1 = 4;
 % 2) Draw the fixation cross in p.ptb.p.ptb.white, set it to the center of our screen and
@@ -152,26 +149,20 @@ p1_jitter(trl) = fEnd1 - fStart1;
 %-------------------------------------------------------------------------------
 % 1) log cue presentation time
 cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
-% instructTex = Screen('MakeTexture', w.win, imread([defaults.path.stimpractice filesep 'instruction.jpg']));
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 Screen('Flip',p.ptb.window);
 p2_cue(trl) = GetSecs; % save output
 WaitSecs(1);
-% 10 random social bars
+
 
 %-------------------------------------------------------------------------------
 %                             3. expectation rating
 %-------------------------------------------------------------------------------
 % OUTPUT:
-% p3_ratingPresent
-% p3_ratingDecideOnset
-% p3_behavioralDecision
-% p3_decisionRT
-
-% 1) log rating presentation time
-% 2) log rat ing decision time
-% 3) log rating decision RT time
+% 1) log rating presentation time: p3_ratingPresent
+% 2) log rating click time: p3_ratingDecideOnset
+% 3) log rating decision RT time: p3_decisionRT
 % 4) remove onscreen after 4 sec
 
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
@@ -204,17 +195,12 @@ p4_jitter(trl) = fEnd2 - fStart2;
 %                                  5. vicarious
 %-------------------------------------------------------------------------------
 % STEPS
-% 0) question Same Different
-% 1) load image
-% 2) response
-
 % OUTPUT
 % p5_administer
 % 1) video
 video_filename = [countBalMat.video_filename{trl}];
 video_file = fullfile(dir_video, video_filename);
 
-% videoFile = strcat([main_dir filesep 'vw121t1aeaff_1-180_.mp4']);
 movie_time = video_Xiaochun(video_file , p );
 p5_video(trl) = movie_time;
 
@@ -222,13 +208,9 @@ p5_video(trl) = movie_time;
 %                                6. post evaluation rating
 %-------------------------------------------------------------------------------
 % OUTPUT
-% p6_ratingPresent
-% p6_ratingDecideOnset
-% p6_behavioralDecision
-% p6_decisionRT
-% 1) log rating presentation time
-% 2) log rat ing decision time
-% 3) log rating decision RT time
+% 1) log rating presentation time: p6_ratingPresent
+% 2) log rating click time: p6_ratingDecideOnset
+% 3) log rating decision RT time: p6_decisionRT
 % 4) remove onscreen after 4 sec
 
 p6_ratingPresent(trl) = GetSecs;
@@ -242,12 +224,19 @@ end
 %                                   save parameter
 %-------------------------------------------------------------------------------
 
-T = table(p1_fixationPresent , p1_jitter,p2_cue,p3_ratingPresent,p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,...
-p5_video,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
+sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%02d', sub)), 'beh' );
 
-saveDir = main_dir;
-saveFileName = fullfile(saveDir, [strcat(sub), '_testparameters_video.csv']);
+T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
+p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
+p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
+saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%02d', sub)), '_task-',taskname,'_beh.csv' ]);
 writetable(T,saveFileName)
+% save mouse trajectory
+trajectory_table = rating_Trajectory;
+
+traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%02d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
+save(traject_saveFileName, 'rating_Trajectory');
+
 % end
 % Clear the screen
 sca;
