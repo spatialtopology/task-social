@@ -90,18 +90,18 @@ RATINGTITLES = {'INTENSITY'};
 % initialize
 Screen('TextSize',p.ptb.window,72);
 if strcmp(rating_type, 'expect')
-    DrawFormattedText(p.ptb.window,'expect','center','center',255);
+    DrawFormattedText(p.ptb.window,'expect', p.ptb.xCenter,dspl.screenHeight/2+150,255);
 %     DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
 elseif strcmp(rating_type, 'actual')
-    DrawFormattedText(p.ptb.window,'actual','center','center',255);
+    DrawFormattedText(p.ptb.window,'actual', p.ptb.xCenter,dspl.screenHeight/2+150,255);
 %     DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
 
 end
 % DrawFormattedText(p.ptb.window,'.','center','center',255);
 timing.initialized = Screen('Flip',p.ptb.window);
 
-cursor.x = cursor.xcenter-4;
-cursor.y = cursor.ycenter+242;
+cursor.x = cursor.xcenter;
+cursor.y = cursor.ycenter+230;
 
 sample = 1;
 SetMouse(cursor.xcenter,cursor.ycenter);
@@ -151,9 +151,9 @@ while GetSecs < timing.initialized + duration
     % produce screen
     Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
     if strcmp(rating_type, 'expect')
-        DrawFormattedText(p.ptb.window,'expect','center','center',255);
+        DrawFormattedText(p.ptb.window,'expect','center',dspl.screenHeight/2+150,255);
     elseif strcmp(rating_type, 'actual')
-        DrawFormattedText(p.ptb.window,'actual','center','center',255);
+        DrawFormattedText(p.ptb.window,'actual','center',dspl.screenHeight/2+150,255);
     end
     % add rating indicator ball
     Screen('FillOval',p.ptb.window,[255 0 0],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
@@ -168,9 +168,9 @@ while GetSecs < timing.initialized + duration
 %           p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
        Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
        if strcmp(rating_type, 'expect') 
-           DrawFormattedText(p.ptb.window,'expect','center','center',255);
+           DrawFormattedText(p.ptb.window,'expect','center',dspl.screenHeight/2+150,255);
        elseif strcmp(rating_type, 'actual')
-           DrawFormattedText(p.ptb.window,'actual','center','center',255);
+           DrawFormattedText(p.ptb.window,'actual','center',dspl.screenHeight/2+150,255);
        end
        Screen('FillOval',p.ptb.window,[1 1 1],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
        Screen('Flip', p.ptb.window);
@@ -178,7 +178,8 @@ while GetSecs < timing.initialized + duration
        WaitSecs(remainder_time);
     end
 
-    end
 end
 
-Screen('CloseAll')
+
+end
+

@@ -6,9 +6,7 @@
 %----------------------------------------------------------------------
 
 % Clear the workspace and the screen
-sca;jjj
-close all;
-clearvars;
+sca;
 %Initial
 debug     = 1;   % PTB Debugging
 AssertOpenGL;
@@ -200,7 +198,7 @@ WaitSecs(1)
 % p4_jitter(trl) = fEnd2 - fStart2;
 
 %-------------------------------------------------------------------------------
-DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
+% DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 % Screen('Flip',p.ptb.window);
 % WaitSecs(0.35);
