@@ -148,13 +148,18 @@ p1_jitter(trl) = fEnd1 - fStart1;
 %                                  2. cue 1s
 %-------------------------------------------------------------------------------
 % 1) log cue presentation time
-cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+if string(countBalMat.cue_type{trl}) == 'low'
+  cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+  cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+elseif string(countBalMat.cue_type{trl}) == 'high'
+  cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+  cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 Screen('Flip',p.ptb.window);
-p2_cue(trl) = GetSecs; % save output
-WaitSecs(1);
-
+% p2_cue(trl) = GetSecs; % save output
+WaitSecs(1)
 
 %-------------------------------------------------------------------------------
 %                             3. expectation rating
@@ -219,6 +224,7 @@ p6_ratingDecideOnset(trl) = buttonPressOnset;
 rating_Trajectory{trl,2} = trajectory;
 p6_decisionRT(trl) = RT;
 
+end
 end
 %-------------------------------------------------------------------------------
 %                                   save parameter
