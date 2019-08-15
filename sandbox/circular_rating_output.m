@@ -90,10 +90,10 @@ RATINGTITLES = {'INTENSITY'};
 % initialize
 Screen('TextSize',p.ptb.window,72);
 if strcmp(rating_type, 'expect')
-    DrawFormattedText(p.ptb.window,'expect', p.ptb.xCenter,dspl.screenHeight/2+150,255);
+    DrawFormattedText(p.ptb.window,'expect','center',dspl.screenHeight/2+150,255);
 %     DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
 elseif strcmp(rating_type, 'actual')
-    DrawFormattedText(p.ptb.window,'actual', p.ptb.xCenter,dspl.screenHeight/2+150,255);
+    DrawFormattedText(p.ptb.window,'actual', 'center',dspl.screenHeight/2+150,255);
 %     DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
 
 end
