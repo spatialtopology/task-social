@@ -7,15 +7,19 @@
 
 % Clear the workspace and the screen
 sca;
+close all;
+clearvars;
 %Initial
-debug     = 1;   % PTB Debugging
-AssertOpenGL;
-commandwindow;
-ListenChar(2);
-if debug
-    ListenChar(0);
-    PsychDebugWindowConfiguration;
-end
+% debug     = 1;   % PTB Debugging
+% 
+% AssertOpenGL;
+% commandwindow;
+% ListenChar(2);
+% if debug
+%     ListenChar(0);
+%     PsychDebugWindowConfiguration;
+% end
+Screen('Preference', 'SkipSyncTests', 1);
 global p
 
 % Here we call some default settings  for setting up Psychtoolbox
@@ -31,9 +35,10 @@ p.ptb.screenNumber            = max(screens);
 % Define black and white
 p.ptb.white                   = WhiteIndex(p.ptb.screenNumber);
 p.ptb.black                   = BlackIndex(p.ptb.screenNumber);
+p.ptb.grey                    = p.ptb.white / 2;
 
 % Open an on screen window
-[p.ptb.window, p.ptb.rect]    = PsychImaging('OpenWindow', p.ptb.screenNumber, p.ptb.black);
+[p.ptb.window, p.ptb.rect]    = PsychImaging('OpenWindow', p.ptb.screenNumber,p.ptb.black    );
 
 % Get the size of the on screen window
 [p.ptb.screenXpixels, p.ptb.screenYpixels] = Screen('WindowSize', p.ptb.window);
@@ -162,7 +167,7 @@ elseif string(countBalMat.cue_type{trl}) == 'high'
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 Screen('Flip',p.ptb.window);
-% p2_cue(trl) = GetSecs; % save output
+p2_cue(trl) = GetSecs; % save output
 WaitSecs(1)
 
 
@@ -180,29 +185,7 @@ WaitSecs(1)
 % 3) log rating decision RT time
 % 4) remove onscreen after 4 sec
 
-% present rating screen "expect" for 350ms
-%-------------------------------------------------------------------------------
-
-% % 1) get jitter
-% jitter2 = 1;
-% % 2) Draw the fixation cross in white, set it to the center of our screen and
-% % set good quality antialiasing
-% Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-%    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-% Screen('Flip', p.ptb.window);
-% fStart2 = GetSecs;
-% WaitSecs(jitter2);
-% fEnd2 = GetSecs;
-% save Parameters
-% p4_fixationPresent(trl) = fStart2;
-% p4_jitter(trl) = fEnd2 - fStart2;
-
-%-------------------------------------------------------------------------------
-% DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-% Screen('Flip',p.ptb.window);
-% WaitSecs(0.35);
-
 p3_ratingPresent(trl) = GetSecs;
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
 
@@ -315,21 +298,7 @@ WaitSecs(0.5);
 % 3) log rating decision RT time
 % 4) remove onscreen after 4 sec
 %-------------------------------------------------------------------------------
-% % 1) get jitter
-% jitter2 = 1;
-% % 2) Draw the fixation cross in white, set it to the center of our screen and
-% % set good quality antialiasing
-% Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-%    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-% Screen('Flip', p.ptb.window);
-% fStart2 = GetSecs;
-% WaitSecs(jitter2);
-% fEnd2 = GetSecs;
-% % save Parameters
-% p4_fixationPresent(trl) = fStart2;
-% p4_jitter(trl) = fEnd2 - fStart2;
-% %-------------------------------------------------------------------------------
-%
+
 % DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
 % Screen('Flip',p.ptb.window);
 % WaitSecs(0.35);
@@ -353,7 +322,8 @@ T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
 p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
 p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
 saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%02d', sub)), '_task-',taskname,'_beh.csv' ]);
-writetable(T,saveFileName)
+save_table_with_number(saveFileName, T)
+% writetable(T,saveFileName)
 % save mouse trajectory
 trajectory_table = rating_Trajectory;
 
@@ -362,3 +332,23 @@ save(traject_saveFileName, 'rating_Trajectory');
 
 % Clear the screen
 sca;
+
+% 
+% %-------------------------------------------------------------------------------
+% %                                   Function
+% %-------------------------------------------------------------------------------
+% function save_table_with_number(filename, data)
+% [f_path, f_name, f_ext] = fileparts(filename);
+% % if isempty(f_ext)
+% %     f_ext = '.csv';
+% %     filename = fullfile(f_path, [f_name, f_ext]);
+% % end
+% 
+% if exist(filename, 'file')
+%     f_dir = dir(fullfile(f_path, [f_name, '*', f_ext]);
+%     f_str = lower(springf('%s*', f_dir.name);
+%     f_num = sscanf(f_str, [f_name, '%d', f_ext, '*']);
+%     new_num = max(f_num) + 1;
+%     savefilename = fullfile(f_path, [f_name, springf('%d', new_num), f_ext]);
+%     writetable(data,savefilename)
+% end
