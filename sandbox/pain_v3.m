@@ -11,6 +11,7 @@ close all;
 clearvars;
 
 global p
+Screen('Preference', 'SkipSyncTests', 1);
 % Here we call some default settings  for setting up Psychtoolbox
 PsychDefaultSetup(2);
 
@@ -60,18 +61,21 @@ p.fix.lineWidthPix = 4;
 %----------------------------------------------------------------------
 %                       Load Design Matrix Parameters
 %----------------------------------------------------------------------
-main_dir = '/Users/h/Dropbox/Projects/socialPain';
+% main_dir = '/Users/h/Dropbox/Projects/socialPain';
+main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
+cue_low_dir =  strcat([main_dir, '/stimuli/cue2/scl']);%'/Users/h/Dropbox/Projects/socialPain/stimuli/cue2/scl';
+cue_high_dir =  strcat([main_dir, '/stimuli/cue2/sch']);
 taskname = 'pain';
 counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
 countBalMat = readtable(counterbalancefile);
 
+
 %----------------------------------------------------------------------
 %                       Load Circular scale
 %----------------------------------------------------------------------
-image_filepath = fullfile(main_dir, filesep, 'stimuli');
-image_scale_filename = strcat(['task-', countBalMat.condition_name{1}, '_scale.jpg']);
-image_scale = fullfile(image_filepath, filesep, image_scale_filename);
-
+image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
+image_scale_filename = ['task-', taskname, '_scale.png'];
+image_scale = fullfile(image_filepath, image_scale_filename);
 
 
 %----------------------------------------------------------------------
@@ -82,6 +86,25 @@ image_scale = fullfile(image_filepath, filesep, image_scale_filename);
 
 
 sub = 1;
+p1_fixationPresent = zeros(size(countBalMat,1),1);
+p1_jitter = zeros(size(countBalMat,1),1);
+p2_cue = zeros(size(countBalMat,1),1);
+p3_ratingPresent = zeros(size(countBalMat,1),1);
+p3_ratingDecideOnset  = zeros(size(countBalMat,1),1);
+% p3_ratingTrajectory  = cell(size(countBalMat,1),1); % Cell
+p3_decisionRT  = zeros(size(countBalMat,1),1);
+p4_fixationPresent  = zeros(size(countBalMat,1),1);
+p4_jitter  = zeros(size(countBalMat,1),1);
+p5_responseOnset  = zeros(size(countBalMat,1),1);
+p5_responseKey  = zeros(size(countBalMat,1),1);
+p5_RT  = zeros(size(countBalMat,1),1);
+p5_imageAttr  = zeros(size(countBalMat,1),1);
+p6_ratingPresent = zeros(size(countBalMat,1),1);
+p6_ratingDecideOnset = zeros(size(countBalMat,1),1);
+% p6_ratingTrajectory = cell(size(countBalMat,1),1); % Cell
+p6_decisionRT = zeros(size(countBalMat,1),1);
+
+rating_Trajectory = cell(size(countBalMat,1),2);
 %----------------------------------------------------------------------
 %                       Keyboard information
 %----------------------------------------------------------------------
@@ -108,9 +131,6 @@ for trl = 1:size(countBalMat,1)
 %-------------------------------------------------------------------------------
 %                             1. Fixtion Jitter 0-4 sec
 %-------------------------------------------------------------------------------
-% #############
-% FORLOOPSTART
-% ##############
 % 1) get jitter
 jitter1 = 4;
 % 2) Draw the fixation cross in p.ptb.p.ptb.white, set it to the center of our screen and
@@ -122,49 +142,45 @@ Screen('Flip', p.ptb.window);
 WaitSecs(jitter1);
 fEnd1 = GetSecs;
 % save Parameters
-p1_fixationPresent = fStart1;
-p1_jitter = fEnd1 - fStart1;
+p1_fixationPresent(trl) = fStart1;
+p1_jitter(trl) = fEnd1 - fStart1;
 
 %-------------------------------------------------------------------------------
 %                                  2. cue 1s
 %-------------------------------------------------------------------------------
 % 1) log cue presentation time
 if string(countBalMat.cue_type{trl}) == 'low'
-  cueImage = fullfile(main_dir,filesep,'sandbox',filesep,'social_10_M723_STD118.bmp');
+  cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+  cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
 elseif string(countBalMat.cue_type{trl}) == 'high'
-  cueImage = fullfile(main_dir,filesep,'sandbox',filesep,'social_12_M686_STD148.bmp');
-end
-% instructTex = Screen('MakeTexture', w.win, imread([defaults.path.stimpractice filesep 'instruction.jpg']));
+  cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+  cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 Screen('Flip',p.ptb.window);
-p2_cue = GetSecs; % save output
-WaitSecs(1);
-% 10 random social bars
+% p2_cue(trl) = GetSecs; % save output
+WaitSecs(1)
 
 %-------------------------------------------------------------------------------
 %                             3. expectation rating
 %-------------------------------------------------------------------------------
 % OUTPUT:
-% p3_ratingPresent
-% p3_ratingDecideOnset
-% p3_behavioralDecision
-% p3_decisionRT
-
-% 1) log rating presentation time
-% 2) log rat ing decision time
-% 3) log rating decision RT time
+% 1) log rating presentation time: p3_ratingPresent
+% 2) log rating click time: p3_ratingDecideOnset
+% 3) log rating decision RT time: p3_decisionRT
 % 4) remove onscreen after 4 sec
 
-p3_ratingPresent = GetSecs;
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale);
+imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+p3_ratingPresent(trl) = GetSecs;
+[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
 
-p3_ratingDecideOnset = buttonPressOnset;
-p3_behavioralDecision = trajectory;
-p3_decisionRT = RT;
+p3_ratingDecideOnset(trl) = buttonPressOnset;
+rating_Trajectory{trl,1} = trajectory;
+p3_decisionRT(trl) = RT;
 
 %-------------------------------------------------------------------------------
-%                             4. Fixtion Jitter 0-4 sec
+%                             4. Fixtion Jitter 0-2 sec
 %-------------------------------------------------------------------------------
 
 % 1) get jitter
@@ -178,8 +194,9 @@ Screen('Flip', p.ptb.window);
 WaitSecs(jitter2);
 fEnd2 = GetSecs;
 % save Parameters
-p4_fixationPresent = fStart2;
-p4_jitter = fEnd2 - fStart2;
+p4_fixationPresent(trl) = fStart2;
+p4_jitter(trl) = fEnd2 - fStart2;
+
 %-------------------------------------------------------------------------------
 %                            5. pain
 %-------------------------------------------------------------------------------
@@ -191,25 +208,23 @@ p4_jitter = fEnd2 - fStart2;
 % OUTPUT
 % p5_administer
 % 1) log pain start time
-TEMP = countBalMat.administer(trl);
-Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-% Tt = TriggerThermode(varargin{i+1}, 'USE_BIOPAC',1);
-% Tt = TriggerThermode(TEMP, 'USE_BIOPAC',1);
-
-
 % 1) get jitter
 jitter3 = 4;
-% 2) Draw the fixation cross in white, set it to the center of our screen and
-% set good quality antialiasing
-
+TEMP = countBalMat.administer(trl);
 fStart2 = GetSecs;
 Screen('Flip', p.ptb.window);
-WaitSecs(jitter2);
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+%%%%Tt = TriggerThermode(varargin{i+1}, 'USE_BIOPAC',1);
+Tt = TriggerThermodeSocial(TEMP, 'USE_BIOPAC',1);
+
+% 2) Draw the fixation cross in white, set it to the center of our screen and
+% set good quality antialiasing
+WaitSecs(jitter3);
 fEnd2 = GetSecs;
 % save Parameters
-p4_fixationPresent = fStart2;
-p4_jitter = fEnd2 - fStart2;
+p5_fixationPresent(trl) = fStart2;
+p5_jitter(trl) = fEnd2 - fStart2;
 
 
 % ERASE LATER
@@ -233,27 +248,32 @@ p4_jitter = fEnd2 - fStart2;
 % 4) remove onscreen after 4 sec
 
 
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,rating_image);
-p6_ratingPresent = GetSecs;
-
-p6_ratingDecideOnset = buttonPressOnset;
-p6_behavioralDecision = trajectory;
-p6_decisionRT = RT;
-
+p6_ratingPresent(trl) = GetSecs;
+[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
+p6_ratingDecideOnset(trl) = buttonPressOnset;
+rating_Trajectory{trl,2} = trajectory;
+p6_decisionRT(trl) = RT;
+end
+end
 %-------------------------------------------------------------------------------
 %                                   save parameter
 %-------------------------------------------------------------------------------
+sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%02d', sub)), 'beh' );
 
-T = table(p1_fixationPresent , p1_jitter,p2_cue,p3_ratingPresent,p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_administer,...
-p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
-
-saveDir = main_dir;
-saveFileName = fullfile(saveDir, [num2str(sub), '_testparameters_pain.csv']);
+T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
+p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
+p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
+saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%02d', sub)), '_task-',taskname,'_beh.csv' ]);
 writetable(T,saveFileName)
+% save mouse trajectory
+trajectory_table = rating_Trajectory;
+
+traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%02d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
+save(traject_saveFileName, 'rating_Trajectory');
+
+% end
 % Clear the screen
 sca;
-
-
 
 
 %-------------------------------------------------------------------------------
@@ -261,7 +281,7 @@ sca;
 %-------------------------------------------------------------------------------
 
 
-function [t] = TriggerThermode(temp, varargin)
+function [t] = TriggerThermodeSocial(temp, varargin)
     USE_BIOPAC = false;
 
     for i = 1:length(varargin)
@@ -281,6 +301,7 @@ function [t] = TriggerThermode(temp, varargin)
     % Integer values are simply converted to binary, non integer values are
     % incremented by 128 and converted to binary. So 45 is bin(45) while
     % 45.5 is bin(45+128).
+    temp = temp + 100;
     if(mod(temp,1))
         % note: this will treat all decimal values the same. Specific
         % temperature mapping is determined in PATHWAY software
@@ -303,15 +324,16 @@ function [t] = TriggerThermode(temp, varargin)
     ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_WAIT', 0, 1000000, 0, 0);
 
 
+
     for i=0:7
           % Terminate FIO0 to FIO7 output (reset to 0)
-          ljudObj.AddRequest(ljhandle, LabJack.LabJackUD.IO.PUT_DIGITAL_BIT, i, 0, 0, 0);
+          ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i, 0, 0, 0);
 
           if USE_BIOPAC
               % Terminate CIO3 and EIO7 output (reset to 0)
               % Note: this sends a binary code to biopac channels (likely
               % D8-D15).
-              ljudObj.AddRequest(ljhandle, LabJack.LabJackUD.IO.PUT_DIGITAL_BIT, i+8,0, 0, 0);
+              ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8,0, 0, 0);
           end
     end
 
