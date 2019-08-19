@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import os
+import os, shutil, glob
 import random
 import pandas as pd
 import numpy as np
@@ -28,18 +28,18 @@ def noConsecutiveShuffle(list_key, list_dict, consec_num):
     return trialList
 
 def generateListKey(trial_per_cond):
-    list_stim1 = range(1,trial_per_cond+1) + range(trial_per_cond*2+1, trial_per_cond*3+1 ) # e.g. range(1,8)
-    list_stim2 = range(trial_per_cond+1,trial_per_cond*2+1) + range(trial_per_cond*3+1, trial_per_cond*4+1 )# e.g. range(8,15)
+    list_stim1 = range(1,trial_per_cond+1) + range(trial_per_cond*2+1, trial_per_cond*3+1 ) + range(trial_per_cond*4+1, trial_per_cond*5+1 )# e.g. range(1,8)
+    list_stim2 = range(trial_per_cond+1,trial_per_cond*2+1) + range(trial_per_cond*3+1, trial_per_cond*4+1 ) + range(trial_per_cond*5+1, trial_per_cond*6+1 )## e.g. range(8,15)
     list_dict = {'same':list_stim1, 'diff':list_stim2}
     random.shuffle(list_stim1)
     random.shuffle(list_stim2)
     x = ['same','diff']
-    list_key  = [item for item in x for i in range(trial_per_cond*2)]
+    list_key  = [item for item in x for i in range(trial_per_cond*3)]
     return list_key, list_dict
 
-def shuffleDataFrame(df_subset):
+def shuffleDataFrame(df_subset, consec_num):
     list_key, list_dict = generateListKey(trial_per_cond)
-    list_order = noConsecutiveShuffle(list_key, list_dict, 4)
+    list_order = noConsecutiveShuffle(list_key, list_dict, consec_num)
     # 7) sort based on shuffled sequence
     list_order[:] =  [x - 1 for x in list_order]
     cB = df_subset.reindex(list_order)
@@ -48,24 +48,34 @@ def shuffleDataFrame(df_subset):
 
 # parameters ___________________________________________________________________
 total_block = 2 # how many repeated blocks of this "cognitive" task
-cond_type = 4 # how many conditions are nested under the task
-trial_per_cond = 7 # how many trials under one condition
-administer_items = [50, 100] # what rotation degree are we using
+cond_type = 6 # how many conditions are nested under the task
+trial_per_cond = 6 # how many trials under one condition
+administer_items = [50, 100, 150] # what rotation degree are we using
 counterbalance_freq = 6 # how many counterbalance versions do you want
-saveDir = '/Users/h/Dropbox/Projects/socialPain/design'
-taskname = 'pain'
+consec_num = 4
+saveDir = '/Users/h/Dropbox/Projects/social_influence/design'
+taskname = 'cognitive'
+cue_high_dir = '/Users/h/Dropbox/Projects/social_influence/stimuli/cue/task-' + taskname + '/sch'
+cue_low_dir = '/Users/h/Dropbox/Projects/social_influence/stimuli/cue/task-' + taskname + '/scl'
 # ______________________________________________________________________________
+
+# if task-cognitive_counterbalance_ver-01_block-01.csv exists, delete
+fileList = glob.glob(os.sep.join([saveDir, "task-cognitive_counterbalance*.csv"]))
+# Iterate over the list of filepaths & remove each file.
+for filePath in fileList:
+    try:
+        os.remove(filePath)
+    except OSError:
+        print("Error while deleting file")
+
 
 
 # 1. choose 28 numbers out of 48 and create stimuli columns ____________________
 num_select = []
-# num_select = random.sample(range(1,49),  14)
-num_select = random.sample(range(1,49),  28)
+
+num_select = random.sample(range(1,49),  cond_type*trial_per_cond)
 num_sort = sorted(num_select)
 list_random = random.sample(num_sort, len(num_sort))
-# FIXED NUMBERS
-
-# START FOR LOOP
 
 list1 = list_random[:int(len(list_random)/2)] #[:14] # block 1 or 2
 list2 = list_random[int(len(list_random)/2):] #[14:] # block 1 or 2
@@ -73,23 +83,39 @@ list_newShuffle = list1*2 + list2*2
 df1 = pd.DataFrame(list1*2)
 df2 = pd.DataFrame(list2*2)
 df = pd.DataFrame()
-#
-# mainFileName = saveDir + os.sep + 'task-cognitive_mainDesign_notCounterbalanced.csv'
-# df.to_csv(mainFileName)
-
+# shuffle high/low cues ________________________________________________________
+# grab stimuli list (only allow png files in the list)
+high_cue_list = [file for file in os.listdir(cue_high_dir) if file.endswith('.png')]
+# split high into 2 bins - we will use each bin for one block of high cues
+high_sample = random.sample(high_cue_list, cond_type*trial_per_cond)
+random.shuffle(high_sample)
+hCue1 = high_sample[:int(len(high_sample)/2)]
+hCue2 = high_sample[int(len(high_sample)/2):]
+high_cue = [hCue1, hCue2]
+low_cue_list = [file for file in os.listdir(cue_low_dir) if file.endswith('.png')]
+# split high into 2 bins - we will use each bin for one block of high cues
+low_sample = random.sample(low_cue_list, cond_type*trial_per_cond)
+random.shuffle(low_sample)
+lCue1 = low_sample[:int(len(low_sample)/2)]
+lCue2 = low_sample[int(len(low_sample)/2):]
+low_cue = [lCue1, lCue2]
 for index, df in enumerate([df1, df2]):
+
+
+
+    # randomly shuffle high cues and assign to high rows
     df.columns = ['stimuli_num']
-# df1.columns = ['stimuli_num']
-# df2.columns = ['stimuli_num']
-#
-# 2. create degree list ________________________________________________________
-    df['administer'] = np.repeat(administer_items,14) # add column 50/100
+
+    # 2. create degree list ________________________________________________________
+    df['administer'] = np.repeat(administer_items,len(df)/len(administer_items)) # add column 50/100
 
     # 3. create same different column ______________________________________________
-    df['match'] = np.repeat(['same', 'different', 'same', 'different'], 7) # add column same/different
+    df['match'] = np.repeat(['same', 'different', 'same', 'different','same', 'different'], trial_per_cond) # add column same/different
 
     # 4. created cue list __________________________________________________________
-    df['cue_type'] = np.resize(['high', 'low'], 28)
+    df['cue_type'] = np.resize(['high', 'low'], cond_type*trial_per_cond)
+    df.loc[::2,'cue_image']  = high_cue[index]
+    df.loc[1::2,'cue_image'] = low_cue[index]
     df['random_order'] = range(len(df))
     df_reset = df.reset_index()
 
@@ -98,7 +124,9 @@ for index, df in enumerate([df1, df2]):
     df['cond_type'] = ((df.cue_type == 'low') & (df.administer == administer_items[0])).astype(int) * 1 + \
         ((df.cue_type == 'high') & (df.administer == administer_items[0])).astype(int) * 2 + \
         ((df.cue_type == 'low') & (df.administer == administer_items[1])).astype(int) * 3 + \
-        ((df.cue_type == 'high') & (df.administer == administer_items[1])).astype(int) * 4
+        ((df.cue_type == 'high') & (df.administer == administer_items[1])).astype(int) * 4 +\
+        ((df.cue_type == 'low') & (df.administer == administer_items[2])).astype(int) * 5 + \
+        ((df.cue_type == 'high') & (df.administer == administer_items[2])).astype(int) * 6
     df['condition_name'] = np.repeat(['cognitive'], len(df))
     df['condition_num_filled_in_during_exper'] = 99
     df['block_num'] = int(index+1)
@@ -116,7 +144,7 @@ for index, df in enumerate([df1, df2]):
     df.to_csv(mainFileName)
 
     for cB_ver in range(1,counterbalance_freq):
-        cB = shuffleDataFrame(df)
+        cB = shuffleDataFrame(df, consec_num)
         cB['cB_version'] = cB_ver # assign from for loop number
         cBverFileName = saveDir + os.sep + \
         'task-cognitive_counterbalance_ver-' + str('%02d' % cB_ver)+ \
