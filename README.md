@@ -2,6 +2,11 @@ Repository for social influence on pain/vicarious pain/cognitive difficulty
 
 ## Pain
 * github: https://github.com/canlab/Paradigms_Private/blob/master/PAINGEN_paradigms/TriggerThermode.m
+* ATS. socialinfluence48, 49, 50
+* temperature can go up by 10 degrees per second
+* 48: baseline 36, rate 10, 1.6 sec plateau
+* 49: baseline 36, rate 10, 1.4 sec plateau
+* 50: baseline 36, rate 10, 1.2 sec plateau
 
 ## Vicarious pain
 1. original dataset
@@ -29,12 +34,18 @@ Repository for social influence on pain/vicarious pain/cognitive difficulty
 * Repository: https://figshare.com/articles/A_new_set_of_three_dimensional_stimuli_for_investigating_mental_rotation_processes/1045385
 
 ## To Dos
-- [ ] Extract jitters
-- [ ] Change movie dimension - 8/19 meeting
-- [ ] Change cognitive task duration to 4 sec
-- [ ] Split video participants into half
-- [ ] Use one for block 1, use the other for block 2
-- [ ] Line up cue type "high" low"
-- [ ] Line up cue image
-- [ ] Line up random order
+- [ ] Overall: Extract jitters from ABCD code
+- [ ] Overall: cue type "high" low"
+- [ ] Overall: cue image
+- [ ] Overall: limit rating to semi-circle
+
+- [x] Pain: pilot pain, actual ATS
+- [x] Pain: 4s duration
+
+- [x] Vicarious: Select new videos. code?
+- [ ] Vicarious: Identify video scheme
+- [x] Vicarious: Counterbalance re-do. Split videos into two for the two blocks
+- [x] Vicarious: Use one for block 1, use the other for block 2
+
+- [ ] Cognitive: Change cognitive task duration to 4 sec (currently, it is self-paced)
 
