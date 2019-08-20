@@ -60,8 +60,8 @@ p.fix.lineWidthPix = 4;
 %----------------------------------------------------------------------
 %                       Load Design Matrix Parameters
 %----------------------------------------------------------------------
-% main_dir = '/Users/h/Dropbox/Projects/socialPain';
-main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
+main_dir = '/Users/h/Dropbox/Projects/socialPain';
+% main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
 dir_video = strcat([main_dir, '/stimuli/36_videos_lanlan/']);
 cue_low_dir =  '/Users/h/Dropbox/Projects/socialPain/stimuli/cue/scl';
 cue_high_dir = '/Users/h/Dropbox/Projects/socialPain/stimuli/cue/sch';
