@@ -7,19 +7,25 @@
 
 % Clear the workspace and the screen
 sca;
+clc;
+clear all;
 close all;
 clearvars;
-%Initial
-% debug     = 1;   % PTB Debugging
-% 
-% AssertOpenGL;
-% commandwindow;
-% ListenChar(2);
-% if debug
-%     ListenChar(0);
-%     PsychDebugWindowConfiguration;
-% end
-Screen('Preference', 'SkipSyncTests', 1);
+
+% ---------------------
+% debug mode % Initial
+debug     = 1;   % PTB Debugging
+
+AssertOpenGL;
+commandwindow;
+ListenChar(2);
+if debug
+    ListenChar(0);
+    PsychDebugWindowConfiguration;
+end
+
+% ---------------------
+% Screen('Preference', 'SkipSyncTests', 1);
 global p
 
 % Here we call some default settings  for setting up Psychtoolbox
@@ -72,8 +78,8 @@ p.fix.lineWidthPix = 4;
 %----------------------------------------------------------------------
 %                       Load Design Matrix Parameters
 %----------------------------------------------------------------------
-% main_dir = '/Users/h/Dropbox/Projects/socialPain';
-main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
+main_dir = '/Users/h/Dropbox/Projects/social_influence';
+% main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
 taskname = 'cognitive';
 counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
 countBalMat = readtable(counterbalancefile);
@@ -135,181 +141,215 @@ p.keys.esc                     = KbName('ESCAPE');
 %                            0. Experimental loop
 %-------------------------------------------------------------------------------
 for trl = 1:size(countBalMat,1)
-%-------------------------------------------------------------------------------
-%                             1. Fixtion Jitter 0-4 sec
-%-------------------------------------------------------------------------------
-
-% 1) get jitter
-jitter1 = 4;
-% 2) Draw the fixation cross in p.ptb.p.ptb.white, set it to the center of our screen and
-% set good quality antialiasing
-Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-Screen('Flip', p.ptb.window);
-fStart1 = GetSecs;
-WaitSecs(jitter1);
-fEnd1 = GetSecs;
-% save Parameters
-p1_fixationPresent(trl) = fStart1;
-p1_jitter(trl) = fEnd1 - fStart1;
-
-%-------------------------------------------------------------------------------
-%                                  2. cue 1s
-%-------------------------------------------------------------------------------
-
-if string(countBalMat.cue_type{trl}) == 'low'
-  cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
-  cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
-elseif string(countBalMat.cue_type{trl}) == 'high'
-  cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
-  cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
-
-imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-Screen('Flip',p.ptb.window);
-p2_cue(trl) = GetSecs; % save output
-WaitSecs(1)
-
-
-%-------------------------------------------------------------------------------
-%                             3. expectation rating
-%-------------------------------------------------------------------------------
-% OUTPUT:
-% p3_ratingPresent
-% p3_ratingDecideOnset
-% p3_behavioralDecision
-% p3_decisionRT
-
-% 1) log rating presentation time
-% 2) log rat ing decision time
-% 3) log rating decision RT time
-% 4) remove onscreen after 4 sec
-
-imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-p3_ratingPresent(trl) = GetSecs;
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
-
-p3_ratingDecideOnset(trl) = buttonPressOnset;
-rating_Trajectory{trl,1} = trajectory;
-p3_decisionRT(trl) = RT;
-
-%-------------------------------------------------------------------------------
-%                             4. Fixtion Jitter 0-4 sec
-%-------------------------------------------------------------------------------
-% 1) get jitter
-jitter2 = 1;
-% 2) Draw the fixation cross in white, set it to the center of our screen and
-% set good quality antialiasing
-Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-Screen('Flip', p.ptb.window);
-fStart2 = GetSecs;
-WaitSecs(jitter2);
-fEnd2 = GetSecs;
-% save Parameters
-p4_fixationPresent(trl) = fStart2;
-p4_jitter(trl) = fEnd2 - fStart2;
-
-%-------------------------------------------------------------------------------
-%                          5. cognitive mental rotation task
-%-------------------------------------------------------------------------------
-% STEPS
-% 0) question Same Different
-% 1) load image
-% 2) response
-
-% OUTPUT
-% p5_administer
-% 1) log pain start time
-respToBeMade = true;
-
-image_filepath = strcat([main_dir '/stimuli/cognitive']);
-image_filename = char(countBalMat.image_filename(trl));
-image_rotation = strcat([image_filepath filesep image_filename]);
-
-while respToBeMade == true
-% present rotate image ---------------------------------------------------------
-rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
-Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
-% present scale lines ----------------------------------------------------------
-Yc = 300; % Y coord
-cDist = 20; % vertical line depth
-lXc = -200; % left X coord
-rXc = 200; % right X coord
-lineCoords = [lXc lXc lXc rXc rXc rXc; Yc-cDist Yc+cDist Yc Yc Yc-cDist Yc+cDist];
-Screen('DrawLines', p.ptb.window, lineCoords,...
-    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-% present same diff text -------------------------------------------------------
-textDiff = 'Diff';
-textSame = 'Same';
-textYc = p.ptb.yCenter + Yc + cDist*4;
-textRXc = p.ptb.xCenter + rXc;
-textLXc = p.ptb.xCenter - rXc;
-DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
-DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
-
-% flip screen  -----------------------------------------------------------------
-Screen('Flip',p.ptb.window);
-p5_administer(trl) = GetSecs;
-
-% key press --------------------------------------------------------------------
-[keyIsDown,secs, keyCode] = KbCheck;
-if keyCode(p.keys.esc)
-    ShowCursor;
-    sca;
-    return
-elseif keyCode(p.keys.left)
-    response = 1;
-    respToBeMade = false;
-    Screen('DrawLines', p.ptb.window, lineCoords,...
+    %-------------------------------------------------------------------------------
+    %                             1. Fixtion Jitter 0-4 sec
+    %-------------------------------------------------------------------------------
+    
+    % 1) get jitter
+    jitter1 = 4;
+    % 2) Draw the fixation cross in p.ptb.p.ptb.white, set it to the center of our screen and
+    % set good quality antialiasing
+    Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-    DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
-    DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, [255 0 0]);
-    Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
-    Screen('Flip',p.ptb.window);
-elseif keyCode(p.keys.right)
-    response = 2;
-    respToBeMade = false;
-    Screen('DrawLines', p.ptb.window, lineCoords,...
-        p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-    DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white);
-    DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, [255 0 0]);
-    Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
-    Screen('Flip',p.ptb.window);
-end
-end
-
-p5_responseOnset(trl) = secs;
-p5_responseKey(trl) = response;
-p5_RT(trl) = p5_responseOnset(trl) - p5_administer(trl);
-p5_imageAttr = [];
-WaitSecs(0.5);
-
-%-------------------------------------------------------------------------------
-%                                6. post evaluation rating
-%-------------------------------------------------------------------------------
-% OUTPUT
-% p6_ratingPresent
-% p6_ratingDecideOnset
-% p6_behavioralDecision
-% p6_decisionRT
-% 1) log rating presentation time
-% 2) log rat ing decision time
-% 3) log rating decision RT time
-% 4) remove onscreen after 4 sec
-%-------------------------------------------------------------------------------
-
-% DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
-% Screen('Flip',p.ptb.window);
-% WaitSecs(0.35);
-
-p6_ratingPresent(trl) = GetSecs;
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
-p6_ratingDecideOnset(trl) = buttonPressOnset;
-rating_Trajectory{trl,2} = trajectory;
-p6_decisionRT(trl) = RT;
-
-end
+    Screen('Flip', p.ptb.window);
+    fStart1 = GetSecs;
+    WaitSecs(jitter1);
+    fEnd1 = GetSecs;
+    % save Parameters
+    p1_fixationPresent(trl) = fStart1;
+    p1_jitter(trl) = fEnd1 - fStart1;
+    
+    %-------------------------------------------------------------------------------
+    %                                  2. cue 1s
+    %-------------------------------------------------------------------------------
+    
+    if string(countBalMat.cue_type{trl}) == 'low'
+        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+        cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+    elseif string(countBalMat.cue_type{trl}) == 'high'
+        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+        cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+        
+        imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+        Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
+        Screen('Flip',p.ptb.window);
+        p2_cue(trl) = GetSecs; % save output
+        WaitSecs(1)
+        
+        
+        %-------------------------------------------------------------------------------
+        %                             3. expectation rating
+        %-------------------------------------------------------------------------------
+        % OUTPUT:
+        % p3_ratingPresent
+        % p3_ratingDecideOnset
+        % p3_behavioralDecision
+        % p3_decisionRT
+        
+        % 1) log rating presentation time
+        % 2) log rat ing decision time
+        % 3) log rating decision RT time
+        % 4) remove onscreen after 4 sec
+        
+        imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+        p3_ratingPresent(trl) = GetSecs;
+        [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
+        
+        p3_ratingDecideOnset(trl) = buttonPressOnset;
+        rating_Trajectory{trl,1} = trajectory;
+        p3_decisionRT(trl) = RT;
+        
+        %-------------------------------------------------------------------------------
+        %                             4. Fixtion Jitter 0-4 sec
+        %-------------------------------------------------------------------------------
+        % 1) get jitter
+        jitter2 = 1;
+        % 2) Draw the fixation cross in white, set it to the center of our screen and
+        % set good quality antialiasing
+        Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+            p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+        Screen('Flip', p.ptb.window);
+        fStart2 = GetSecs;
+        WaitSecs(jitter2);
+        fEnd2 = GetSecs;
+        % save Parameters
+        p4_fixationPresent(trl) = fStart2;
+        p4_jitter(trl) = fEnd2 - fStart2;
+        
+        %-------------------------------------------------------------------------------
+        %                          5. cognitive mental rotation task
+        %-------------------------------------------------------------------------------
+        % STEPS
+        % 0) question Same Different
+        % 1) load image
+        % 2) response
+        
+        % OUTPUT
+        % p5_administer
+        % 1) log pain start time
+        respToBeMade = true;
+        
+        image_filepath = strcat([main_dir '/stimuli/cognitive']);
+        image_filename = char(countBalMat.image_filename(trl));
+        image_rotation = strcat([image_filepath filesep image_filename]);
+        
+        % while respToBeMade == true
+        % present rotate image ---------------------------------------------------------
+        rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
+        Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
+        % present scale lines ----------------------------------------------------------
+        Yc = 300; % Y coord
+        cDist = 20; % vertical line depth
+        lXc = -200; % left X coord
+        rXc = 200; % right X coord
+        lineCoords = [lXc lXc lXc rXc rXc rXc; Yc-cDist Yc+cDist Yc Yc Yc-cDist Yc+cDist];
+        Screen('DrawLines', p.ptb.window, lineCoords,...
+            p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+        % present same diff text -------------------------------------------------------
+        textDiff = 'Diff';
+        textSame = 'Same';
+        textYc = p.ptb.yCenter + Yc + cDist*4;
+        textRXc = p.ptb.xCenter + rXc;
+        textLXc = p.ptb.xCenter - rXc;
+        DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
+        DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
+        
+        % flip screen  -----------------------------------------------------------------
+        timing.initialized = Screen('Flip',p.ptb.window);
+        p5_administer(trl) = timing.initialized;
+        duration = 4;
+        while GetSecs < timing.initialized + duration
+            
+            % key press --------------------------------------------------------------------
+            [keyIsDown,secs, keyCode] = KbCheck;
+            if keyCode(p.keys.esc)
+                ShowCursor;
+                sca;
+                return
+            elseif keyCode(p.keys.left)
+                RT = GetSecs - timing.initialized;
+                response = 1;
+                
+                % respToBeMade = false;
+                Screen('DrawLines', p.ptb.window, lineCoords,...
+                    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+                DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
+                DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, [255 0 0]);
+                Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
+                Screen('Flip',p.ptb.window);
+                
+                WaitSecs(0.5);
+                
+                % fill in with fixation cross
+                remainder_time = duration-0.5-RT;
+                Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+                    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+                Screen('Flip', p.ptb.window);
+                WaitSecs(remainder_time);
+%                 while GetSecs < timing.initialized + duration %4-RT-0.5
+%                     % fixation screen
+%                     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+%                         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+%                     Screen('Flip', p.ptb.window);
+%                 end
+            elseif keyCode(p.keys.right)
+                
+                RT = GetSecs - timing.initialized;
+                response = 2;
+                % respToBeMade = false;
+                Screen('DrawLines', p.ptb.window, lineCoords,...
+                    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+                DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white);
+                DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, [255 0 0]);
+                Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
+                Screen('Flip',p.ptb.window);
+                WaitSecs(0.5);
+                % fill in with fixation cross
+                remainder_time = duration-0.5-RT;
+                Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+                    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+                Screen('Flip', p.ptb.window);
+                WaitSecs(remainder_time);
+                %                 while GetSecs <  4-RT-0.5 %timing.initialized + duration
+                %                     % fixation screen
+                %                     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+                %                         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+                %                     Screen('Flip', p.ptb.window);
+                %                 end
+            end
+        end
+        
+        p5_responseOnset(trl) = secs;
+        p5_responseKey(trl) = response;
+        p5_RT(trl) = p5_responseOnset(trl) - p5_administer(trl);
+        p5_imageAttr = [];
+        WaitSecs(0.5);
+        
+        %-------------------------------------------------------------------------------
+        %                                6. post evaluation rating
+        %-------------------------------------------------------------------------------
+        % OUTPUT
+        % p6_ratingPresent
+        % p6_ratingDecideOnset
+        % p6_behavioralDecision
+        % p6_decisionRT
+        % 1) log rating presentation time
+        % 2) log rat ing decision time
+        % 3) log rating decision RT time
+        % 4) remove onscreen after 4 sec
+        %-------------------------------------------------------------------------------
+        
+        % DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
+        % Screen('Flip',p.ptb.window);
+        % WaitSecs(0.35);
+        
+        p6_ratingPresent(trl) = GetSecs;
+        [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
+        p6_ratingDecideOnset(trl) = buttonPressOnset;
+        rating_Trajectory{trl,2} = trajectory;
+        p6_decisionRT(trl) = RT;
+        
+    end
 end
 
 %-------------------------------------------------------------------------------
@@ -319,8 +359,8 @@ end
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%02d', sub)), 'beh' );
 
 T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
-p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
-p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
+    p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
+    p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
 saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%02d', sub)), '_task-',taskname,'_beh.csv' ]);
 save_table_with_number(saveFileName, T)
 % writetable(T,saveFileName)
@@ -333,7 +373,7 @@ save(traject_saveFileName, 'rating_Trajectory');
 % Clear the screen
 sca;
 
-% 
+%
 % %-------------------------------------------------------------------------------
 % %                                   Function
 % %-------------------------------------------------------------------------------
@@ -343,7 +383,7 @@ sca;
 % %     f_ext = '.csv';
 % %     filename = fullfile(f_path, [f_name, f_ext]);
 % % end
-% 
+%
 % if exist(filename, 'file')
 %     f_dir = dir(fullfile(f_path, [f_name, '*', f_ext]);
 %     f_str = lower(springf('%s*', f_dir.name);
