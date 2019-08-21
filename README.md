@@ -1,9 +1,9 @@
 # Repository for social influence on 
-[1. pain](## Pain)
-[2. vicarious pain](## Vicarious pain)
-[3. cognitive difficulty](## Cognitive) 
+[1. pain](##pain)
+[2. vicarious pain](##vicarious-pain)
+[3. cognitive difficulty](##cognitive) 
 
-## Pain
+## pain
 * github: https://github.com/canlab/Paradigms_Private/blob/master/PAINGEN_paradigms/TriggerThermode.m
 * ATS. socialinfluence48, 49, 50
 * temperature can go up by 10 degrees per second
@@ -11,7 +11,7 @@
 * 49 C: baseline 36, rate 10, 1.4 sec plateau
 * 50 C: baseline 36, rate 10, 1.2 sec plateau
 
-## Vicarious pain
+## vicarious-pain
 1. original dataset
 	* UNBC-McMaster Shoulder Pain Expression Archive Database
 	* http://www.pitt.edu/~emotion/um-spread.htm
@@ -32,7 +32,7 @@
 	2. stimuli in CANlab google drive
 		* https://drive.google.com/open?id=1w6wBWPvWoPUGIM22g2jW7ynzeiy3S5oB
 
-## Cognitive 
+## cognitive 
 * Mental rotation task
 * **Reference**: Ganis, G., & Kievit, R. A. (2015). A New Set of Three-Dimensional Shapes for Investigating Mental Rotation Processes: Validation Data and Stimulus Set. Journal of Open Psychology Data, 3(1), e3. DOI: http://doi.org/10.5334/jopd.ai
 * Repository: https://figshare.com/articles/A_new_set_of_three_dimensional_stimuli_for_investigating_mental_rotation_processes/1045385
