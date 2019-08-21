@@ -1,7 +1,7 @@
 # Repository for social influence on 
-[1. pain](##pain)
-[2. vicarious pain](##vicarious-pain)
-[3. cognitive difficulty](##cognitive) 
+[1. pain](##pain)<br/>
+[2. vicarious pain](##vicarious-pain)<br/>
+[3. cognitive difficulty](##cognitive)<br/>
 
 ## pain
 * github: https://github.com/canlab/Paradigms_Private/blob/master/PAINGEN_paradigms/TriggerThermode.m
