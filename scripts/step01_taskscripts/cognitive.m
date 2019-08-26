@@ -1,6 +1,3 @@
-% start from scratch
-
-
 %----------------------------------------------------------------------
 %                       Window Parameters
 %----------------------------------------------------------------------
@@ -78,7 +75,7 @@ p.fix.lineWidthPix = 4;
 %----------------------------------------------------------------------
 %                       Load Design Matrix Parameters
 %----------------------------------------------------------------------
-main_dir = '/Users/h/Dropbox/Projects/social_influence';
+main_dir = '/Users/h/Documents/projects_local/social_influence';
 % main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
 taskname = 'cognitive';
 counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
@@ -357,20 +354,22 @@ end
 %-------------------------------------------------------------------------------
 % Save onset time
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%02d', sub)), 'beh' );
-
+if ~exist(sub_save_dir, 'dir')
+    mkdir(sub_save_dir)
+end
 T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
     p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
     p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
 saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%02d', sub)), '_task-',taskname,'_beh.csv' ]);
-save_table_with_number(saveFileName, T)
-% writetable(T,saveFileName)
+
+writetable(T,saveFileName)
 % save mouse trajectory
 trajectory_table = rating_Trajectory;
-
 traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%02d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
 save(traject_saveFileName, 'rating_Trajectory');
 
 % Clear the screen
+close all;
 sca;
 
 %

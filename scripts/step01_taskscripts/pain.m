@@ -61,8 +61,9 @@ p.fix.lineWidthPix = 4;
 %----------------------------------------------------------------------
 %                       Load Design Matrix Parameters
 %----------------------------------------------------------------------
+main_dir = '/Users/h/Documents/projects_local/social_influence';
 % main_dir = '/Users/h/Dropbox/Projects/socialPain';
-main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
+% main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
 cue_low_dir =  strcat([main_dir, '/stimuli/cue2/scl']);%'/Users/h/Dropbox/Projects/socialPain/stimuli/cue2/scl';
 cue_high_dir =  strcat([main_dir, '/stimuli/cue2/sch']);
 taskname = 'pain';
