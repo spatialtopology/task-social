@@ -1,6 +1,8 @@
 # Repository for social influence on <br/>[1. pain](##pain)<br/>[2. vicarious pain](##vicarious-pain)<br/>[3. cognitive difficulty](##cognitive)<br/>
 
-![ ](https://github.com/spacetop-admin/figures/blob/master/fig_socialinfluence.png)
+## run code from scripts > step01_taskscripts
+
+![socialinfluence](https://github.com/spacetop-admin/figures/blob/master/fig_socialinfluence.png)
 ## pain
 * code from github: https://github.com/canlab/Paradigms_Private/blob/master/PAINGEN_paradigms/TriggerThermode.m
 * ATS. @Boulder rm173 socialinfluence48, socialinfluence49, socialinfluence50
