@@ -100,14 +100,19 @@ end
 % DrawFormattedText(p.ptb.window,'.','center','center',255);
 timing.initialized = Screen('Flip',p.ptb.window);
 
-cursor.x = cursor.xcenter;
-cursor.y = cursor.ycenter+230;
-
+cursor.x = cursor.xcenter-242;
+cursor.y = cursor.ycenter+250; %+230
+% cursor.xcenter-250, cursor.ycenter+160
 sample = 1;
 SetMouse(cursor.xcenter,cursor.ycenter);
+% SetMouse(cursor.x,cursor.y);
 nextsample = GetSecs;
 
 buttonpressed  = false;
+
+xlim = cursor.xcenter;
+ylim = cursor.ycenter+240;
+rlim = 270;
 
 while GetSecs < timing.initialized + duration
 
@@ -133,21 +138,23 @@ while GetSecs < timing.initialized + duration
     % calculate displacement
     cursor.x = (cursor.x + x-cursor.xcenter) * TRACKBALL_MULTIPLIER;
     cursor.y = (cursor.y + y-cursor.ycenter) * TRACKBALL_MULTIPLIER;
+    
 
-    % check bounds
-    if cursor.x > cursor.xmax
-        cursor.x = cursor.xmax;
-    elseif cursor.x < cursor.xmin
-        cursor.x = cursor.xmin;
-    end
+%     % check bounds - square
+%     if cursor.x > cursor.xmax
+%         cursor.x = cursor.xmax;
+%     elseif cursor.x < cursor.xmin
+%         cursor.x = cursor.xmin;
+%     end
+% 
+%     if cursor.y > cursor.ymax
+%         cursor.y = cursor.ymax;
+%     elseif cursor.y < cursor.ymin
+%         cursor.y = cursor.ymin;
+%     end
 
-    if cursor.y > cursor.ymax
-        cursor.y = cursor.ymax;
-    elseif cursor.y < cursor.ymin
-        cursor.y = cursor.ymin;
-    end
 
-
+    [cursor.x, cursor.y, xlim, ylim] = limit(cursor.x, cursor.y, cursor.xcenter-250, cursor.ycenter+160, rlim, xlim,ylim);
     % produce screen
     Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
     if strcmp(rating_type, 'expect')
@@ -181,5 +188,22 @@ while GetSecs < timing.initialized + duration
 end
 
 
+end
+
+
+function [x, y, xlim, ylim] = limit(x, y, xcenter, ycenter, r, xlim,ylim)
+if (y<=ycenter) && (((x-xcenter)^2 + (y-ycenter)^2) <= r^2)
+  xlim = x;
+  ylim = y;
+elseif (y<=ycenter) && (((x-xcenter)^2 + (y-ycenter)^2) > r^2)
+  x = xlim;
+  y = ylim;
+elseif y>ycenter && (((x-xcenter)^2 + (y-ycenter)^2) <= r^2)
+  xlim = x;
+  y = ycenter;
+elseif y>ycenter && (((x-xcenter)^2 + (y-ycenter)^2) > r^2)
+  x = xlim;
+  y = ycenter;
+end
 end
 

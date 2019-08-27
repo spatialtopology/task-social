@@ -163,27 +163,8 @@ fStart2 = GetSecs;
 Screen('Flip', p.ptb.window);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-%%%%Tt = TriggerThermode(varargin{i+1}, 'USE_BIOPAC',1);
-% Tt = TriggerThermodeSocial(TEMP, 'USE_BIOPAC',1);
-% start
-ip = '10.31.46.212';
-Tt = main(ip, 20121,4,code)
-Ts = main(ip, 20121,5,code);
-% MAIN wrapper function to demonstrate the socket communication with
-% PATHWAY.
-% usage: type in command window with approriate input variables:
-%        main(hostName, portNum, commandId, parameter)
-%
-% Input:
-% 1. hostName - host address ('xxx.xxx.xxx.xxx' or 'localhost')
-% 2. portNum - port number
-% 3. commandId - the command code (as double)
-% 4. parameter - parameter for command (optional, depending on command Id)
-%
-% Written by Yael Frankel
-%
-% Last updated:
-% March, 25th, 2014
+% pilot trigger thermode Luke Chang's lab
+Tt = TriggerThermode2(TEMP);
 % 2) Draw the fixation cross in white, set it to the center of our screen and
 % set good quality antialiasing
 WaitSecs(jitter3);
@@ -220,7 +201,7 @@ p6_ratingDecideOnset(trl) = buttonPressOnset;
 rating_Trajectory{trl,2} = trajectory;
 p6_decisionRT(trl) = RT;
 end
-end
+
 %-------------------------------------------------------------------------------
 %                                   save parameter
 %-------------------------------------------------------------------------------
@@ -246,64 +227,73 @@ sca;
 %                                   Function
 %-------------------------------------------------------------------------------
 
-
-function [t] = TriggerThermodeSocial(temp, varargin)
-    USE_BIOPAC = false;
-
-    for i = 1:length(varargin)
-        switch varargin{i}
-            case 'USE_BIOPAC'
-                USE_BIOPAC = varargin{i+1};
-        end
-    end
-
-    ljasm = NET.addAssembly('LJUDDotNet');
-    ljudObj = LabJack.LabJackUD.LJUD;
-
-    [~, ljhandle] = ljudObj.OpenLabJackS('LJ_dtU3', 'LJ_ctUSB', '0', true, 0);
-    ljudObj.ePutS(ljhandle, 'LJ_ioPIN_CONFIGURATION_RESET', 0, 0, 0);
-
-    % calculate byte code
-    % Integer values are simply converted to binary, non integer values are
-    % incremented by 128 and converted to binary. So 45 is bin(45) while
-    % 45.5 is bin(45+128).
-    temp = temp + 100;
-    if(mod(temp,1))
-        % note: this will treat all decimal values the same. Specific
-        % temperature mapping is determined in PATHWAY software
-        temp = floor(temp) + 128;
-    end
-    bytecode=sprintf('%08.0f',str2double(dec2bin(temp)))-'0';
-
-    for i=0:7
-        % Initiate FIO0 to FIO7 output
-        ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT',i, bytecode(i+1), 0, 0);
-
-        if USE_BIOPAC
-            % Initiate CIO3 and EIO7 output (biopac)
-            ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8, bytecode(i+1), 0, 0);
-        end
-    end
-
-    % Wait for 1 second. The delay is performed in the U3 hardware, and delay time is in microseconds.
-    % Valid delay values are 0 to 4194176 microseconds, and resolution is 128 microseconds.
-    ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_WAIT', 0, 1000000, 0, 0);
-
-
-
-    for i=0:7
-          % Terminate FIO0 to FIO7 output (reset to 0)
-          ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i, 0, 0, 0);
-
-          if USE_BIOPAC
-              % Terminate CIO3 and EIO7 output (reset to 0)
-              % Note: this sends a binary code to biopac channels (likely
-              % D8-D15).
-              ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8,0, 0, 0);
-          end
-    end
-
-    t = GetSecs;
-    % Perform the operations/requests
-    ljudObj.GoOne(ljhandle);
+function [t] = TriggerThermode2(temp)
+ip = '192.168.1.3';
+port = 20121;
+main(ip, port, 1, temp);
+main(ip, port, 4, temp);
+t = GetSecs;
+main(ip, port, 5, temp);
 end
+% 
+% 
+% function [t] = TriggerThermodeSocial(temp, varargin)
+%     USE_BIOPAC = false;
+% 
+%     for i = 1:length(varargin)
+%         switch varargin{i}
+%             case 'USE_BIOPAC'
+%                 USE_BIOPAC = varargin{i+1};
+%         end
+%     end
+% 
+%     ljasm = NET.addAssembly('LJUDDotNet');
+%     ljudObj = LabJack.LabJackUD.LJUD;
+% 
+%     [~, ljhandle] = ljudObj.OpenLabJackS('LJ_dtU3', 'LJ_ctUSB', '0', true, 0);
+%     ljudObj.ePutS(ljhandle, 'LJ_ioPIN_CONFIGURATION_RESET', 0, 0, 0);
+% 
+%     % calculate byte code
+%     % Integer values are simply converted to binary, non integer values are
+%     % incremented by 128 and converted to binary. So 45 is bin(45) while
+%     % 45.5 is bin(45+128).
+%     temp = temp + 100;
+%     if(mod(temp,1))
+%         % note: this will treat all decimal values the same. Specific
+%         % temperature mapping is determined in PATHWAY software
+%         temp = floor(temp) + 128;
+%     end
+%     bytecode=sprintf('%08.0f',str2double(dec2bin(temp)))-'0';
+% 
+%     for i=0:7
+%         % Initiate FIO0 to FIO7 output
+%         ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT',i, bytecode(i+1), 0, 0);
+% 
+%         if USE_BIOPAC
+%             % Initiate CIO3 and EIO7 output (biopac)
+%             ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8, bytecode(i+1), 0, 0);
+%         end
+%     end
+% 
+%     % Wait for 1 second. The delay is performed in the U3 hardware, and delay time is in microseconds.
+%     % Valid delay values are 0 to 4194176 microseconds, and resolution is 128 microseconds.
+%     ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_WAIT', 0, 1000000, 0, 0);
+% 
+% 
+% 
+%     for i=0:7
+%           % Terminate FIO0 to FIO7 output (reset to 0)
+%           ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i, 0, 0, 0);
+% 
+%           if USE_BIOPAC
+%               % Terminate CIO3 and EIO7 output (reset to 0)
+%               % Note: this sends a binary code to biopac channels (likely
+%               % D8-D15).
+%               ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8,0, 0, 0);
+%           end
+%     end
+% 
+%     t = GetSecs;
+%     % Perform the operations/requests
+%     ljudObj.GoOne(ljhandle);
+% end
