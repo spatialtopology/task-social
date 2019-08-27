@@ -1,13 +1,10 @@
+function cognitive(input_counterbalance_file)
 %----------------------------------------------------------------------
 %                       Window Parameters
 %----------------------------------------------------------------------
 
 % Clear the workspace and the screen
-sca;
-clc;
-clear all;
-close all;
-clearvars;
+
 
 % ---------------------
 % debug mode % Initial
@@ -391,3 +388,4 @@ sca;
 %     savefilename = fullfile(f_path, [f_name, springf('%d', new_num), f_ext]);
 %     writetable(data,savefilename)
 % end
+end

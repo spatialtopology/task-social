@@ -1,4 +1,4 @@
-% start from scratch
+function pain(input_counterbalance_file)% start from scratch
 
 
 %---------------------------------- ------------------------------------
@@ -67,7 +67,7 @@ main_dir = '/Users/h/Documents/projects_local/social_influence';
 cue_low_dir =  strcat([main_dir, '/stimuli/cue2/scl']);%'/Users/h/Dropbox/Projects/socialPain/stimuli/cue2/scl';
 cue_high_dir =  strcat([main_dir, '/stimuli/cue2/sch']);
 taskname = 'pain';
-counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
+counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file '.csv']);
 countBalMat = readtable(counterbalancefile);
 
 
@@ -341,4 +341,5 @@ function [t] = TriggerThermodeSocial(temp, varargin)
     t = GetSecs;
     % Perform the operations/requests
     ljudObj.GoOne(ljhandle);
+end
 end

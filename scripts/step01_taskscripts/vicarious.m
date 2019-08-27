@@ -1,3 +1,4 @@
+function vicarious(input_counterbalance_file)
 % start from scratch
 
 
@@ -6,9 +7,9 @@
 %----------------------------------------------------------------------
 
 % Clear the workspace and the screen
-sca;
-close all;
-clearvars;
+% sca;
+% close all;
+% clearvars;
 
 global p
 Screen('Preference', 'SkipSyncTests', 1);
@@ -67,7 +68,8 @@ dir_video = strcat([main_dir, '/stimuli/36_videos_lanlan/']);
 cue_low_dir =  '/Users/h/Dropbox/Projects/socialPain/stimuli/cue/scl';
 cue_high_dir = '/Users/h/Dropbox/Projects/socialPain/stimuli/cue/sch';
 taskname = 'vicarious';
-counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
+% counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
+counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file '.csv']); 
 countBalMat = readtable(counterbalancefile);
 %----------------------------------------------------------------------
 %                       Load Circular scale
@@ -248,3 +250,4 @@ save(traject_saveFileName, 'rating_Trajectory');
 % end
 % Clear the screen
 sca;
+end
