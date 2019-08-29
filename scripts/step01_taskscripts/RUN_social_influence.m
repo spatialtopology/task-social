@@ -29,7 +29,7 @@ switch bl_ind
     vicarious(v1);cognitive(c1);pain(p1);pain(p2);cognitive(c2);vicarious(v2);
 
   case 2 % c1 p2 v1 v2 p1 c2
-    cognitive(c1);pain(p2);vicarious(v1);vicarious(v2);pain(p1);cognitive(c2);
+    cognitive(sub,c1);pain(p2);vicarious(v1);vicarious(v2);pain(p1);cognitive(c2);
 
   case 3 % p2 v2 c1 c2 v1 p1
     pain(p2);vicarious(v2);cognitive(c1);cognitive(c2);vicarious(v1);pain(p1);

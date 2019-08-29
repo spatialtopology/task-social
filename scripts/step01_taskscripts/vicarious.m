@@ -1,62 +1,32 @@
-function vicarious(input_counterbalance_file)
-% start from scratch
+function vicarious(sub,input_counterbalance_file)
 
-
-%---------------------------------- ------------------------------------
+%----------------------------------------------------------------------
 %                       Window Parameters
 %----------------------------------------------------------------------
-
 % Clear the workspace and the screen
-% sca;
-% close all;
-% clearvars;
+sca;
 
 global p
 Screen('Preference', 'SkipSyncTests', 1);
-% Here we call some default settings  for setting up Psychtoolbox
 PsychDefaultSetup(2);
-
-% p = ptbInit;
-% Get the screen numbers
-screens                       = Screen('Screens');
-
-% Draw to the external screen if avaliable
-p.ptb.screenNumber            = max(screens);
-
-% Define black and white
-p.ptb.white                   = WhiteIndex(p.ptb.screenNumber);
+screens                       = Screen('Screens'); % Get the screen numbers
+p.ptb.screenNumber            = max(screens); % Draw to the external screen if avaliable
+p.ptb.white                   = WhiteIndex(p.ptb.screenNumber); % Define black and white
 p.ptb.black                   = BlackIndex(p.ptb.screenNumber);
-
-% Open an on screen window
 [p.ptb.window, p.ptb.rect]    = PsychImaging('OpenWindow', p.ptb.screenNumber, p.ptb.black);
-
-% Get the size of the on screen window
 [p.ptb.screenXpixels, p.ptb.screenYpixels] = Screen('WindowSize', p.ptb.window);
-
-% Query the frame duration
 p.ptb.ifi                      = Screen('GetFlipInterval', p.ptb.window);
-
-% Set up alpha-blending for smooth (anti-aliased) lines
-Screen('BlendFunction', p.ptb.window, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
-
-% Setup the text type for the window
+Screen('BlendFunction', p.ptb.window, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA'); % Set up alpha-blending for smooth (anti-aliased) lines
 Screen('TextFont', p.ptb.window, 'Arial');
 Screen('TextSize', p.ptb.window, 36);
-
-% Get the centre coordinate of the window
 [p.ptb.xCenter, p.ptb.yCenter] = RectCenter(p.ptb.rect);
-
-% Here we set the size of the arms of our fixation cross
-p.fix.sizePix                  = 40;
-
+p.fix.sizePix                  = 40; % size of the arms of our fixation cross
+p.fix.lineWidthPix             = 4; % Set the line width for our fixation cross
 % Now we set the coordinates (these are all relative to zero we will let
 % the drawing routine center the cross in the center of our monitor for us)
 p.fix.xCoords                  = [-p.fix.sizePix p.fix.sizePix 0 0];
 p.fix.yCoords                  = [0 0 -p.fix.sizePix p.fix.sizePix];
 p.fix.allCoords                = [p.fix.xCoords; p.fix.yCoords];
-
-% Set the line width for our fixation cross
-p.fix.lineWidthPix = 4;
 
 %----------------------------------------------------------------------
 %                       Load Design Matrix Parameters
@@ -64,20 +34,15 @@ p.fix.lineWidthPix = 4;
 main_dir = '/Users/h/Documents/projects_local/social_influence';
 % main_dir = '/Users/h/Dropbox/Projects/socialPain';
 % main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
-dir_video = strcat([main_dir, '/stimuli/36_videos_lanlan/']);
+dir_video = strcat([main_dir, '/stimuli/task-vicarious_videofps-024_dur-4s/selected']);
 cue_low_dir =  '/Users/h/Dropbox/Projects/socialPain/stimuli/cue/scl';
 cue_high_dir = '/Users/h/Dropbox/Projects/socialPain/stimuli/cue/sch';
 taskname = 'vicarious';
-% counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
-counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file '.csv']); 
+counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file '.csv']);
 countBalMat = readtable(counterbalancefile);
 %----------------------------------------------------------------------
 %                       Load Circular scale
 %----------------------------------------------------------------------
-% image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
-% image_scale_filename = ['task-', countBalMat.condition_name{1}, '_scale.jpg'];
-% image_scale = fullfile(image_filepath, image_scale_filename);
-
 image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
 image_scale_filename = ['task-', taskname, '_scale.png'];
 image_scale = fullfile(image_filepath, image_scale_filename);
@@ -85,10 +50,6 @@ image_scale = fullfile(image_filepath, image_scale_filename);
 %----------------------------------------------------------------------
 %                       Load Jitter Matrix
 %----------------------------------------------------------------------
-
-
-sub = 1;
-
 p1_fixationPresent = zeros(size(countBalMat,1),1);
 p1_jitter = zeros(size(countBalMat,1),1);
 p2_cue = zeros(size(countBalMat,1),1);
@@ -106,19 +67,11 @@ p6_ratingPresent = zeros(size(countBalMat,1),1);
 p6_ratingDecideOnset = zeros(size(countBalMat,1),1);
 % p6_ratingTrajectory = cell(size(countBalMat,1),1); % Cell
 p6_decisionRT = zeros(size(countBalMat,1),1);
-
 rating_Trajectory = cell(size(countBalMat,1),2);
+
 %----------------------------------------------------------------------
 %                       Keyboard information
 %----------------------------------------------------------------------
-
-% Define the keyboard keys that are listened for. We will be using the left
-% and right arrow keys as response keys for the task and the escape key as
-% a exit/reset key
-
-% leftKey = KbName('f');
-% rightKey = KbName('j');
-
 KbName('UnifyKeyNames');
 p.keys.confirm                 = KbName('return');
 p.keys.right                   = KbName('j');
@@ -235,7 +188,9 @@ end
 %-------------------------------------------------------------------------------
 
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%02d', sub)), 'beh' );
-
+if ~exist(sub_save_dir, 'dir')
+    mkdir(sub_save_dir)
+end
 T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
 p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
 p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);

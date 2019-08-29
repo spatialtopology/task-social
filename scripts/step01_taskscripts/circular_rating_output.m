@@ -16,28 +16,31 @@ function [trajectory, RT, buttonPressOnset] = circular_rating_output(duration, p
 % figure; comet(trajectory(:,1),trajectory(:,2))
 %
 % Phil Kragel 6/20/2019
+% edited Heejung Jung 7/26/2019
+%
+% Additions ________________
+% 1. duration:    length of rating scale, NOTE that the duration is filled with a fixation
+%                 once the participant incidates a response.
+%                 e.g. * experimenter fixes rating duration to 4 sec.
+%                      * participant RT to respond to rating scale was 1.6 sec.
+%                      * response will stay on screen for 0.5 sec
+%                      * fixation cross will fill the the remainder of the duration
+%                              i.e., 4-1.6-0.5 = 1.9 sec of fixation
+% 2. p: psychtoolbox window parameters
+% 3. image_scale: social influence task requires different rating scales
+%                 (pain rating vs cognitive effort rating)
+%                 The code takes different rating scale images
+% 4. rating_type: social influence task has two ratings "expectation" & "actual experience"
+%                 rating_type takes the keyword and displays it onto the rating scale
+
+
 
 SAMPLERATE = .01; % used in continuous ratings
 TRACKBALL_MULTIPLIER=1;
 RT = NaN;
 buttonPressOnset = NaN;
 
-% AssertOpenGL;
-
-
-% Get the screen numbers
-% screens = Screen('Screens');
-
-% Draw to the external screen if avaliable
-% screenNumber = max(screens);
-% Define black and white
-% white = WhiteIndex(screenNumber);
-% black = BlackIndex(screenNumber);
-%%% prepare the screen
-% [window, rect] = PsychImaging('OpenWindow', screenNumber, black);
-
 HideCursor;
-
 
 %%% configure screen
 dspl.screenWidth = p.ptb.rect(3);
@@ -89,14 +92,7 @@ RATINGTITLES = {'INTENSITY'};
 
 % initialize
 Screen('TextSize',p.ptb.window,72);
-if strcmp(rating_type, 'expect')
-    DrawFormattedText(p.ptb.window,'expect','center',dspl.screenHeight/2+150,255);
-%     DrawFormattedText2('<size=60>expect?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
-elseif strcmp(rating_type, 'actual')
-    DrawFormattedText(p.ptb.window,'actual', 'center',dspl.screenHeight/2+150,255);
-%     DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
-
-end
+DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
 % DrawFormattedText(p.ptb.window,'.','center','center',255);
 timing.initialized = Screen('Flip',p.ptb.window);
 
@@ -150,11 +146,7 @@ while GetSecs < timing.initialized + duration
 
     % produce screen
     Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
-    if strcmp(rating_type, 'expect')
-        DrawFormattedText(p.ptb.window,'expect','center',dspl.screenHeight/2+150,255);
-    elseif strcmp(rating_type, 'actual')
-        DrawFormattedText(p.ptb.window,'actual','center',dspl.screenHeight/2+150,255);
-    end
+    DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
     % add rating indicator ball
     Screen('FillOval',p.ptb.window,[255 0 0],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
     Screen('Flip',p.ptb.window);
@@ -167,11 +159,7 @@ while GetSecs < timing.initialized + duration
 %        Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 %           p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
        Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
-       if strcmp(rating_type, 'expect') 
-           DrawFormattedText(p.ptb.window,'expect','center',dspl.screenHeight/2+150,255);
-       elseif strcmp(rating_type, 'actual')
-           DrawFormattedText(p.ptb.window,'actual','center',dspl.screenHeight/2+150,255);
-       end
+       DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
        Screen('FillOval',p.ptb.window,[1 1 1],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
        Screen('Flip', p.ptb.window);
        remainder_time = duration-0.5-RT;
@@ -182,4 +170,3 @@ end
 
 
 end
-
