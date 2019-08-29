@@ -22,19 +22,6 @@ TRACKBALL_MULTIPLIER=1;
 RT = NaN;
 buttonPressOnset = NaN;
 
-% AssertOpenGL;
-
-
-% Get the screen numbers
-% screens = Screen('Screens');
-
-% Draw to the external screen if avaliable
-% screenNumber = max(screens);
-% Define black and white
-% white = WhiteIndex(screenNumber);
-% black = BlackIndex(screenNumber);
-%%% prepare the screen
-% [window, rect] = PsychImaging('OpenWindow', screenNumber, black);
 
 HideCursor;
 
@@ -52,6 +39,8 @@ dspl.ycenter = dspl.screenHeight/2; % 540
 % create SCALE screen for continuous rating
 dspl.cscale.width = 964;
 dspl.cscale.height = 480;
+dspl.cscale.xcenter = 497;
+dspl.cscale.ycenter = 406;
 dspl.cscale.w = Screen('OpenOffscreenWindow',p.ptb.screenNumber);
 % paint black
 Screen('FillRect',dspl.cscale.w,0);
@@ -100,18 +89,21 @@ end
 % DrawFormattedText(p.ptb.window,'.','center','center',255);
 timing.initialized = Screen('Flip',p.ptb.window);
 
-cursor.x = cursor.xcenter-242;
-cursor.y = cursor.ycenter+250; %+230
+cursor.x = cursor.xcenter
+cursor.y = cursor.ycenter %+230
 % cursor.xcenter-250, cursor.ycenter+160
 sample = 1;
-SetMouse(cursor.xcenter,cursor.ycenter);
+SetMouse(dspl.xcenter,dspl.screenHeight/2+165 ); 
+% SetMouse(dspl.cscale.xcenter,dspl.cscale.ycenter);
+% SetMouse(cursor.xcenter-250, cursor.ycenter+160);
+% SetMouse(cursor.xcenter,cursor.ycenter);
 % SetMouse(cursor.x,cursor.y);
 nextsample = GetSecs;
 
 buttonpressed  = false;
 
 xlim = cursor.xcenter;
-ylim = cursor.ycenter+240;
+ylim = cursor.ycenter;
 rlim = 270;
 
 while GetSecs < timing.initialized + duration
@@ -138,7 +130,7 @@ while GetSecs < timing.initialized + duration
     % calculate displacement
     cursor.x = (cursor.x + x-cursor.xcenter) * TRACKBALL_MULTIPLIER;
     cursor.y = (cursor.y + y-cursor.ycenter) * TRACKBALL_MULTIPLIER;
-    
+
 
 %     % check bounds - square
 %     if cursor.x > cursor.xmax
@@ -146,7 +138,7 @@ while GetSecs < timing.initialized + duration
 %     elseif cursor.x < cursor.xmin
 %         cursor.x = cursor.xmin;
 %     end
-% 
+%
 %     if cursor.y > cursor.ymax
 %         cursor.y = cursor.ymax;
 %     elseif cursor.y < cursor.ymin
@@ -154,7 +146,8 @@ while GetSecs < timing.initialized + duration
 %     end
 
 
-    [cursor.x, cursor.y, xlim, ylim] = limit(cursor.x, cursor.y, cursor.xcenter-250, cursor.ycenter+160, rlim, xlim,ylim);
+%     [cursor.x, cursor.y, xlim, ylim] = limit(cursor.x, cursor.y, cursor.xcenter-250, cursor.ycenter+160, rlim, xlim,ylim);
+    [cursor.x, cursor.y, xlim, ylim] = limit(cursor.x, cursor.y, dspl.xcenter,dspl.screenHeight/2+165, rlim, xlim,ylim);
     % produce screen
     Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
     if strcmp(rating_type, 'expect')
@@ -164,6 +157,8 @@ while GetSecs < timing.initialized + duration
     end
     % add rating indicator ball
     Screen('FillOval',p.ptb.window,[255 0 0],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
+%     Screen('FillOval',p.ptb.window,[255 0 0],[[dspl.cscale.xcenter dspl.cscale.ycenter]-cursor.size [dspl.cscale.xcenter dspl.cscale.ycenter]+cursor.size]);
+   
     Screen('Flip',p.ptb.window);
 
     elseif any(buttonpressed)
@@ -174,12 +169,14 @@ while GetSecs < timing.initialized + duration
 %        Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 %           p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
        Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
-       if strcmp(rating_type, 'expect') 
+       if strcmp(rating_type, 'expect')
            DrawFormattedText(p.ptb.window,'expect','center',dspl.screenHeight/2+150,255);
        elseif strcmp(rating_type, 'actual')
            DrawFormattedText(p.ptb.window,'actual','center',dspl.screenHeight/2+150,255);
        end
        Screen('FillOval',p.ptb.window,[1 1 1],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
+       
+%         Screen('FillOval',p.ptb.window,[1 1 1],[[ dspl.cscale.xcenter dspl.cscale.ycenter]-cursor.size [dspl.cscale.xcenter dspl.cscale.ycenter]+cursor.size]);
        Screen('Flip', p.ptb.window);
        remainder_time = duration-0.5-RT;
        WaitSecs(remainder_time);
@@ -206,4 +203,3 @@ elseif y>ycenter && (((x-xcenter)^2 + (y-ycenter)^2) > r^2)
   y = ycenter;
 end
 end
-
