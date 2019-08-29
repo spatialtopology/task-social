@@ -36,12 +36,12 @@ def noConsecutiveShuffle(list_key, list_dict, consec_num):
     return trialList
 
 def generateListKey(trial_per_cond):
-    list_stim1 = range(1,trial_per_cond+1)   # e.g. range(1,8)
-    list_stim2 = range(trial_per_cond+1,trial_per_cond*2+1) # e.g. range(8,15)
-    list_stim3 = range(trial_per_cond*2+1, trial_per_cond*3+1 )# e.g. range(1,8)
-    list_stim4 = range(trial_per_cond*3+1, trial_per_cond*4+1 )# e.g. range(8,15)
-    list_stim5 = range(trial_per_cond*4+1, trial_per_cond*5+1 )# e.g. range(8,15)
-    list_stim6 = range(trial_per_cond*5+1, trial_per_cond*6+1 )# e.g. range(8,15)
+    list_stim1 = list(range(1,trial_per_cond+1))    # e.g. range(1,8)
+    list_stim2 = list(range(trial_per_cond+1,trial_per_cond*2+1)) # e.g. range(8,15)
+    list_stim3 = list(range(trial_per_cond*2+1, trial_per_cond*3+1 ))# e.g. range(1,8)
+    list_stim4 = list(range(trial_per_cond*3+1, trial_per_cond*4+1 ))# e.g. range(8,15)
+    list_stim5 = list(range(trial_per_cond*4+1, trial_per_cond*5+1 ))# e.g. range(8,15)
+    list_stim6 = list(range(trial_per_cond*5+1, trial_per_cond*6+1 ))# e.g. range(8,15)
     list_dict = {'c1':list_stim1, 'c2':list_stim2, 'c3':list_stim3, 'c4':list_stim4, 'c5':list_stim5, 'c6':list_stim6}
     random.shuffle(list_stim1)
     random.shuffle(list_stim2)
@@ -71,11 +71,11 @@ administer_items = ['low', 'med', 'high'] # what rotation degree are we using
 counterbalance_freq = 6 # how many counterbalance versions do you want
 consec_num = 4
 taskname = 'vicarious'
-dir_save = '/Users/h/Dropbox/Projects/social_influence/design'
-dir_cue_high = '/Users/h/Dropbox/Projects/social_influence/stimuli/cue/task-' + taskname + '/sch'
-dir_cue_low = '/Users/h/Dropbox/Projects/social_influence/stimuli/cue/task-' + taskname + '/scl'
+dir_save = '/Users/h/Documents/projects_local/social_influence'
+dir_cue_high = dir_save + '/stimuli/cue/task-' + taskname + '/sch'
+dir_cue_low = dir_save + '/stimuli/cue/task-' + taskname + '/scl'
 # dir_video = '/Users/h/Dropbox/Projects/socialPain/stimuli/36_videos_lanlan'
-dir_video = '/Users/h/Dropbox/Projects/social_influence/stimuli/task-vicarious_videofps-024_dur-4s/selected/'
+dir_video = dir_save + '/stimuli/task-vicarious_videofps-024_dur-4s/selected/'
 # ______________________________________________________________________________
 
 # if task-cognitive_counterbalance_ver-01_block-01.csv exists, delete
@@ -97,15 +97,18 @@ for filePath in fileList:
 for cB_ver in range(1,counterbalance_freq):
     list1 = []
     list2 = []
+    sub_list = ['042-ll042','043-jh043','047-jl047','048-aa048','049-bm049',
+            '052-dr052','064-ak064','066-mg066','080-bn080',
+            '092-ch092','095-tv095','096-bg096','097-gf097','101-mg101',
+            '103-jk103','106-nm106','107-hs107','108-th108','109-ib109',
+            '115-jy115','120-kz120','121-vw121','123-jh123','124-dn124']
+    random.shuffle(sub_list)
     for x in range(0,3):
-        sub_list = ['042-ll042','043-jh043','047-jl047','048-aa048','049-bm049',
-        '052-dr052','064-ak064','066-mg066','080-bn080',
-        '092-ch092','095-tv095','096-bg096','097-gf097','101-mg101',
-        '103-jk103','106-nm106','107-hs107','108-th108','109-ib109',
-        '115-jy115','120-kz120','121-vw121','123-jh123','124-dn124']
-        random.shuffle(sub_list)
+
         half1 = sub_list[:int(len(sub_list)/2)] #[:24] # block 1 or 2
         half2 = sub_list[int(len(sub_list)/2):] #[24:] # block 1 or 2
+        random.shuffle(half1)
+        random.shuffle(half2)
         list1.append(half1)
         list2.append(half2)
     # list_newShuffle = list1*3 + list2*3
@@ -118,13 +121,14 @@ for cB_ver in range(1,counterbalance_freq):
     # grab stimuli list (only allow png files in the list)
     high_cue_list = [file for file in os.listdir(dir_cue_high) if file.endswith('.png')]
     # split high into 2 bins - we will use each bin for one block of high cues
-    high_sample = random.sample(high_cue_list, cond_type*trial_per_cond/2)
-    random.shuffle(high_sample)
+    # high_sample = random.sample(high_cue_list, int(cond_type*trial_per_cond/2))
+    random.shuffle(high_cue_list)
+    # high_samplehigh_cue_list[:int(cond_type*trial_per_cond/2)]
 
     low_cue_list = [file for file in os.listdir(dir_cue_low) if file.endswith('.png')]
     # split high into 2 bins - we will use each bin for one block of high cues
-    low_sample = random.sample(low_cue_list, cond_type*trial_per_cond/2)
-    random.shuffle(low_sample)
+    # low_sample = random.sample(low_cue_list, int(cond_type*trial_per_cond/2))
+    random.shuffle(low_cue_list)
 
 
     for ind, sub_list in enumerate([flattenlist1, flattenlist2]):
@@ -137,9 +141,9 @@ for cB_ver in range(1,counterbalance_freq):
         # df['administer'] = np.tile( np.repeat(administer_items,len(df)/len(administer_items)/3),3)
         df['administer'] = np.repeat(administer_items,12)
         # 4. created cue list __________________________________________________________
-        df['cue_type'] =  np.tile(['high', 'low'], len(df)/2)
-        df.loc[::2,'cue_image']  = high_sample#high_cue[index]
-        df.loc[1::2,'cue_image'] = low_sample#low_cue[index]
+        df['cue_type'] =  np.tile(['high', 'low'], int(len(df)/2)) #0:18, 18:36
+        df.loc[::2,'cue_image']  = high_cue_list[int(cond_type*trial_per_cond/2)*(ind):int(cond_type*trial_per_cond/2)*(ind+1)]#high_cue[index]
+        df.loc[1::2,'cue_image'] = low_cue_list[int(cond_type*trial_per_cond/2)*(ind):int(cond_type*trial_per_cond/2)*(ind+1)]
         df['random_order'] = range(len(df))
         df_reset = df.reset_index()
 
@@ -168,7 +172,6 @@ for cB_ver in range(1,counterbalance_freq):
         for ind_img, row in df.iterrows():
             image_fileglob = glob.glob(os.sep.join([dir_video,row.image_glob]))
             df.loc[ind_img, 'video_filename'] = os.path.split(image_fileglob[0])[1]
-            print image_fileglob
         # split DataFrame
         mainFileName = dir_save + os.sep + "task-" + taskname + "_mainDesign_notCounterbalanced_block-" + str('%02d' % ind) + ".csv"
         df.to_csv(mainFileName)
@@ -179,7 +182,7 @@ for cB_ver in range(1,counterbalance_freq):
 
         cB = shuffleDataFrame(df, consec_num)
         cB['cB_version'] = cB_ver # assign from for loop number
-        cBverFileName = dir_save + os.sep + \
+        cBverFileName = dir_save + os.sep + "design" +\
         "task-" + taskname + "_counterbalance_ver-" + str('%02d' % cB_ver)+ \
-         "_block-" +str('%02d' % int(index+1)) +".csv"
+         "_block-" +str('%02d' % int(ind+1)) +".csv"
         cB.to_csv(cBverFileName)
