@@ -52,8 +52,8 @@ for ind,sub in enumerate(sublist):
 
 
 # pain _________________________________________________________________________
-for ind,sub in enumerate([95, 97]):
-
+# for ind,sub in enumerate([96]):
+for ind,sub in enumerate([95,97]):
         coord_file = main_dir +'/data/sub-0' + str(sub) + '/beh/sub-0' + str(sub) + '_task-pain_beh_trajectory_formatted.csv'
         beh_file = main_dir + '/data/sub-0' + str(sub) + '/beh/sub-0' + str(sub) + '_task-pain_beh.csv'
         counterbalance_file = main_dir + '/design/task-pain_counterbalance_ver-01_block-01.csv'
