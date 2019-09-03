@@ -43,6 +43,10 @@ cue_high_dir = strcat([main_dir, '/stimuli/cue/sch']);
 taskname = 'vicarious';
 counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-02.csv']);
 countBalMat = readtable(counterbalancefile);
+sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 'beh' );
+if ~exist(sub_save_dir, 'dir')
+    mkdir(sub_save_dir)
+end
 %----------------------------------------------------------------------
 %                       Load Circular scale
 %----------------------------------------------------------------------
@@ -134,10 +138,7 @@ end
 %                                   save parameter
 %-------------------------------------------------------------------------------
 % Save onset time
-sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%02d', sub)), 'beh' );
-if ~exist(sub_save_dir, 'dir')
-    mkdir(sub_save_dir)
-end
+
 T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
     p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
     p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
