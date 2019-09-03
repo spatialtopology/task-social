@@ -14,7 +14,7 @@ clearvars;
 
 prompt = 'subject number (in raw number form, e.g. 1, 2,...,98): ';
 sub = input(prompt);
-
+    
 % debug mode % Initial
 % debug     = 0;   % PTB Debugging
 % 
@@ -77,7 +77,7 @@ image_scale = fullfile(image_filepath, image_scale_filename);
 %----------------------------------------------------------------------
 %                       Load Jitter Matrix
 %----------------------------------------------------------------------
-sub = 1;
+
 
 p1_fixationPresent = zeros(size(countBalMat,1),1);
 p1_jitter = zeros(size(countBalMat,1),1);
