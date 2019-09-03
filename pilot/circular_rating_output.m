@@ -29,8 +29,8 @@ HideCursor;
 %%% configure screen
 dspl.screenWidth = p.ptb.rect(3);
 dspl.screenHeight = p.ptb.rect(4);
-dspl.xcenter = dspl.screenWidth/2; % 960
-dspl.ycenter = dspl.screenHeight/2; % 540
+dspl.xcenter = dspl.screenWidth/2; % 1440/2 = 720
+dspl.ycenter = dspl.screenHeight/2; % 900/2 = 450
 
 % dspl.screenWidth = screenXpixels;
 % dspl.screenHeight = screenYpixels;
@@ -89,8 +89,8 @@ end
 % DrawFormattedText(p.ptb.window,'.','center','center',255);
 timing.initialized = Screen('Flip',p.ptb.window);
 
-cursor.x = cursor.xcenter
-cursor.y = cursor.ycenter %+230
+cursor.x = cursor.xcenter;
+cursor.y = cursor.ycenter; %+230
 % cursor.xcenter-250, cursor.ycenter+160
 sample = 1;
 SetMouse(dspl.xcenter,dspl.screenHeight/2+165 ); 
@@ -148,7 +148,7 @@ while GetSecs < timing.initialized + duration
 
 %     [cursor.x, cursor.y, xlim, ylim] = limit(cursor.x, cursor.y, cursor.xcenter-250, cursor.ycenter+160, rlim, xlim,ylim);
     [cursor.x, cursor.y, xlim, ylim] = limit(cursor.x, cursor.y, dspl.xcenter,dspl.screenHeight/2+165, rlim, xlim,ylim);
-    % produce screen
+    % produce screen 720, 615 
     Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
     if strcmp(rating_type, 'expect')
         DrawFormattedText(p.ptb.window,'expect','center',dspl.screenHeight/2+150,255);
