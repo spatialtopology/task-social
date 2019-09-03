@@ -6,20 +6,23 @@
 %----------------------------------------------------------------------
 
 % Clear the workspace and the screen
-sca;
-close all;
-clearvars;
+% sca;
+% close all;
+% clearvars;
+
+prompt = 'subject number (in raw number form, e.g. 1, 2,...,98): ';
+sub = input(prompt);
 
 global p
-debug     = 1;   % PTB Debugging
-
-AssertOpenGL;
-commandwindow;
-ListenChar(2);
-if debug
-    ListenChar(0);
-    PsychDebugWindowConfiguration;
-end
+% debug     = 0;   % PTB Debugging
+% 
+% AssertOpenGL;
+% commandwindow;
+% ListenChar(2);
+% if debug
+%     ListenChar(0);
+%     PsychDebugWindowConfiguration;
+% end
 Screen('Preference', 'SkipSyncTests', 1);
 % Here we call some default settings  for setting up Psychtoolbox
 PsychDefaultSetup(2);
@@ -76,7 +79,7 @@ main_dir = '/Users/h/Documents/projects_local/social_influence';
 cue_low_dir =  strcat([main_dir, '/stimuli/cue/scl']);%'/Users/h/Dropbox/Projects/socialPain/stimuli/cue2/scl';
 cue_high_dir =  strcat([main_dir, '/stimuli/cue/sch']);
 taskname = 'pain';
-counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
+counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-02.csv']);
 countBalMat = readtable(counterbalancefile);
 
 
@@ -95,7 +98,7 @@ image_scale = fullfile(image_filepath, image_scale_filename);
 
 
 
-sub = 1;
+
 p1_fixationPresent = zeros(size(countBalMat,1),1);
 p1_jitter = zeros(size(countBalMat,1),1);
 p2_cue = zeros(size(countBalMat,1),1);
@@ -142,18 +145,18 @@ for trl = 1:size(countBalMat,1)
 %                             1. Fixtion Jitter 0-4 sec
 %-------------------------------------------------------------------------------
 % 1) get jitter
-% jitter1 = 4;
-% % 2) Draw the fixation cross in p.ptb.p.ptb.white, set it to the center of our screen and
-% % set good quality antialiasing
-% Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-%    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-% fStart1 = GetSecs;
-% Screen('Flip', p.ptb.window);
-% WaitSecs(jitter1);
-% fEnd1 = GetSecs;
-% % save Parameters
-% p1_fixationPresent(trl) = fStart1;
-% p1_jitter(trl) = fEnd1 - fStart1;
+jitter1 = 4;
+% 2) Draw the fixation cross in p.ptb.p.ptb.white, set it to the center of our screen and
+% set good quality antialiasing
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+fStart1 = GetSecs;
+Screen('Flip', p.ptb.window);
+WaitSecs(jitter1);
+fEnd1 = GetSecs;
+% save Parameters
+p1_fixationPresent(trl) = fStart1;
+p1_jitter(trl) = fEnd1 - fStart1;
 
 %-------------------------------------------------------------------------------
 %                            5. pain
@@ -174,7 +177,12 @@ Screen('Flip', p.ptb.window);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 % pilot trigger thermode Luke Chang's lab
-Tt = TriggerThermode2(TEMP);
+
+ip = '192.168.1.3';
+newtemp = TEMP+10;
+port = 20121;
+main(ip, port, 1, newtemp);
+% TriggerThermode2(TEMP);
 % 2) Draw the fixation cross in white, set it to the center of our screen and
 % set good quality antialiasing
 WaitSecs(jitter3);
@@ -183,6 +191,15 @@ fEnd2 = GetSecs;
 p5_fixationPresent(trl) = fStart2;
 p5_jitter(trl) = fEnd2 - fStart2;
 
+% jitter - wait after thermode
+TEMP = countBalMat.administer(trl);
+fStart2 = GetSecs;
+Screen('Flip', p.ptb.window);
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+WaitSecs(8);
+
+main(ip, port, 5, newtemp);
 
 % ERASE LATER
 % fStart3 = GetSecs;
@@ -210,6 +227,10 @@ p6_ratingPresent(trl) = GetSecs;
 p6_ratingDecideOnset(trl) = buttonPressOnset;
 rating_Trajectory{trl,2} = trajectory;
 p6_decisionRT(trl) = RT;
+
+
+
+
 end
 
 %-------------------------------------------------------------------------------
@@ -237,14 +258,15 @@ sca;
 %                                   Function
 %-------------------------------------------------------------------------------
 
-function [t] = TriggerThermode2(temp)
+function TriggerThermode2(temp)
 ip = '192.168.1.3';
 newtemp = temp+10;
 port = 20121;
 main(ip, port, 1, newtemp);
+
 % main(ip, port, 4, newtemp);
-t = GetSecs;
-main(ip, port, 5, newtemp);
+% t = GetSecs;
+% main(ip, port, 5, newtemp);
 end
 %
 %
