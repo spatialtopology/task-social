@@ -155,13 +155,11 @@ while GetSecs < timing.initialized + duration
        RT = GetSecs - timing.initialized;
        buttonPressOnset = GetSecs;
        buttonpressed = [0 0 0];
-
-%        Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-%           p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
        Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
        DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
-       Screen('FillOval',p.ptb.window,[1 1 1],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
-       Screen('Flip', p.ptb.window);
+       % cursor changes
+       Screen('FillOval',p.ptb.window,[255 0 255],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
+       Screen('Flip',p.ptb.window);
        remainder_time = duration-0.5-RT;
        WaitSecs(remainder_time);
     end
