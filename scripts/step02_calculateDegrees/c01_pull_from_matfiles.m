@@ -1,6 +1,6 @@
 % iteratively go through dataset and pull out last row
 % sub-096_task-cognitive_beh_trajectory
-sub = [95,96,97,99];
+sub = [99]%,96,97,99];
 taskname = {'cognitive',  'vicarious_1', 'vicarious_2','pain'};
 for i = 1:length(sub)
 for task = 1:4
@@ -21,4 +21,3 @@ writetable(T2,saveFileName)
 end
 
 end
-

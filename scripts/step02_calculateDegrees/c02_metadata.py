@@ -4,7 +4,7 @@ import os
 # vicarious ____________________________________________________________________
 # import 3 datasets
 main_dir = '/Users/h/Documents/projects_local/social_influence'
-sublist = [95, 96, 97, 99]
+sublist = [99] #, 96, 97, 99]
 for ind,sub in enumerate(sublist):
     for b_num in list(range(1,3)):
         coord_file = main_dir +'/data/sub-0' + str(sub) + '/beh/sub-0' + str(sub) + '_task-vicarious_' + str(b_num)  + '_beh_trajectory_formatted.csv'
@@ -53,7 +53,7 @@ for ind,sub in enumerate(sublist):
 
 # pain _________________________________________________________________________
 # for ind,sub in enumerate([96]):
-for ind,sub in enumerate([95,97]):
+for ind,sub in enumerate([95,97, 99]):
         coord_file = main_dir +'/data/sub-0' + str(sub) + '/beh/sub-0' + str(sub) + '_task-pain_beh_trajectory_formatted.csv'
         beh_file = main_dir + '/data/sub-0' + str(sub) + '/beh/sub-0' + str(sub) + '_task-pain_beh.csv'
         counterbalance_file = main_dir + '/design/task-pain_counterbalance_ver-01_block-01.csv'
