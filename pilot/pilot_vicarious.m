@@ -41,7 +41,7 @@ dir_video = strcat([main_dir, '/stimuli/task-vicarious_videofps-024_dur-4s/selec
 cue_low_dir =  strcat([main_dir, '/stimuli/cue/scl']);
 cue_high_dir = strcat([main_dir, '/stimuli/cue/sch']);
 taskname = 'vicarious';
-counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-02.csv']);
+counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
 countBalMat = readtable(counterbalancefile);
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 'beh' );
 if ~exist(sub_save_dir, 'dir')
@@ -142,12 +142,12 @@ end
 T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
     p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
     p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
-saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh_2.csv' ]);
+saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh_1.csv' ]);
 
 writetable(T,saveFileName)
 % save mouse trajectory
 trajectory_table = rating_Trajectory;
-traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh_2_trajectory.mat' ]);
+traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh_1_trajectory.mat' ]);
 save(traject_saveFileName, 'rating_Trajectory');
 
 % Clear the screen
