@@ -49,6 +49,7 @@ def generate_video(image_folder, video_name, save_dir, fps, fourcc, subnum_folde
         new_images = images[max_ind-48:max_ind+48]
     elif max_ind  <=48:
         new_images = images[0:96]
+    new_images.sort()
     # Array images should only consider the image files ignoring others if any
     frame = cv2.imread(os.path.join(image_folder, new_images[0]))
 
