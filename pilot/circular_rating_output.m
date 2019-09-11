@@ -174,7 +174,7 @@ while GetSecs < timing.initialized + duration
        elseif strcmp(rating_type, 'actual')
            DrawFormattedText(p.ptb.window,'actual','center',dspl.screenHeight/2+150,255);
        end
-       Screen('FillOval',p.ptb.window,[1 1 1],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
+       Screen('FillOval',p.ptb.window,[255,0,255],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
        
 %         Screen('FillOval',p.ptb.window,[1 1 1],[[ dspl.cscale.xcenter dspl.cscale.ycenter]-cursor.size [dspl.cscale.xcenter dspl.cscale.ycenter]+cursor.size]);
        Screen('Flip', p.ptb.window);
