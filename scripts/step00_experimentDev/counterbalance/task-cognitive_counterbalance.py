@@ -28,8 +28,8 @@ def noConsecutiveShuffle(list_key, list_dict, consec_num):
     return trialList
 
 def generateListKey(trial_per_cond):
-    list_stim1 = range(1,trial_per_cond+1) + range(trial_per_cond*2+1, trial_per_cond*3+1 ) + range(trial_per_cond*4+1, trial_per_cond*5+1 )# e.g. range(1,8)
-    list_stim2 = range(trial_per_cond+1,trial_per_cond*2+1) + range(trial_per_cond*3+1, trial_per_cond*4+1 ) + range(trial_per_cond*5+1, trial_per_cond*6+1 )## e.g. range(8,15)
+    list_stim1 = list(range(1,trial_per_cond+1)) + list(range(trial_per_cond*2+1, trial_per_cond*3+1 )) + list(range(trial_per_cond*4+1, trial_per_cond*5+1 ))# e.g. range(1,8)
+    list_stim2 = list(range(trial_per_cond+1,trial_per_cond*2+1)) + list(range(trial_per_cond*3+1, trial_per_cond*4+1 )) + list(range(trial_per_cond*5+1, trial_per_cond*6+1 ))## e.g. range(8,15)
     list_dict = {'same':list_stim1, 'diff':list_stim2}
     random.shuffle(list_stim1)
     random.shuffle(list_stim2)
@@ -53,10 +53,10 @@ trial_per_cond = 6 # how many trials under one condition
 administer_items = [50, 100, 150] # what rotation degree are we using
 counterbalance_freq = 6 # how many counterbalance versions do you want
 consec_num = 4
-saveDir = '/Users/h/Dropbox/Projects/social_influence/design'
+saveDir = '/Users/h/Documents/projects_local/social_influence/design'
 taskname = 'cognitive'
-cue_high_dir = '/Users/h/Dropbox/Projects/social_influence/stimuli/cue/task-' + taskname + '/sch'
-cue_low_dir = '/Users/h/Dropbox/Projects/social_influence/stimuli/cue/task-' + taskname + '/scl'
+cue_high_dir = '/Users/h/Documents/projects_local/social_influence/stimuli/cue/task-' + taskname + '/sch'
+cue_low_dir = '/Users/h/Documents/projects_local/social_influence/stimuli/cue/task-' + taskname + '/scl'
 # ______________________________________________________________________________
 
 # if task-cognitive_counterbalance_ver-01_block-01.csv exists, delete
@@ -70,31 +70,31 @@ for filePath in fileList:
 
 
 
-# 1. choose 28 numbers out of 48 and create stimuli columns ____________________
+# 1. choose 24 numbers out of 48 and create stimuli columns ____________________
 num_select = []
 
-num_select = random.sample(range(1,49),  cond_type*trial_per_cond)
+num_select = random.sample(range(1,49),  int(cond_type*trial_per_cond/len(administer_items)*total_block))
 num_sort = sorted(num_select)
 list_random = random.sample(num_sort, len(num_sort))
 
-list1 = list_random[:int(len(list_random)/2)] #[:14] # block 1 or 2
-list2 = list_random[int(len(list_random)/2):] #[14:] # block 1 or 2
-list_newShuffle = list1*2 + list2*2
-df1 = pd.DataFrame(list1*2)
-df2 = pd.DataFrame(list2*2)
+list1 = list_random[:int(len(list_random)/2)] #[:12] # block 1 or 2
+list2 = list_random[int(len(list_random)/2):] #[12:] # block 1 or 2
+list_newShuffle = list1*3 + list2*3
+df1 = pd.DataFrame(random.sample(list1,len(list1))  +random.sample(list1,len(list1))  +random.sample(list1,len(list1))  )
+df2 = pd.DataFrame(random.sample(list2,len(list2))  +random.sample(list2,len(list2))  +random.sample(list2,len(list2))  )
 df = pd.DataFrame()
 # shuffle high/low cues ________________________________________________________
 # grab stimuli list (only allow png files in the list)
 high_cue_list = [file for file in os.listdir(cue_high_dir) if file.endswith('.png')]
 # split high into 2 bins - we will use each bin for one block of high cues
-high_sample = random.sample(high_cue_list, cond_type*trial_per_cond)
+high_sample = random.sample(high_cue_list, int(cond_type*trial_per_cond) )
 random.shuffle(high_sample)
 hCue1 = high_sample[:int(len(high_sample)/2)]
 hCue2 = high_sample[int(len(high_sample)/2):]
 high_cue = [hCue1, hCue2]
 low_cue_list = [file for file in os.listdir(cue_low_dir) if file.endswith('.png')]
 # split high into 2 bins - we will use each bin for one block of high cues
-low_sample = random.sample(low_cue_list, cond_type*trial_per_cond)
+low_sample = random.sample(low_cue_list, int(cond_type*trial_per_cond) )
 random.shuffle(low_sample)
 lCue1 = low_sample[:int(len(low_sample)/2)]
 lCue2 = low_sample[int(len(low_sample)/2):]
