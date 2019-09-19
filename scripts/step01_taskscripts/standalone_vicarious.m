@@ -69,7 +69,7 @@ vnames = {'param_fmriSession', 'param_counterbalanceVer', 'param_counterbalanceB
 'p3_expect_onset', 'p3_expect_responseonset', 'p3_expect_RT', ...
 'p4_fixation_onset', 'p4_fixation_duration',...
 'p5_administer_type', 'p5_administer_filename', 'p5_administer_onset',...
-'p6_actual_onset', 'p6_actual_responseonset', 'p6_actual_RT'}
+'p6_actual_onset', 'p6_actual_responseonset', 'p6_actual_RT'};
 T = array2table(zeros(size(countBalMat,1),size(vnames,2)));
 T.Properties.VariableNames = vnames;
 
@@ -190,6 +190,6 @@ traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', su
 save(traject_saveFileName, 'rating_Trajectory');
 
 psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
-save(psychtoolbox_saveFileName, p);
+save(psychtoolbox_saveFileName, 'p');
 
 sca;
