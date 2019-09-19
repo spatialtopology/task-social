@@ -4,8 +4,7 @@ function cognitive(sub,input_counterbalance_file, run_num)
 %                       Window Parameters
 %----------------------------------------------------------------------
 % Clear the workspace and the screen
-sca;
-
+% sca;
 global p
 Screen('Preference', 'SkipSyncTests', 1);
 PsychDefaultSetup(2);
@@ -31,19 +30,20 @@ p.fix.allCoords                = [p.fix.xCoords; p.fix.yCoords];
 %----------------------------------------------------------------------
 %                       Load Design Matrix Parameters
 %----------------------------------------------------------------------
-main_dir = '/Users/h/Documents/projects_local/social_influence';
-% main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
+task_dir = pwd;
+main_dir = fileparts(fileparts(task_dir));
 taskname = 'cognitive';
-counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file '.csv']);
+
+dir_video = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
+cue_low_dir =  fullfile(main_dir,'stimuli','cue','scl');
+cue_high_dir = fullfile([main_dir,'stimuli','cue','sch']);
+counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file, '.csv']);
 countBalMat = readtable(counterbalancefile);
+
 
 %----------------------------------------------------------------------
 %                       Load Circular scale
 %----------------------------------------------------------------------
-% image_filepath = fullfile(main_dir, filesep, 'stimuli');
-% image_scale_filename = ['task-', taskname, '_scale.jpg'];
-% image_scale = fullfile(image_filepath, filesep, image_scale_filename);
-
 image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
 image_scale_filename = ['task-', taskname, '_scale.png'];
 image_scale = fullfile(image_filepath, image_scale_filename);
@@ -51,36 +51,37 @@ image_scale = fullfile(image_filepath, image_scale_filename);
 %----------------------------------------------------------------------
 %                       Load Jitter Matrix
 %----------------------------------------------------------------------
-p1_fixationPresent = zeros(size(countBalMat,1),1);
-p1_jitter = zeros(size(countBalMat,1),1);
-p2_cue = zeros(size(countBalMat,1),1);
-p3_ratingPresent = zeros(size(countBalMat,1),1);
-p3_ratingDecideOnset  = zeros(size(countBalMat,1),1);
-% p3_ratingTrajectory  = cell(size(countBalMat,1),1); % Cell
-p3_decisionRT  = zeros(size(countBalMat,1),1);
-p4_fixationPresent  = zeros(size(countBalMat,1),1);
-p4_jitter  = zeros(size(countBalMat,1),1);
-p5_responseOnset  = zeros(size(countBalMat,1),1);
-p5_responseKey  = zeros(size(countBalMat,1),1);
-p5_RT  = zeros(size(countBalMat,1),1);
-p5_imageAttr  = zeros(size(countBalMat,1),1);
-p6_ratingPresent = zeros(size(countBalMat,1),1);
-p6_ratingDecideOnset = zeros(size(countBalMat,1),1);
-% p6_ratingTrajectory = cell(size(countBalMat,1),1); % Cell
-p6_decisionRT = zeros(size(countBalMat,1),1);
+vnames = {'param_fmriSession', 'param_runNum','param_counterbalanceVer', 'param_counterbalanceBlockNum',...
+'param_stimNum', 'param_stimMatch','param_stimFilename','param_cue_type', 'param_administer_type', 'param_cond_type'...
+'p1_fixation_onset', 'p1_fixation_duration',...
+'p2_cue_onset', 'p2_cue_type', 'p2_cue_filename',...
+'p3_expect_onset', 'p3_expect_responseonset', 'p3_expect_RT', ...
+'p4_fixation_onset', 'p4_fixation_duration',...
+'p5_administer_type', 'p5_administer_filename', 'p5_administer_onset', 'p5_administer_responseonset', 'p5_administer_responsekey', 'p5_administer_RT',...
+'p6_actual_onset', 'p6_actual_responseonset', 'p6_actual_RT'};
+T = array2table(zeros(size(countBalMat,1),size(vnames,2)));
+T.Properties.VariableNames = vnames;
 
-rating_Trajectory = cell(size(countBalMat,1),2);
+a = split(counterbalancefile,filesep); % full path filename components
+version_chunk = split(extractAfter(a(end),"ver-"),"_");
+block_chunk = split(extractAfter(a(end),"block-"),["-", "."]);
+T.param_runNum(:) = run_num;
+T.param_counterbalanceVer(:) = str2double(version_chunk{1});
+T.param_counterbalanceBlockNum(:) = str2double(block_chunk{1});
+T.param_stimNum = countBalMat.stimuli_num;
+T.param_stimMatch = countBalMat.match;
+T.param_stimFilename = countBalMat.image_filename;
+T.param_cue_type = countBalMat.cue_type;
+T.param_administer_type = countBalMat.administer;
+T.param_cond_type = countBalMat.cond_type;
+T.p2_cue_type = countBalMat.cue_type;
+T.p2_cue_filename = countBalMat.cue_image;
+T.p5_administer_type = countBalMat.administer;
+T.p5_administer_filename = countBalMat.image_filename;
+
 %----------------------------------------------------------------------
 %                       Keyboard information
 %----------------------------------------------------------------------
-
-% Define the keyboard keys that are listened for. We will be using the left
-% and right arrow keys as response keys for the task and the escape key as
-% a exit/reset key
-
-% leftKey = KbName('f');
-% rightKey = KbName('j');
-
 KbName('UnifyKeyNames');
 p.keys.confirm                 = KbName('return');
 p.keys.right                   = KbName('j');
@@ -91,82 +92,58 @@ p.keys.esc                     = KbName('ESCAPE');
 %-------------------------------------------------------------------------------
 %                            0. Experimental loop
 %-------------------------------------------------------------------------------
-for trl = 1:size(countBalMat,1)
+for trl = 1:5 %size(countBalMat,1)
     %-------------------------------------------------------------------------------
     %                             1. Fixtion Jitter 0-4 sec
     %-------------------------------------------------------------------------------
-
-    % 1) get jitter
     jitter1 = 4;
-    % 2) Draw the fixation cross in p.ptb.p.ptb.white, set it to the center of our screen and
-    % set good quality antialiasing
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-        p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-    Screen('Flip', p.ptb.window);
+       p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     fStart1 = GetSecs;
+    Screen('Flip', p.ptb.window);
     WaitSecs(jitter1);
     fEnd1 = GetSecs;
-    % save Parameters
-    p1_fixationPresent(trl) = fStart1;
-    p1_jitter(trl) = fEnd1 - fStart1;
 
+     T.p1_fixation_onset(trl) = fStart1;
+     T.p1_fixation_duration(trl) = fEnd1 - fStart1;
     %-------------------------------------------------------------------------------
     %                                  2. cue 1s
     %-------------------------------------------------------------------------------
-
     if string(countBalMat.cue_type{trl}) == 'low'
-        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
-        cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+      cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+      cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
     elseif string(countBalMat.cue_type{trl}) == 'high'
-        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
-        cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+      cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+      cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
 
-        imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-        Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-        Screen('Flip',p.ptb.window);
-        p2_cue(trl) = GetSecs; % save output
-        WaitSecs(1)
-
+    imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+    Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
+    Screen('Flip',p.ptb.window);
+    T.p2_cue_onset(trl) = GetSecs;
+    WaitSecs(1)
 
         %-------------------------------------------------------------------------------
         %                             3. expectation rating
         %-------------------------------------------------------------------------------
-        % OUTPUT:
-        % p3_ratingPresent
-        % p3_ratingDecideOnset
-        % p3_behavioralDecision
-        % p3_decisionRT
-
-        % 1) log rating presentation time
-        % 2) log rat ing decision time
-        % 3) log rating decision RT time
-        % 4) remove onscreen after 4 sec
-
         imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-        p3_ratingPresent(trl) = GetSecs;
+        T.p3_expect_onset(trl) = GetSecs;
         [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
-
-        p3_ratingDecideOnset(trl) = buttonPressOnset;
         rating_Trajectory{trl,1} = trajectory;
-        p3_decisionRT(trl) = RT;
+        T.p3_expect_responseonset(trl) = buttonPressOnset;
+        T.p3_expect_RT(trl) = RT;
 
         %-------------------------------------------------------------------------------
         %                             4. Fixtion Jitter 0-4 sec
         %-------------------------------------------------------------------------------
-        % 1) get jitter
         jitter2 = 1;
-        % 2) Draw the fixation cross in white, set it to the center of our screen and
-        % set good quality antialiasing
         Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-            p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-        Screen('Flip', p.ptb.window);
+           p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
         fStart2 = GetSecs;
+        Screen('Flip', p.ptb.window);
         WaitSecs(jitter2);
         fEnd2 = GetSecs;
-        % save Parameters
-        p4_fixationPresent(trl) = fStart2;
-        p4_jitter(trl) = fEnd2 - fStart2;
-
+        T.p4_fixation_onset(trl) = fStart2;
+        T.p4_fixation_duration(trl) = fEnd2 - fStart2;
         %-------------------------------------------------------------------------------
         %                          5. cognitive mental rotation task
         %-------------------------------------------------------------------------------
@@ -180,9 +157,9 @@ for trl = 1:size(countBalMat,1)
         % 1) log pain start time
         respToBeMade = true;
 
-        image_filepath = strcat([main_dir '/stimuli/cognitive']);
+        image_filepath = fullfile(main_dir,'stimuli','cognitive');
         image_filename = char(countBalMat.image_filename(trl));
-        image_rotation = strcat([image_filepath filesep image_filename]);
+        image_rotation = fullfile(image_filepath,image_filename);
 
         % while respToBeMade == true
         % present rotate image ---------------------------------------------------------
@@ -207,7 +184,7 @@ for trl = 1:size(countBalMat,1)
 
         % flip screen  -----------------------------------------------------------------
         timing.initialized = Screen('Flip',p.ptb.window);
-        p5_administer(trl) = timing.initialized;
+        T.p5_administer_onset(trl) = timing.initialized;
         duration = 4;
         while GetSecs < timing.initialized + duration
 
@@ -269,37 +246,21 @@ for trl = 1:size(countBalMat,1)
                 %                 end
             end
         end
-
-        p5_responseOnset(trl) = secs;
-        p5_responseKey(trl) = response;
-        p5_RT(trl) = p5_responseOnset(trl) - p5_administer(trl);
-        p5_imageAttr = [];
-        WaitSecs(0.5);
+        T.p5_administer_responseonset(trl) = secs;
+        T.p5_administer_responsekey(trl) = response;
+        T.p5_administer_RT(trl) = secs - timing.initialized;
+        % WaitSecs(0.5);
 
         %-------------------------------------------------------------------------------
         %                                6. post evaluation rating
         %-------------------------------------------------------------------------------
-        % OUTPUT
-        % p6_ratingPresent
-        % p6_ratingDecideOnset
-        % p6_behavioralDecision
-        % p6_decisionRT
-        % 1) log rating presentation time
-        % 2) log rat ing decision time
-        % 3) log rating decision RT time
-        % 4) remove onscreen after 4 sec
-        %-------------------------------------------------------------------------------
-
-        % DrawFormattedText2('<size=60>actual?', 'win', p.ptb.window, 'sx', p.ptb.xCenter, 'sy', p.ptb.yCenter, 'baseColor',p.ptb.white ); % Text output of mouse position draw in the centre of the screen
-        % Screen('Flip',p.ptb.window);
-        % WaitSecs(0.35);
-
-        p6_ratingPresent(trl) = GetSecs;
         [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
-        p6_ratingDecideOnset(trl) = buttonPressOnset;
         rating_Trajectory{trl,2} = trajectory;
-        p6_decisionRT(trl) = RT;
-
+        T.p6_actual_onset(trl) = GetSecs;
+        T.p6_actual_responseonset(trl) = buttonPressOnset;
+        T.p6_actual_RT(trl) = RT;
+        tmpFileName = saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
+        writetable(T,tmpFileName);
     end
 end
 
@@ -311,38 +272,16 @@ sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 
 if ~exist(sub_save_dir, 'dir')
     mkdir(sub_save_dir)
 end
-T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
-    p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
-    p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
-saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_run-', sprintf('%02d', run_num),'_beh.csv' ]);
 
-writetable(T,saveFileName)
-% save mouse trajectory
-trajectory_table = rating_Trajectory;
-traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_run-', sprintf('%02d', run_num),'_beh_trajectory.mat' ]);
+saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh.csv' ]);
+writetable(T,saveFileName);
+
+traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
 save(traject_saveFileName, 'rating_Trajectory');
+
+psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
+save(psychtoolbox_saveFileName, p);
 
 % Clear the screen
 close all;
 sca;
-
-%
-% %-------------------------------------------------------------------------------
-% %                                   Function
-% %-------------------------------------------------------------------------------
-% function save_table_with_number(filename, data)
-% [f_path, f_name, f_ext] = fileparts(filename);
-% % if isempty(f_ext)
-% %     f_ext = '.csv';
-% %     filename = fullfile(f_path, [f_name, f_ext]);
-% % end
-%
-% if exist(filename, 'file')
-%     f_dir = dir(fullfile(f_path, [f_name, '*', f_ext]);
-%     f_str = lower(springf('%s*', f_dir.name);
-%     f_num = sscanf(f_str, [f_name, '%d', f_ext, '*']);
-%     new_num = max(f_num) + 1;
-%     savefilename = fullfile(f_path, [f_name, springf('%d', new_num), f_ext]);
-%     writetable(data,savefilename)
-% end
-end
