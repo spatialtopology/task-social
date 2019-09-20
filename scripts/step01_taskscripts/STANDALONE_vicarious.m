@@ -8,16 +8,6 @@ prompt = 'subject number (in raw number form, e.g. 1, 2,...,98): ';
 sub = input(prompt);
 
 global p
-% debug mode % Initial
-% debug     = 1;   % PTB Debugging
-%
-% AssertOpenGL;
-% commandwindow;
-% ListenChar(2);
-% if debug
-%     ListenChar(0);
-%     PsychDebugWindowConfiguration;
-% end
 Screen('Preference', 'SkipSyncTests', 1);
 PsychDefaultSetup(2);
 screens                       = Screen('Screens'); % Get the screen numbers

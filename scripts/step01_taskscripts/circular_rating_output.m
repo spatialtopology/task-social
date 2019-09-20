@@ -45,36 +45,23 @@ HideCursor;
 %%% configure screen
 dspl.screenWidth = p.ptb.rect(3);
 dspl.screenHeight = p.ptb.rect(4);
-dspl.xcenter = dspl.screenWidth/2; % 960
-dspl.ycenter = dspl.screenHeight/2; % 540
+dspl.xcenter = dspl.screenWidth/2;
+dspl.ycenter = dspl.screenHeight/2;
 
-% dspl.screenWidth = screenXpixels;
-% dspl.screenHeight = screenYpixels;
-% dspl.xcenter = xCenter;
-% dspl.ycenter = yCenter;
-% create SCALE screen for continuous rating
-dspl.cscale.width = 964;
-dspl.cscale.height = 480;
-dspl.cscale.xcenter = 483;
+dspl.cscale.width = 964; % image scale width
+dspl.cscale.height = 480; % image scale height
+dspl.cscale.xcenter = 483; % scale center (does not equal to screen center)
 dspl.cscale.ycenter = 407;
 dspl.cscale.w = Screen('OpenOffscreenWindow',p.ptb.screenNumber);
-% paint black
+
 Screen('FillRect',dspl.cscale.w,0);
-% add scale image
-% dspl.cscale.imagefile = which(image_scale);
-% dspl.cscale.imagefile = '/Users/h/Dropbox/Projects/socialPain/scale.png';
 dspl.cscale.texture = Screen('MakeTexture',p.ptb.window, imread(image_scale));
 % placement
 dspl.cscale.rect = [...
     [dspl.xcenter dspl.ycenter]-[0.5*dspl.cscale.width 0.5*dspl.cscale.height] ...
     [dspl.xcenter dspl.ycenter]+[0.5*dspl.cscale.width 0.5*dspl.cscale.height]];
-% dspl.cscale.rect = [dspl.xcenter dspl.ycenter dspl.xcenter dspl.ycenter];
-% shiftdown = ceil(dspl.screenHeight*0);
-% dspl.cscale.rect = dspl.cscale.rect + [0 shiftdown 0 shiftdown];
 Screen('DrawTexture',dspl.cscale.w,dspl.cscale.texture,[],dspl.cscale.rect);
-% add title
 Screen('TextSize',dspl.cscale.w,40);
-
 
 % determine cursor parameters for all scales
 cursor.xmin = dspl.cscale.rect(1);
@@ -82,15 +69,9 @@ cursor.xmax = dspl.cscale.rect(3);
 cursor.ymin = dspl.cscale.rect(2);
 cursor.ymax = dspl.cscale.rect(4);
 
-
 cursor.size = 8;
 cursor.xcenter = ceil(dspl.cscale.rect(1) + (dspl.cscale.rect(3) - dspl.cscale.rect(1))*0.5);
 cursor.ycenter = ceil(dspl.cscale.rect(2) + (dspl.cscale.rect(4)-dspl.cscale.rect(2))*0.847);
-%
-% cursor.xcenter = ceil(cursor.xmax - cursor.xmin);
-% cursor.ycenter = ceil(cursor.ymax - cursor.ymin);
-
-
 
 RATINGTITLES = {'INTENSITY'};
 
@@ -98,13 +79,8 @@ RATINGTITLES = {'INTENSITY'};
 % initialize
 Screen('TextSize',p.ptb.window,72);
 DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
-% DrawFormattedText(p.ptb.window,'.','center','center',255);
 timing.initialized = Screen('Flip',p.ptb.window);
-% xlim = cursor.xcenter;
-% ylim = cursor.ycenter;
 
-% cursor.x = dspl.cscale.rect(1) + 483;
-% cursor.y = dspl.cscale.rect(2) + 407;
 cursor.x = cursor.xcenter;
 cursor.y = cursor.ycenter;
 sample = 1;
@@ -116,8 +92,6 @@ rlim = 250;
 xlim = cursor.xcenter;
 ylim = cursor.ycenter;
 while GetSecs < timing.initialized + duration
-    % cursor.x = dspl.cscale.rect(1) + 483;
-    % cursor.y = dspl.cscale.rect(3) + 407;
 
     loopstart = GetSecs;
 
@@ -132,11 +106,8 @@ while GetSecs < timing.initialized + duration
 
 
     if ~buttonpressed
-    % measure mouse movement
-    [x, y, buttonpressed] = GetMouse;
-
-    % reset mouse position
-    SetMouse(cursor.xcenter,cursor.ycenter);
+    [x, y, buttonpressed] = GetMouse; % measure mouse movement
+    SetMouse(cursor.xcenter,cursor.ycenter); % reset mouse position
 
     % calculate displacement
     cursor.x = (cursor.x + x-cursor.xcenter) * TRACKBALL_MULTIPLIER;
@@ -155,7 +126,6 @@ while GetSecs < timing.initialized + duration
     elseif cursor.y < cursor.ymin
         cursor.y = cursor.ymin;
     end
-
 
     % produce screen
     Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
@@ -184,7 +154,7 @@ end
 
 
 %-------------------------------------------------------------------------------
-%                                  Limit cursor
+%                            function Limit cursor
 %-------------------------------------------------------------------------------
 % Function by Xiaochun Han
 function [x, y, xlim, ylim] = limit(x, y, xcenter, ycenter, r, xlim,ylim)
