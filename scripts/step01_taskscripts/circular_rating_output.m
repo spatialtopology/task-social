@@ -43,8 +43,8 @@ buttonPressOnset = NaN;
 HideCursor;
 
 %%% configure screen
-dspl.screenWidth = p.ptb.rect(3)
-dspl.screenHeight = p.ptb.rect(4)
+dspl.screenWidth = p.ptb.rect(3);
+dspl.screenHeight = p.ptb.rect(4);
 dspl.xcenter = dspl.screenWidth/2; % 960
 dspl.ycenter = dspl.screenHeight/2; % 540
 
