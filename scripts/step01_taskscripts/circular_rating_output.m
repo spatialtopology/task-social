@@ -43,8 +43,8 @@ buttonPressOnset = NaN;
 HideCursor;
 
 %%% configure screen
-dspl.screenWidth = p.ptb.rect(3);
-dspl.screenHeight = p.ptb.rect(4);
+dspl.screenWidth = p.ptb.rect(3)
+dspl.screenHeight = p.ptb.rect(4)
 dspl.xcenter = dspl.screenWidth/2; % 960
 dspl.ycenter = dspl.screenHeight/2; % 540
 
@@ -55,6 +55,8 @@ dspl.ycenter = dspl.screenHeight/2; % 540
 % create SCALE screen for continuous rating
 dspl.cscale.width = 964;
 dspl.cscale.height = 480;
+dspl.cscale.xcenter = 483;
+dspl.cscale.ycenter = 407;
 dspl.cscale.w = Screen('OpenOffscreenWindow',p.ptb.screenNumber);
 % paint black
 Screen('FillRect',dspl.cscale.w,0);
@@ -82,8 +84,11 @@ cursor.ymax = dspl.cscale.rect(4);
 
 
 cursor.size = 8;
-cursor.xcenter = ceil(cursor.xmax - cursor.xmin);
-cursor.ycenter = ceil(cursor.ymax - cursor.ymin);
+cursor.xcenter = ceil(dspl.cscale.rect(1) + (dspl.cscale.rect(3) - dspl.cscale.rect(1))*0.5);
+cursor.ycenter = ceil(dspl.cscale.rect(2) + (dspl.cscale.rect(4)-dspl.cscale.rect(2))*0.847);
+%
+% cursor.xcenter = ceil(cursor.xmax - cursor.xmin);
+% cursor.ycenter = ceil(cursor.ymax - cursor.ymin);
 
 
 
@@ -95,17 +100,24 @@ Screen('TextSize',p.ptb.window,72);
 DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
 % DrawFormattedText(p.ptb.window,'.','center','center',255);
 timing.initialized = Screen('Flip',p.ptb.window);
+% xlim = cursor.xcenter;
+% ylim = cursor.ycenter;
 
+% cursor.x = dspl.cscale.rect(1) + 483;
+% cursor.y = dspl.cscale.rect(2) + 407;
 cursor.x = cursor.xcenter;
-cursor.y = cursor.ycenter+230;
-
+cursor.y = cursor.ycenter;
 sample = 1;
 SetMouse(cursor.xcenter,cursor.ycenter);
 nextsample = GetSecs;
 
 buttonpressed  = false;
-
+rlim = 250;
+xlim = cursor.xcenter;
+ylim = cursor.ycenter;
 while GetSecs < timing.initialized + duration
+    % cursor.x = dspl.cscale.rect(1) + 483;
+    % cursor.y = dspl.cscale.rect(3) + 407;
 
     loopstart = GetSecs;
 
@@ -129,6 +141,7 @@ while GetSecs < timing.initialized + duration
     % calculate displacement
     cursor.x = (cursor.x + x-cursor.xcenter) * TRACKBALL_MULTIPLIER;
     cursor.y = (cursor.y + y-cursor.ycenter) * TRACKBALL_MULTIPLIER;
+    [cursor.x, cursor.y, xlim, ylim] = limit(cursor.x, cursor.y, cursor.xcenter, cursor.ycenter, rlim, xlim, ylim);
 
     % check bounds
     if cursor.x > cursor.xmax
@@ -167,4 +180,25 @@ while GetSecs < timing.initialized + duration
 end
 
 
+end
+
+
+%-------------------------------------------------------------------------------
+%                                  Limit cursor
+%-------------------------------------------------------------------------------
+% Function by Xiaochun Han
+function [x, y, xlim, ylim] = limit(x, y, xcenter, ycenter, r, xlim,ylim)
+if (y<=ycenter) && (((x-xcenter)^2 + (y-ycenter)^2) <= r^2)
+   xlim = x;
+   ylim = y;
+elseif (y<=ycenter) && (((x-xcenter)^2 + (y-ycenter)^2) > r^2)
+   x = xlim;
+   y = ylim;
+elseif y>ycenter && (((x-xcenter)^2 + (y-ycenter)^2) <= r^2)
+   xlim = x;
+   y = ycenter;
+elseif y>ycenter && (((x-xcenter)^2 + (y-ycenter)^2) > r^2)
+   x = xlim;
+   y = ycenter;
+end
 end
