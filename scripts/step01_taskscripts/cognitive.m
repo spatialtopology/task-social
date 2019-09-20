@@ -28,7 +28,7 @@ p.fix.yCoords                  = [0 0 -p.fix.sizePix p.fix.sizePix];
 p.fix.allCoords                = [p.fix.xCoords; p.fix.yCoords];
 
 %----------------------------------------------------------------------
-%                       Load Design Matrix Parameters
+%                       Directories
 %----------------------------------------------------------------------
 task_dir = pwd;
 main_dir = fileparts(fileparts(task_dir));
@@ -39,6 +39,12 @@ cue_low_dir =  fullfile(main_dir,'stimuli','cue','scl');
 cue_high_dir = fullfile([main_dir,'stimuli','cue','sch']);
 counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file, '.csv']);
 countBalMat = readtable(counterbalancefile);
+
+% Save onset time
+sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 'beh' );
+if ~exist(sub_save_dir, 'dir')
+    mkdir(sub_save_dir)
+end
 
 %----------------------------------------------------------------------
 %                       Load Circular scale
@@ -91,116 +97,114 @@ p.keys.esc                     = KbName('ESCAPE');
 %-------------------------------------------------------------------------------
 %                            0. Experimental loop
 %-------------------------------------------------------------------------------
-for trl = 1:5 %size(countBalMat,1)
-    %-------------------------------------------------------------------------------
-    %                             1. Fixtion Jitter 0-4 sec
-    %-------------------------------------------------------------------------------
-    jitter1 = 4;
-    Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-       p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-    fStart1 = GetSecs;
-    Screen('Flip', p.ptb.window);
-    WaitSecs(jitter1);
-    fEnd1 = GetSecs;
+for trl = 1:size(countBalMat,1)
+%-------------------------------------------------------------------------------
+%                             1. Fixtion Jitter 0-4 sec
+%-------------------------------------------------------------------------------
+jitter1 = 4;
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+T.p1_fixation_onset(trl) = Screen('Flip', p.ptb.window);
+WaitSecs(jitter1);
+fEnd1 = GetSecs;
+T.p1_fixation_duration(trl) = fEnd1 - T.p1_fixation_onset(trl);
+%-------------------------------------------------------------------------------
+%                                  2. cue 1s
+%-------------------------------------------------------------------------------
+if string(countBalMat.cue_type{trl}) == 'low'
+  cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+  cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+elseif string(countBalMat.cue_type{trl}) == 'high'
+  cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+  cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
 
-     T.p1_fixation_onset(trl) = fStart1;
-     T.p1_fixation_duration(trl) = fEnd1 - fStart1;
-    %-------------------------------------------------------------------------------
-    %                                  2. cue 1s
-    %-------------------------------------------------------------------------------
-    if string(countBalMat.cue_type{trl}) == 'low'
-      cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
-      cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
-    elseif string(countBalMat.cue_type{trl}) == 'high'
-      cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
-      cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
+T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
+WaitSecs(1)
 
-    imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-    Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-    T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
-    WaitSecs(1)
+%-------------------------------------------------------------------------------
+%                             3. expectation rating
+%-------------------------------------------------------------------------------
+imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+T.p3_expect_onset(trl) = GetSecs;
+[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
+rating_Trajectory{trl,1} = trajectory;
+T.p3_expect_responseonset(trl) = buttonPressOnset;
+T.p3_expect_RT(trl) = RT;
 
-        %-------------------------------------------------------------------------------
-        %                             3. expectation rating
-        %-------------------------------------------------------------------------------
-        T.p3_expect_onset(trl) = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-        [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
-        rating_Trajectory{trl,1} = trajectory;
-        T.p3_expect_responseonset(trl) = buttonPressOnset;
-        T.p3_expect_RT(trl) = RT;
+%-------------------------------------------------------------------------------
+%                             4. Fixtion Jitter 0-4 sec
+%-------------------------------------------------------------------------------
+jitter2 = 1;
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
+WaitSecs(jitter2);
+fEnd2 = GetSecs;
+T.p4_fixation_duration(trl) = fEnd2- T.p4_fixation_onset(trl);
 
-        %-------------------------------------------------------------------------------
-        %                             4. Fixtion Jitter 0-4 sec
-        %-------------------------------------------------------------------------------
-        jitter2 = 1;
-        Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-           p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-        T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
-        WaitSecs(jitter2);
-        fEnd2 = GetSecs;
-        T.p4_fixation_duration(trl) = fEnd2 - fStart2;
-        %-------------------------------------------------------------------------------
-        %                          5. cognitive mental rotation task
-        %-------------------------------------------------------------------------------
-        respToBeMade = true;
+%-------------------------------------------------------------------------------
+%                          5. cognitive mental rotation task
+%-------------------------------------------------------------------------------
+respToBeMade = true;
+image_filepath = fullfile(main_dir,'stimuli','cognitive');
+image_filename = char(countBalMat.image_filename(trl));
+image_rotation = fullfile(image_filepath,image_filename);
 
-        image_filepath = fullfile(main_dir,'stimuli','cognitive');
-        image_filename = char(countBalMat.image_filename(trl));
-        image_rotation = fullfile(image_filepath,image_filename);
+% while respToBeMade == true
+% present rotate image ---------------------------------------------------------
+rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
+Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
+% present scale lines ----------------------------------------------------------
+Yc = 300; % Y coord
+cDist = 20; % vertical line depth
+lXc = -200; % left X coord
+rXc = 200; % right X coord
+lineCoords = [lXc lXc lXc rXc rXc rXc; Yc-cDist Yc+cDist Yc Yc Yc-cDist Yc+cDist];
+Screen('DrawLines', p.ptb.window, lineCoords,...
+p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+% present same diff text -------------------------------------------------------
+textDiff = 'Diff';
+textSame = 'Same';
+textYc = p.ptb.yCenter + Yc + cDist*4;
+textRXc = p.ptb.xCenter + rXc;
+textLXc = p.ptb.xCenter - rXc;
+DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
+DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
 
-        % while respToBeMade == true
-        % present rotate image ---------------------------------------------------------
-        rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
-        Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
-        % present scale lines ----------------------------------------------------------
-        Yc = 300; % Y coord
-        cDist = 20; % vertical line depth
-        lXc = -200; % left X coord
-        rXc = 200; % right X coord
-        lineCoords = [lXc lXc lXc rXc rXc rXc; Yc-cDist Yc+cDist Yc Yc Yc-cDist Yc+cDist];
-        Screen('DrawLines', p.ptb.window, lineCoords,...
-            p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-        % present same diff text -------------------------------------------------------
-        textDiff = 'Diff';
-        textSame = 'Same';
-        textYc = p.ptb.yCenter + Yc + cDist*4;
-        textRXc = p.ptb.xCenter + rXc;
-        textLXc = p.ptb.xCenter - rXc;
-        DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
-        DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
+% flip screen  -----------------------------------------------------------------
+timing.initialized = Screen('Flip',p.ptb.window);
+T.p5_administer_onset(trl) = timing.initialized;
+duration = 4;
+while GetSecs < timing.initialized + duration
 
-        % flip screen  -----------------------------------------------------------------
-        timing.initialized = Screen('Flip',p.ptb.window);
-        T.p5_administer_onset(trl) = timing.initialized;
-        duration = 4;
-        while GetSecs < timing.initialized + duration
+% key press --------------------------------------------------------------------
+[keyIsDown,secs, keyCode] = KbCheck;
+if keyCode(p.keys.esc)
+ShowCursor;
+sca;
+return
+elseif keyCode(p.keys.left)
+RT = GetSecs - timing.initialized;
+response = 1;
 
-            % key press --------------------------------------------------------------------
-            [keyIsDown,secs, keyCode] = KbCheck;
-            if keyCode(p.keys.esc)
-                ShowCursor;
-                sca;
-                return
-            elseif keyCode(p.keys.left)
-                RT = GetSecs - timing.initialized;
-                response = 1;
+% respToBeMade = false;
+Screen('DrawLines', p.ptb.window, lineCoords,...
+p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
+DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, [255 0 0]);
+Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
+Screen('Flip',p.ptb.window);
 
-                % respToBeMade = false;
-                Screen('DrawLines', p.ptb.window, lineCoords,...
-                    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-                DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
-                DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, [255 0 0]);
-                Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
-                Screen('Flip',p.ptb.window);
-
-                WaitSecs(0.5);
+WaitSecs(0.5);
 
                 % fill in with fixation cross
-                remainder_time = duration-0.5-RT;
-                Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-                    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-                Screen('Flip', p.ptb.window);
-                WaitSecs(remainder_time);
+remainder_time = duration-0.5-RT;
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+Screen('Flip', p.ptb.window);
+WaitSecs(remainder_time);
 %                 while GetSecs < timing.initialized + duration %4-RT-0.5
 %                     % fixation screen
 %                     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
@@ -233,33 +237,26 @@ for trl = 1:5 %size(countBalMat,1)
                 %                 end
             end
         end
-        T.p5_administer_responseonset(trl) = secs;
-        T.p5_administer_responsekey(trl) = response;
-        T.p5_administer_RT(trl) = secs - timing.initialized;
-        % WaitSecs(0.5);
+T.p5_administer_responseonset(trl) = secs;
+T.p5_administer_responsekey(trl) = response;
+T.p5_administer_RT(trl) = secs - timing.initialized;
 
-        %-------------------------------------------------------------------------------
-        %                                6. post evaluation rating
-        %-------------------------------------------------------------------------------
-        [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
-        rating_Trajectory{trl,2} = trajectory;
-        T.p6_actual_onset(trl) = GetSecs;
-        T.p6_actual_responseonset(trl) = buttonPressOnset;
-        T.p6_actual_RT(trl) = RT;
-        tmpFileName = saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
-        writetable(T,tmpFileName);
-    end
+%-------------------------------------------------------------------------------
+%                                6. post evaluation rating
+%-------------------------------------------------------------------------------
+T.p6_actual_onset(trl) = GetSecs;
+[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
+rating_Trajectory{trl,2} = trajectory;
+T.p6_actual_responseonset(trl) = buttonPressOnset;
+T.p6_actual_RT(trl) = RT;
+tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
+writetable(T,tmpFileName);
+end
 end
 
 %-------------------------------------------------------------------------------
 %                                   save parameter
 %-------------------------------------------------------------------------------
-% Save onset time
-sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 'beh' );
-if ~exist(sub_save_dir, 'dir')
-    mkdir(sub_save_dir)
-end
-
 saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh.csv' ]);
 writetable(T,saveFileName);
 
@@ -267,7 +264,7 @@ traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', su
 save(traject_saveFileName, 'rating_Trajectory');
 
 psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
-save(psychtoolbox_saveFileName, p);
+save(psychtoolbox_saveFileName, 'p');
 
 % Clear the screen
 close all;

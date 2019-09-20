@@ -121,7 +121,8 @@ function pain(sub,input_counterbalance_file, run_num)
   %-------------------------------------------------------------------------------
   %                             3. expectation rating
   %-------------------------------------------------------------------------------
-  T.p3_expect_onset(trl) = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+  Screen('MakeTexture', p.ptb.window, imread(cueImage));
+  T.p3_expect_onset(trl) = GetSecs;
   [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
   T.p3_expect_responseonset(trl) = buttonPressOnset;
   rating_Trajectory{trl,1} = trajectory;
