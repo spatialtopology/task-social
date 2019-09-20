@@ -31,14 +31,14 @@ p.fix.allCoords                = [p.fix.xCoords; p.fix.yCoords];
 %----------------------------------------------------------------------
 %                       Load Design Matrix Parameters
 %----------------------------------------------------------------------
-main_dir = '/Users/h/Documents/projects_local/social_influence';
-% main_dir = '/Users/h/Dropbox/Projects/socialPain';
-% main_dir = 'C:\Users\RTNF\Documents\GitHub\social_influence';
-dir_video = strcat([main_dir, '/stimuli/task-vicarious_videofps-024_dur-4s/selected']);
-cue_low_dir =  '/Users/h/Dropbox/Projects/socialPain/stimuli/cue/scl';
-cue_high_dir = '/Users/h/Dropbox/Projects/socialPain/stimuli/cue/sch';
+task_dir = pwd;
+main_dir = fileparts(fileparts(task_dir));
 taskname = 'vicarious';
-counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file '.csv']);
+
+dir_video = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
+cue_low_dir =  fullfile(main_dir,'stimuli','cue','scl');
+cue_high_dir = fullfile([main_dir,'stimuli','cue','sch']);
+counterbalancefile = fullfile(main_dir, 'design', ['task-', taskname, '_counterbalance_ver-01_block-01.csv']);
 countBalMat = readtable(counterbalancefile);
 %----------------------------------------------------------------------
 %                       Load Circular scale
@@ -50,24 +50,31 @@ image_scale = fullfile(image_filepath, image_scale_filename);
 %----------------------------------------------------------------------
 %                       Load Jitter Matrix
 %----------------------------------------------------------------------
-p1_fixationPresent = zeros(size(countBalMat,1),1);
-p1_jitter = zeros(size(countBalMat,1),1);
-p2_cue = zeros(size(countBalMat,1),1);
-p3_ratingPresent = zeros(size(countBalMat,1),1);
-p3_ratingDecideOnset  = zeros(size(countBalMat,1),1);
-% p3_ratingTrajectory  = cell(size(countBalMat,1),1); % Cell
-p3_decisionRT  = zeros(size(countBalMat,1),1);
-p4_fixationPresent  = zeros(size(countBalMat,1),1);
-p4_jitter  = zeros(size(countBalMat,1),1);
-p5_responseOnset  = zeros(size(countBalMat,1),1);
-p5_responseKey  = zeros(size(countBalMat,1),1);
-p5_RT  = zeros(size(countBalMat,1),1);
-p5_imageAttr  = zeros(size(countBalMat,1),1);
-p6_ratingPresent = zeros(size(countBalMat,1),1);
-p6_ratingDecideOnset = zeros(size(countBalMat,1),1);
-% p6_ratingTrajectory = cell(size(countBalMat,1),1); % Cell
-p6_decisionRT = zeros(size(countBalMat,1),1);
-rating_Trajectory = cell(size(countBalMat,1),2);
+vnames = {'param_fmriSession', 'param_counterbalanceVer', 'param_counterbalanceBlockNum',...
+'param_videoSubject', 'param_videoFilename','param_cue_type', 'param_administer_type', 'param_cond_type'...
+'p1_fixation_onset', 'p1_fixation_duration',...
+'p2_cue_onset', 'p2_cue_type', 'p2_cue_filename',...
+'p3_expect_onset', 'p3_expect_responseonset', 'p3_expect_RT', ...
+'p4_fixation_onset', 'p4_fixation_duration',...
+'p5_administer_type', 'p5_administer_filename', 'p5_administer_onset',...
+'p6_actual_onset', 'p6_actual_responseonset', 'p6_actual_RT'};
+T = array2table(zeros(size(countBalMat,1),size(vnames,2)));
+T.Properties.VariableNames = vnames;
+
+a = split(counterbalancefile,filesep); % full path filename components
+version_chunk = split(extractAfter(a(end),"ver-"),"_");
+block_chunk = split(extractAfter(a(end),"block-"),["-", "."]);
+T.param_counterbalanceVer(:) = str2double(version_chunk{1});
+T.param_counterbalanceBlockNum(:) = str2double(block_chunk{1});
+T.param_videoSubject = countBalMat.video_subject;
+T.param_videoFilename = countBalMat.video_filename;
+T.param_cue_type = countBalMat.cue_type;
+T.param_administer_type = countBalMat.administer;
+T.param_cond_type = countBalMat.cond_type;
+T.p2_cue_type = countBalMat.cue_type;
+T.p2_cue_filename = countBalMat.cue_image;
+T.p5_administer_type = countBalMat.administer;
+T.p5_administer_filename = countBalMat.video_filename;
 
 %----------------------------------------------------------------------
 %                       Keyboard information
@@ -87,24 +94,20 @@ for trl = 1:size(countBalMat,1)
 %-------------------------------------------------------------------------------
 %                             1. Fixtion Jitter 0-4 sec
 %-------------------------------------------------------------------------------
-% 1) get jitter
 jitter1 = 4;
-% 2) Draw the fixation cross in p.ptb.p.ptb.white, set it to the center of our screen and
-% set good quality antialiasing
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 fStart1 = GetSecs;
 Screen('Flip', p.ptb.window);
 WaitSecs(jitter1);
 fEnd1 = GetSecs;
-% save Parameters
-p1_fixationPresent(trl) = fStart1;
-p1_jitter(trl) = fEnd1 - fStart1;
+
+ T.p1_fixation_onset(trl) = fStart1;
+ T.p1_fixation_duration(trl) = fEnd1 - fStart1;
 
 %-------------------------------------------------------------------------------
 %                                  2. cue 1s
 %-------------------------------------------------------------------------------
-% 1) log cue presentation time
 if string(countBalMat.cue_type{trl}) == 'low'
   cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
   cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
@@ -114,95 +117,104 @@ elseif string(countBalMat.cue_type{trl}) == 'high'
 
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-Screen('Flip',p.ptb.window);
-% p2_cue(trl) = GetSecs; % save output
+T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
 WaitSecs(1)
 
 %-------------------------------------------------------------------------------
 %                             3. expectation rating
 %-------------------------------------------------------------------------------
-% OUTPUT:
-% 1) log rating presentation time: p3_ratingPresent
-% 2) log rating click time: p3_ratingDecideOnset
-% 3) log rating decision RT time: p3_decisionRT
-% 4) remove onscreen after 4 sec
-
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-p3_ratingPresent(trl) = GetSecs;
+T.p3_expect_onset(trl) = GetSecs;
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
-
-p3_ratingDecideOnset(trl) = buttonPressOnset;
 rating_Trajectory{trl,1} = trajectory;
-p3_decisionRT(trl) = RT;
+T.p3_expect_responseonset(trl) = buttonPressOnset;
+T.p3_expect_RT(trl) = RT;
 
 %-------------------------------------------------------------------------------
 %                             4. Fixtion Jitter 0-4 sec
 %-------------------------------------------------------------------------------
-
-% 1) get jitter
 jitter2 = 1;
-% 2) Draw the fixation cross in white, set it to the center of our screen and
-% set good quality antialiasing
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 fStart2 = GetSecs;
 Screen('Flip', p.ptb.window);
 WaitSecs(jitter2);
 fEnd2 = GetSecs;
-% save Parameters
-p4_fixationPresent(trl) = fStart2;
-p4_jitter(trl) = fEnd2 - fStart2;
+T.p4_fixation_onset(trl) = fStart2;
+T.p4_fixation_duration(trl) = fEnd2 - fStart2;
 
 %-------------------------------------------------------------------------------
 %                                  5. vicarious
 %-------------------------------------------------------------------------------
-% STEPS
-% OUTPUT
-% p5_administer
-% 1) video
 video_filename = [countBalMat.video_filename{trl}];
 video_file = fullfile(dir_video, video_filename);
-
-movie_time = video_Xiaochun(video_file , p );
-p5_video(trl) = movie_time;
+movie_time = video_play(video_file , p );
+T.p5_administer_onset(trl) = movie_time;
 
 %-------------------------------------------------------------------------------
 %                                6. post evaluation rating
 %-------------------------------------------------------------------------------
-% OUTPUT
-% 1) log rating presentation time: p6_ratingPresent
-% 2) log rating click time: p6_ratingDecideOnset
-% 3) log rating decision RT time: p6_decisionRT
-% 4) remove onscreen after 4 sec
-
-p6_ratingPresent(trl) = GetSecs;
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
-p6_ratingDecideOnset(trl) = buttonPressOnset;
 rating_Trajectory{trl,2} = trajectory;
-p6_decisionRT(trl) = RT;
+T.p6_actual_onset(trl) = GetSecs;
+T.p6_actual_responseonset(trl) = buttonPressOnset;
+T.p6_actual_RT(trl) = RT;
 
 end
 end
 %-------------------------------------------------------------------------------
 %                                   save parameter
 %-------------------------------------------------------------------------------
-
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 'beh' );
 if ~exist(sub_save_dir, 'dir')
     mkdir(sub_save_dir)
 end
-T = table(p1_fixationPresent,p1_jitter,p2_cue,p3_ratingPresent,...
-p3_ratingDecideOnset,p3_decisionRT,p4_fixationPresent,p4_jitter,p5_responseOnset,...
-p5_responseKey,p5_RT,p6_ratingPresent,p6_ratingDecideOnset,p6_decisionRT);
-saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_run-', sprintf('%02d', run_num),'_beh.csv' ]);
-writetable(T,saveFileName)
-% save mouse trajectory
-trajectory_table = rating_Trajectory;
 
-traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_run-', sprintf('%02d', run_num),'_beh_trajectory.mat' ]);
+saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh.csv' ]);
+writetable(T,saveFileName);
+
+traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
 save(traject_saveFileName, 'rating_Trajectory');
 
-% end
-% Clear the screen
+psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
+save(psychtoolbox_saveFileName, 'p');
+
 sca;
+
+
+
+
+%-------------------------------------------------------------------------------
+%                                   Function
+%-------------------------------------------------------------------------------
+% Function by Xiaochun Han
+function [Tm] = video_play(moviename,p)
+
+% [p.ptb.window, rect]  = Screen(p.ptb.screenID, 'OpenWindow',p.ptb.bg);
+Tt = 0;
+rate = 1;
+[movie, ~, ~, imgw, imgh] = Screen('OpenMovie', p.ptb.window, moviename);
+Screen('PlayMovie', movie, rate);
+Tm = GetSecs;
+t = 0; dur = 0;
+while 1
+    if ((imgw>0) && (imgh>0))
+        tex = Screen('GetMovieImage', p.ptb.window, movie, 1);
+        t = t + tex;
+        if tex < 0
+            break;
+        end
+
+        if tex == 0
+            WaitSecs('YieldSecs', 0.005);
+            continue;
+        end
+        Screen('DrawTexture', p.ptb.window, tex);
+        Screen('Flip', p.ptb.window);
+        Screen('Close', tex);
+    end
+end
+Screen('Flip', p.ptb.window);
+Screen('PlayMovie', movie, 0);
+Screen('CloseMovie', movie);
 end
