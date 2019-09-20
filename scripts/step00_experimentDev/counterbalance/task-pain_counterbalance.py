@@ -13,7 +13,7 @@ def noConsecutiveShuffle(list_key, list_dict, consec_num):
     orderTest=False
 
     while orderTest == False:
-        for i in range(len(list_key)):
+        for i in list(range(len(list_key))):
             # if ''.join(list_key).count('same'* consec_num) > 0 or ''.join(list_key).count('diff' * consec_num) >0:
             if ''.join(list_key).count('c1'* consec_num) > 0 or \
             ''.join(list_key).count('c2' * consec_num) >0 or \
@@ -33,12 +33,12 @@ def noConsecutiveShuffle(list_key, list_dict, consec_num):
     return trialList
 
 def generateListKey(trial_per_cond):
-    list_stim1 = range(1,trial_per_cond+1)   # e.g. range(1,8)
-    list_stim2 = range(trial_per_cond+1,trial_per_cond*2+1) # e.g. range(8,15)
-    list_stim3 = range(trial_per_cond*2+1, trial_per_cond*3+1 )# e.g. range(1,8)
-    list_stim4 = range(trial_per_cond*3+1, trial_per_cond*4+1 )# e.g. range(8,15)
-    list_stim5 = range(trial_per_cond*4+1, trial_per_cond*5+1 )# e.g. range(8,15)
-    list_stim6 = range(trial_per_cond*5+1, trial_per_cond*6+1 )# e.g. range(8,15)
+    list_stim1 = list(range(1,trial_per_cond+1) )  # e.g. range(1,8)
+    list_stim2 = list(range(trial_per_cond+1,trial_per_cond*2+1)) # e.g. range(8,15)
+    list_stim3 = list(range(trial_per_cond*2+1, trial_per_cond*3+1 ))# e.g. range(1,8)
+    list_stim4 = list(range(trial_per_cond*3+1, trial_per_cond*4+1 ))# e.g. range(8,15)
+    list_stim5 = list(range(trial_per_cond*4+1, trial_per_cond*5+1 ))# e.g. range(8,15)
+    list_stim6 = list(range(trial_per_cond*5+1, trial_per_cond*6+1 ))# e.g. range(8,15)
     list_dict = {'c1':list_stim1, 'c2':list_stim2, 'c3':list_stim3, 'c4':list_stim4, 'c5':list_stim5, 'c6':list_stim6}
     random.shuffle(list_stim1)
     random.shuffle(list_stim2)
@@ -47,7 +47,7 @@ def generateListKey(trial_per_cond):
     random.shuffle(list_stim5)
     random.shuffle(list_stim6)
     x = ['c1','c2', 'c3', 'c4', 'c5', 'c6']
-    list_key  = [item for item in x for i in range(trial_per_cond)]
+    list_key  = [item for item in x for i in list(range(trial_per_cond))]
     return list_key, list_dict
 
 def shuffleDataFrame(df_subset, consec_num):
@@ -66,10 +66,10 @@ trial_per_cond = 6 # how many trials under one condition
 administer_items = [48, 49, 50] # what rotation degree are we using
 counterbalance_freq = 6 # how many counterbalance versions do you want
 consec_num = 4
-saveDir = '/Users/h/Dropbox/Projects/social_influence/design'
+saveDir = '/Users/h/Documents/projects_local/social_influence/design'
 taskname = 'pain'
-cue_high_dir = '/Users/h/Dropbox/Projects/social_influence/stimuli/cue/task-' + taskname + '/sch'
-cue_low_dir = '/Users/h/Dropbox/Projects/social_influence/stimuli/cue/task-' + taskname + '/scl'
+cue_high_dir = '/Users/h/Documents/projects_local/social_influence/stimuli/cue/task-' + taskname + '/sch'
+cue_low_dir = '/Users/h/Documents/projects_local/social_influence/stimuli/cue/task-' + taskname + '/scl'
 df = pd.DataFrame()
 # ______________________________________________________________________________
 #for index, df in enumerate([df1, df2]):
@@ -103,12 +103,12 @@ for index, df in enumerate([df1, df2]):
     df['cue_type'] = np.tile(['high', 'low'], 18)  # np.resize(['high', 'low'], )
     df.loc[::2,'cue_image']  = high_cue[index]
     df.loc[1::2,'cue_image'] = low_cue[index]
-    df['random_order'] = range(len(df))
+    df['random_order'] = list(range(len(df)))
     df_reset = df.reset_index()
 
 
 # 3. calculated trial type _____________________________________________________
-    df['trial_type'] = ((df.cue_type == 'low') & (df.administer == administer_items[0])).astype(int) * 1 + \
+    df['cond_type'] = ((df.cue_type == 'low') & (df.administer == administer_items[0])).astype(int) * 1 + \
         ((df.cue_type == 'high') & (df.administer == administer_items[0])).astype(int) * 2 + \
         ((df.cue_type == 'low') & (df.administer == administer_items[1])).astype(int) * 3 + \
         ((df.cue_type == 'high') & (df.administer == administer_items[1])).astype(int) * 4 + \
@@ -121,11 +121,11 @@ for index, df in enumerate([df1, df2]):
 
 
     # 5. split dataframes into two blocks and counterbalance _______________________
-    for cB_ver in range(1,counterbalance_freq):
+    for cB_ver in list(range(1,counterbalance_freq)):
 
         # 1) split dataframes
         # 2) shuffle each bin with the function  ___________________________________
-        for index in range(2):
+        for index in list(range(2)):
             cB = shuffleDataFrame(df, consec_num)
             cB['condition_name'] = np.repeat([taskname], len(cB))
             cB['condition_num_filled_in_during_exper'] = 99
