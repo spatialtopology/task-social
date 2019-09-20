@@ -45,7 +45,7 @@ switch bl_ind
   case 5 % c2 p1 v2 v1 p2 c1
     cognitive(sub,c2,1);pain(sub,p1,2);vicarious(sub,v2,3); %vicarious(sub,v1,4);pain(sub,p2,5);cognitive(sub,c1,6);
 end
-elseif session != 1
+elseif session ~= 1
 switch bl_ind
   case 0 % p1 v1 c2 c1 v2 p2
     cognitive(sub,c1,4);vicarious(sub,v2,5);pain(sub,p2,6);

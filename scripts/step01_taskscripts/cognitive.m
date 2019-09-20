@@ -40,7 +40,6 @@ cue_high_dir = fullfile([main_dir,'stimuli','cue','sch']);
 counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file, '.csv']);
 countBalMat = readtable(counterbalancefile);
 
-
 %----------------------------------------------------------------------
 %                       Load Circular scale
 %----------------------------------------------------------------------
@@ -52,7 +51,7 @@ image_scale = fullfile(image_filepath, image_scale_filename);
 %                       Load Jitter Matrix
 %----------------------------------------------------------------------
 vnames = {'param_fmriSession', 'param_runNum','param_counterbalanceVer', 'param_counterbalanceBlockNum',...
-'param_stimNum', 'param_stimMatch','param_stimFilename','param_cue_type', 'param_administer_type', 'param_cond_type'...
+'param_cogStimNum', 'param_cogStimMatch','param_cogStimFilename','param_cue_type', 'param_administer_type', 'param_cond_type',...
 'p1_fixation_onset', 'p1_fixation_duration',...
 'p2_cue_onset', 'p2_cue_type', 'p2_cue_filename',...
 'p3_expect_onset', 'p3_expect_responseonset', 'p3_expect_RT', ...
@@ -68,9 +67,9 @@ block_chunk = split(extractAfter(a(end),"block-"),["-", "."]);
 T.param_runNum(:) = run_num;
 T.param_counterbalanceVer(:) = str2double(version_chunk{1});
 T.param_counterbalanceBlockNum(:) = str2double(block_chunk{1});
-T.param_stimNum = countBalMat.stimuli_num;
-T.param_stimMatch = countBalMat.match;
-T.param_stimFilename = countBalMat.image_filename;
+T.param_cogStimNum = countBalMat.stimuli_num;
+T.param_cogStimMatch = countBalMat.match;
+T.param_cogStimFilename = countBalMat.image_filename;
 T.param_cue_type = countBalMat.cue_type;
 T.param_administer_type = countBalMat.administer;
 T.param_cond_type = countBalMat.cond_type;
@@ -118,15 +117,13 @@ for trl = 1:5 %size(countBalMat,1)
 
     imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
     Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-    Screen('Flip',p.ptb.window);
-    T.p2_cue_onset(trl) = GetSecs;
+    T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
     WaitSecs(1)
 
         %-------------------------------------------------------------------------------
         %                             3. expectation rating
         %-------------------------------------------------------------------------------
-        imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-        T.p3_expect_onset(trl) = GetSecs;
+        T.p3_expect_onset(trl) = Screen('MakeTexture', p.ptb.window, imread(cueImage));
         [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
         rating_Trajectory{trl,1} = trajectory;
         T.p3_expect_responseonset(trl) = buttonPressOnset;
@@ -138,23 +135,13 @@ for trl = 1:5 %size(countBalMat,1)
         jitter2 = 1;
         Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
            p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-        fStart2 = GetSecs;
-        Screen('Flip', p.ptb.window);
+        T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
         WaitSecs(jitter2);
         fEnd2 = GetSecs;
-        T.p4_fixation_onset(trl) = fStart2;
         T.p4_fixation_duration(trl) = fEnd2 - fStart2;
         %-------------------------------------------------------------------------------
         %                          5. cognitive mental rotation task
         %-------------------------------------------------------------------------------
-        % STEPS
-        % 0) question Same Different
-        % 1) load image
-        % 2) response
-
-        % OUTPUT
-        % p5_administer
-        % 1) log pain start time
         respToBeMade = true;
 
         image_filepath = fullfile(main_dir,'stimuli','cognitive');
