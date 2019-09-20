@@ -10,7 +10,7 @@ sub = input(prompt);
 global p
 % debug mode % Initial
 % debug     = 1;   % PTB Debugging
-% 
+%
 % AssertOpenGL;
 % commandwindow;
 % ListenChar(2);
@@ -139,7 +139,7 @@ imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 T.p3_expect_onset(trl) = GetSecs;
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
 rating_Trajectory{trl,1} = trajectory;
-T.p3_expect_responseonset(trl) = buttonPressOnset;
+T.p3_expect_responseonset(trl) = buttonpressOnset;
 T.p3_expect_RT(trl) = RT;
 
 %-------------------------------------------------------------------------------
