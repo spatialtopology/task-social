@@ -1,5 +1,9 @@
 function cognitive(sub,input_counterbalance_file, run_num)
 
+%% -----------------------------------------------------------------------------
+%                                Parameters
+% ______________________________________________________________________________
+
 %% A. Psychtoolsbox parameters _________________________________________________
 global p
 Screen('Preference', 'SkipSyncTests', 1);
@@ -17,8 +21,6 @@ Screen('TextSize', p.ptb.window, 36);
 [p.ptb.xCenter, p.ptb.yCenter]  = RectCenter(p.ptb.rect);
 p.fix.sizePix                   = 40; % size of the arms of our fixation cross
 p.fix.lineWidthPix              = 4; % Set the line width for our fixation cross
-% Now we set the coordinates (these are all relative to zero we will let
-% the drawing routine center the cross in the center of our monitor for us)
 p.fix.xCoords                   = [-p.fix.sizePix p.fix.sizePix 0 0];
 p.fix.yCoords                   = [0 0 -p.fix.sizePix p.fix.sizePix];
 p.fix.allCoords                 = [p.fix.xCoords; p.fix.yCoords];
@@ -34,7 +36,6 @@ cue_high_dir                    = fullfile([main_dir,'stimuli','cue','sch']);
 counterbalancefile              = fullfile(main_dir, 'design', [input_counterbalance_file, '.csv']);
 countBalMat                     = readtable(counterbalancefile);
 
-% Save onset time
 sub_save_dir                    = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 'beh' );
 if ~exist(sub_save_dir, 'dir')
     mkdir(sub_save_dir)
@@ -76,9 +77,7 @@ T.p2_cue_filename              = countBalMat.cue_image;
 T.p5_administer_type           = countBalMat.administer;
 T.p5_administer_filename       = countBalMat.image_filename;
 
-%----------------------------------------------------------------------
-%                       Keyboard information
-%----------------------------------------------------------------------
+%% E. Keyboard information _____________________________________________________
 KbName('UnifyKeyNames');
 p.keys.confirm                 = KbName('return');
 p.keys.right                   = KbName('j');
@@ -86,10 +85,10 @@ p.keys.left                    = KbName('f');
 p.keys.space                   = KbName('space');
 p.keys.esc                     = KbName('ESCAPE');
 
+
 %% ------------------------------------------------------------------------------
 %                              Start Experiment
 %________________________________________________________________________________
-
 
 %% 0. Experimental loop _________________________________________________________
 for trl = 1:size(countBalMat,1)
@@ -209,6 +208,7 @@ DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, [255 0 0]);
 Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
 Screen('Flip',p.ptb.window);
 WaitSecs(0.5);
+
 % fill in with fixation cross
 remainder_time = duration-0.5-RT;
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
@@ -243,6 +243,5 @@ save(traject_saveFileName, 'rating_Trajectory');
 psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 
-% Clear the screen
 close all;
 sca;
