@@ -9,15 +9,15 @@ sub = input(prompt);
 
 global p
 % debug mode % Initial
-debug     = 1;   % PTB Debugging
-
-AssertOpenGL;
-commandwindow;
-ListenChar(2);
-if debug
-    ListenChar(0);
-    PsychDebugWindowConfiguration;
-end
+% debug     = 1;   % PTB Debugging
+% 
+% AssertOpenGL;
+% commandwindow;
+% ListenChar(2);
+% if debug
+%     ListenChar(0);
+%     PsychDebugWindowConfiguration;
+% end
 Screen('Preference', 'SkipSyncTests', 1);
 PsychDefaultSetup(2);
 screens                       = Screen('Screens'); % Get the screen numbers
@@ -129,8 +129,7 @@ elseif string(countBalMat.cue_type{trl}) == 'high'
 
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-Screen('Flip',p.ptb.window);
-T.p2_cue_onset(trl) = GetSecs;
+T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
 WaitSecs(1)
 
 %-------------------------------------------------------------------------------
