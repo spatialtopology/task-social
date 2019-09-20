@@ -137,17 +137,17 @@ fEnd2 = GetSecs;
 T.p4_fixation_duration(trl) = fEnd2- T.p4_fixation_onset(trl);
 
 
-%% 5. cognitive ________________________________________________________________
+%% ____________________________ 5. cognitive ___________________________________
 respToBeMade = true;
 image_filepath = fullfile(main_dir,'stimuli','cognitive');
 image_filename = char(countBalMat.image_filename(trl));
 image_rotation = fullfile(image_filepath,image_filename);
 
 % while respToBeMade == true
-% present rotate image ---------------------------------------------------------
+% 5-1. present rotate image ____________________________________________________
 rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
 Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
-% present scale lines ----------------------------------------------------------
+% 5-2. present scale lines _____________________________________________________
 Yc = 300; % Y coord
 cDist = 20; % vertical line depth
 lXc = -200; % left X coord
@@ -155,7 +155,7 @@ rXc = 200; % right X coord
 lineCoords = [lXc lXc lXc rXc rXc rXc; Yc-cDist Yc+cDist Yc Yc Yc-cDist Yc+cDist];
 Screen('DrawLines', p.ptb.window, lineCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-% present same diff text -------------------------------------------------------
+% 5-3. present same diff text __________________________________________________
 textDiff = 'Diff';
 textSame = 'Same';
 textYc = p.ptb.yCenter + Yc + cDist*4;
@@ -163,8 +163,7 @@ textRXc = p.ptb.xCenter + rXc;
 textLXc = p.ptb.xCenter - rXc;
 DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
 DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
-
-% flip screen  -----------------------------------------------------------------
+% 5-4. flip screen _____________________________________________________________
 timing.initialized = Screen('Flip',p.ptb.window);
 T.p5_administer_onset(trl) = timing.initialized;
 duration = 4;
@@ -222,7 +221,7 @@ T.p5_administer_responsekey(trl) = response;
 T.p5_administer_RT(trl) = secs - timing.initialized;
 
 
-%% 6. post evaluation rating ___________________________________________________
+%% ________________________ 6. post evaluation rating __________________________
 T.p6_actual_onset(trl) = GetSecs;
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
 rating_Trajectory{trl,2} = trajectory;
@@ -233,7 +232,7 @@ writetable(T,tmpFileName);
 end
 end
 
-%% save parameter ______________________________________________________________
+%% __________________________ save parameter ___________________________________
 saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh.csv' ]);
 writetable(T,saveFileName);
 
