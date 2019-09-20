@@ -1,9 +1,9 @@
 
 % 1. grab participant number ___________________________________________________
 prompt = 'session number : ';
-sub = input(prompt);
-prompt = 'subject number (in raw number form, e.g. 1, 2,...,98): ';
 session = input(prompt);
+prompt = 'subject number (in raw number form, e.g. 1, 2,...,98): ';
+sub = input(prompt);
 
 
 
