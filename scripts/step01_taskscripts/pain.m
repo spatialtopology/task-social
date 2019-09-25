@@ -71,11 +71,14 @@ function pain(sub,input_counterbalance_file, run_num)
 
   %% E. Keyboard information _____________________________________________________
   KbName('UnifyKeyNames');
-  p.keys.confirm                 = KbName('return');
-  p.keys.right                   = KbName('j');
-  p.keys.left                    = KbName('f');
-  p.keys.space                   = KbName('space');
-  p.keys.esc                     = KbName('ESCAPE');
+    p.keys.confirm                 = KbName('return');
+    p.keys.right                   = KbName('j');
+    p.keys.left                    = KbName('f');
+    p.keys.space                   = KbName('space');
+    p.keys.esc                     = KbName('ESCAPE');
+    p.keys.trigger                 = KbName('5%');
+    p.keys.start                   = KbName('s');
+    p.keys.end                     = KbName('e');
 
   %% F. fmri Parameters __________________________________________________________
   TR                             = 0.46;

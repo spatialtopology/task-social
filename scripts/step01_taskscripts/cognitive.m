@@ -84,6 +84,9 @@ p.keys.right                   = KbName('j');
 p.keys.left                    = KbName('f');
 p.keys.space                   = KbName('space');
 p.keys.esc                     = KbName('ESCAPE');
+p.keys.trigger                 = KbName('5%');
+p.keys.start                   = KbName('s');
+p.keys.end                     = KbName('e');
 
 %% F. fmri Parameters __________________________________________________________
 TR                             = 0.46;
