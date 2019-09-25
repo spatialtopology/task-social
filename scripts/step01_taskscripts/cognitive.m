@@ -85,17 +85,33 @@ p.keys.left                    = KbName('f');
 p.keys.space                   = KbName('space');
 p.keys.esc                     = KbName('ESCAPE');
 
+%% F. fmri Parameters __________________________________________________________
+TR                             = 0.46;
 
-%% ------------------------------------------------------------------------------
+%% G. Instructions _____________________________________________________________
+instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
+instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
+
+%% -----------------------------------------------------------------------------
 %                              Start Experiment
-%________________________________________________________________________________
+% ______________________________________________________________________________
+%% ______________________________ Instructions _________________________________
+Screen('TextSize',p.ptb.window,72);
+DrawFormattedText(p.ptb.window,instruct_start,'center',p.ptb.screenYpixels/2+150,255);
+Screen('Flip',p.ptb.window);
 
-%% 0. Experimental loop _________________________________________________________
+%% _______________________ Wait for Trigger to Begin ___________________________
+DisableKeysForKbCheck([]);
+KbTriggerWait(p.keys.start);
+T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+WaitSecs(TR*6);
+
+%% ___________________________ 0. Experimental loop ____________________________
 for trl = 1:size(countBalMat,1)
 
 
-%% 1. Fixtion Jitter 0-4 sec ____________________________________________________
-jitter1 = 4;
+%% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
+jitter1 = countBalMat.ISI1(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 T.p1_fixation_onset(trl) = Screen('Flip', p.ptb.window);
@@ -103,8 +119,7 @@ WaitSecs(jitter1);
 fEnd1 = GetSecs;
 T.p1_fixation_duration(trl) = fEnd1 - T.p1_fixation_onset(trl);
 
-
-%% 2. cue 1s ___________________________________________________________________
+%% ________________________________ 2. cue 1s __________________________________
 if string(countBalMat.cue_type{trl}) == 'low'
   cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
   cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
@@ -118,7 +133,7 @@ T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
 WaitSecs(1)
 
 
-%% 3. expectation rating _______________________________________________________
+%% __________________________ 3. expectation rating ____________________________
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 T.p3_expect_onset(trl) = GetSecs;
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
@@ -127,8 +142,8 @@ T.p3_expect_responseonset(trl) = buttonPressOnset;
 T.p3_expect_RT(trl) = RT;
 
 
-%% 4. Fixtion Jitter 0-4 sec ___________________________________________________
-jitter2 = 1;
+%% _________________________ 4. Fixtion Jitter 0-4 sec _________________________
+jitter2 = countBalMat.ISI2(trl);;
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
@@ -147,6 +162,7 @@ image_rotation = fullfile(image_filepath,image_filename);
 % 5-1. present rotate image ____________________________________________________
 rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
 Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
+
 % 5-2. present scale lines _____________________________________________________
 Yc = 300; % Y coord
 cDist = 20; % vertical line depth
@@ -155,6 +171,7 @@ rXc = 200; % right X coord
 lineCoords = [lXc lXc lXc rXc rXc rXc; Yc-cDist Yc+cDist Yc Yc Yc-cDist Yc+cDist];
 Screen('DrawLines', p.ptb.window, lineCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+
 % 5-3. present same diff text __________________________________________________
 textDiff = 'Diff';
 textSame = 'Same';
@@ -163,13 +180,14 @@ textRXc = p.ptb.xCenter + rXc;
 textLXc = p.ptb.xCenter - rXc;
 DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
 DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
+
 % 5-4. flip screen _____________________________________________________________
 timing.initialized = Screen('Flip',p.ptb.window);
 T.p5_administer_onset(trl) = timing.initialized;
 duration = 4;
 while GetSecs < timing.initialized + duration
 
-% key press --------------------------------------------------------------------
+% 5-5. key press --------------------------------------------------------------------
 [keyIsDown,secs, keyCode] = KbCheck;
 if keyCode(p.keys.esc)
 ShowCursor;

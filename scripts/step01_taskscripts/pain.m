@@ -1,9 +1,10 @@
 function pain(sub,input_counterbalance_file, run_num)
 
-  %---------------------------------- ------------------------------------
-  %                       Window Parameters
-  %----------------------------------------------------------------------
-  % Clear the workspace and the screen
+
+  %% -----------------------------------------------------------------------------
+  %                           Parameters
+  % ______________________________________________________________________________
+  %% A. Psychtoolbox parameters _________________________________________________
   sca;
 
   global p
@@ -28,9 +29,7 @@ function pain(sub,input_counterbalance_file, run_num)
   p.fix.yCoords                  = [0 0 -p.fix.sizePix p.fix.sizePix];
   p.fix.allCoords                = [p.fix.xCoords; p.fix.yCoords];
 
-  %----------------------------------------------------------------------
-  %                       Load Design Matrix Parameters
-  %----------------------------------------------------------------------
+  %% B. Directories ______________________________________________________________
   task_dir = pwd;
   main_dir = fileparts(fileparts(task_dir));
   taskname = 'pain';
@@ -41,16 +40,12 @@ function pain(sub,input_counterbalance_file, run_num)
   counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file, '.csv']);
   countBalMat = readtable(counterbalancefile);
 
-  %----------------------------------------------------------------------
-  %                       Load Circular scale
-  %----------------------------------------------------------------------
+  %% C. Circular rating scale _____________________________________________________
   image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
   image_scale_filename = ['task-', taskname, '_scale.png'];
   image_scale = fullfile(image_filepath, image_scale_filename);
 
-  %----------------------------------------------------------------------
-  %                       Load Jitter Matrix
-  %----------------------------------------------------------------------
+  %% D. making output table ________________________________________________________
   vnames = {'param_fmriSession','param_runNum','param_counterbalanceVer','param_counterbalanceBlockNum',...
   'param_cue_type','param_administer_type','param_cond_type',...
   'p1_fixation_onset','p1_fixation_duration',...
@@ -74,9 +69,7 @@ function pain(sub,input_counterbalance_file, run_num)
   T.p2_cue_type = countBalMat.cue_type;
   T.p5_administer_type = countBalMat.administer;
 
-  %----------------------------------------------------------------------
-  %                       Keyboard information
-  %----------------------------------------------------------------------
+  %% E. Keyboard information _____________________________________________________
   KbName('UnifyKeyNames');
   p.keys.confirm                 = KbName('return');
   p.keys.right                   = KbName('j');
@@ -84,15 +77,33 @@ function pain(sub,input_counterbalance_file, run_num)
   p.keys.space                   = KbName('space');
   p.keys.esc                     = KbName('ESCAPE');
 
-  %-------------------------------------------------------------------------------
-  %                            0. Experimental loop
-  %-------------------------------------------------------------------------------
+  %% F. fmri Parameters __________________________________________________________
+  TR                             = 0.46;
+
+  %% G. Instructions _____________________________________________________________
+  instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
+  instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
+
+  %% ------------------------------------------------------------------------------
+  %                              Start Experiment
+  %________________________________________________________________________________
+
+  %% ______________________________ Instructions _________________________________
+  Screen('TextSize',p.ptb.window,72);
+  DrawFormattedText(p.ptb.window,instruct_start,'center',p.ptb.screenYpixels/2+150,255);
+  Screen('Flip',p.ptb.window);
+
+  %% _______________________ Wait for Trigger to Begin ___________________________
+  DisableKeysForKbCheck([]);
+  KbTriggerWait(p.keys.start);
+  T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+  WaitSecs(TR*6);
+
+  %% ___________________________ 0. Experimental loop ____________________________
   for trl = 1:size(countBalMat,1)
 
-  %-------------------------------------------------------------------------------
-  %                             1. Fixtion Jitter 0-4 sec
-  %-------------------------------------------------------------------------------
-  jitter1 = 4;
+  %% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
+  jitter1 = countBalMat.ISI1(trl);;
   Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
      p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
   fStart1 = GetSecs;
@@ -102,9 +113,7 @@ function pain(sub,input_counterbalance_file, run_num)
 
    T.p1_fixation_onset(trl) = fStart1;
    T.p1_fixation_duration(trl) = fEnd1 - fStart1;
-  %-------------------------------------------------------------------------------
-  %                                  2. cue 1s
-  %-------------------------------------------------------------------------------
+  %% ________________________________ 2. cue 1s __________________________________
   % 1) log cue presentation time
   if string(countBalMat.cue_type{trl}) == 'low'
     cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
@@ -132,7 +141,7 @@ function pain(sub,input_counterbalance_file, run_num)
   %                             4. Fixtion Jitter 0-2 sec
   %-------------------------------------------------------------------------------
   % 1) get jitter
-  jitter2 = 1;
+  jitter2 = countBalMat.ISI2(trl);;
   Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
      p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
   fStart2 = GetSecs;

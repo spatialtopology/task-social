@@ -2,7 +2,6 @@ function vicarious(sub,input_counterbalance_file, run_num)
 %% -----------------------------------------------------------------------------
 %                           Parameters
 % ______________________________________________________________________________
-% Clear the workspace and the screen
 sca;
 
 %% A. Psychtoolbox parameters _________________________________________________
@@ -78,17 +77,34 @@ p.keys.left                    = KbName('f');
 p.keys.space                   = KbName('space');
 p.keys.esc                     = KbName('ESCAPE');
 
+%% F. fmri Parameters __________________________________________________________
+TR                             = 0.46;
+
+%% G. Instructions _____________________________________________________________
+instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
+instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
 
 %% ------------------------------------------------------------------------------
 %                              Start Experiment
 %________________________________________________________________________________
+
+%% ______________________________ Instructions _________________________________
+Screen('TextSize',p.ptb.window,72);
+DrawFormattedText(p.ptb.window,instruct_start,'center',p.ptb.screenYpixels/2+150,255);
+Screen('Flip',p.ptb.window);
+
+%% _______________________ Wait for Trigger to Begin ___________________________
+DisableKeysForKbCheck([]);
+KbTriggerWait(p.keys.start);
+T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+WaitSecs(TR*6);
 
 %% 0. Experimental loop _________________________________________________________
 for trl = 1:size(countBalMat,1)
 
 
 %% 1. Fixtion Jitter 0-4 sec ____________________________________________________
-jitter1 = 4;
+jitter1 = countBalMat.ISI1(trl);;
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 fStart1 = GetSecs;
@@ -124,7 +140,7 @@ T.p3_expect_RT(trl) = RT;
 
 
 %% 4. Fixtion Jitter 0-4 sec ___________________________________________________
-jitter2 = 1;
+jitter2 = countBalMat.ISI2(trl);;
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 fStart2 = GetSecs;
