@@ -65,17 +65,18 @@ def shuffleDataFrame(df_subset, consec_num):
 
 # parameters ___________________________________________________________________
 total_block = 2 # how many repeated blocks of this "cognitive" task
-cond_type = 6 # how many conditions are nested under the task
-trial_per_cond = 6 # how many trials under one condition
 administer_items = ['low', 'med', 'high'] # what rotation degree are we using
+cue_items = ['low', 'high']
 counterbalance_freq = 6 # how many counterbalance versions do you want
+cond_type = len(administer_items) * len(cue_items)  # 6: how many conditions are nested under the task
+trial_per_cond = 6 # how many trials under one condition
 consec_num = 4
 taskname = 'vicarious'
-dir_save = '/Users/h/Documents/projects_local/social_influence'
-dir_cue_high = dir_save + '/stimuli/cue/task-' + taskname + '/sch'
-dir_cue_low = dir_save + '/stimuli/cue/task-' + taskname + '/scl'
-# dir_video = '/Users/h/Dropbox/Projects/socialPain/stimuli/36_videos_lanlan'
-dir_video = dir_save + '/stimuli/task-vicarious_videofps-024_dur-4s/selected/'
+dir_main = '/Users/h/Documents/projects_local/social_influence'
+dir_cue_high = os.path.join(dir_main,'stimuli','cue','task-' + taskname,'sch')
+dir_cue_low = os.path.join(dir_main,'stimuli','cue','task-' + taskname,'scl')
+dir_save = os.path.join(dir_main, 'design','counterbalance')
+dir_video = os.path.join(dir_main,'stimuli','task-vicarious_videofps-024_dur-4s','selected')
 # ______________________________________________________________________________
 
 # if task-cognitive_counterbalance_ver-01_block-01.csv exists, delete
@@ -87,6 +88,9 @@ for filePath in fileList:
     except OSError:
         print("Error while deleting file")
 
+# if save dir doesn't exist, create
+if not os.path.exists(dir_save):
+    os.makedirs(dir_save)
 
 
 # 1. shuffle 12 subject sequences ____________________
@@ -173,16 +177,13 @@ for cB_ver in range(1,counterbalance_freq):
             image_fileglob = glob.glob(os.sep.join([dir_video,row.image_glob]))
             df.loc[ind_img, 'video_filename'] = os.path.split(image_fileglob[0])[1]
         # split DataFrame
-        mainFileName = dir_save + os.sep + "task-" + taskname + "_mainDesign_notCounterbalanced_block-" + str('%02d' % ind) + ".csv"
+        mainFileName = os.path.join(dir_save, "task-" + taskname + "_mainDesign_notCounterbalanced_block-" + str('%02d' % ind) + ".csv")
         df.to_csv(mainFileName)
-
-    # df1 = df.iloc[:, :len(df)/2]
-    # df2 = df.iloc[:, len(df)/2:]
-    # for index, df in enumerate([df1, df2]):
 
         cB = shuffleDataFrame(df, consec_num)
         cB['cB_version'] = cB_ver # assign from for loop number
-        cBverFileName = dir_save + os.sep + "design" +\
+        cBverFileName = os.path.join(dir_save, \
         "task-" + taskname + "_counterbalance_ver-" + str('%02d' % cB_ver)+ \
-         "_block-" +str('%02d' % int(ind+1)) +".csv"
+         "_block-" +str('%02d' % int(ind+1)) +".csv")
+
         cB.to_csv(cBverFileName)

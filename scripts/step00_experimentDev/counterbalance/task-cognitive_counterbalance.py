@@ -48,19 +48,21 @@ def shuffleDataFrame(df_subset, consec_num):
 
 # parameters ___________________________________________________________________
 total_block = 2 # how many repeated blocks of this "cognitive" task
-cond_type = 6 # how many conditions are nested under the task
-trial_per_cond = 6 # how many trials under one condition
 administer_items = [50, 100, 150] # what rotation degree are we using
+cue_items = ['low', 'high']
 counterbalance_freq = 6 # how many counterbalance versions do you want
+cond_type = len(administer_items) * len(cue_items)  # 6: how many conditions are nested under the task
+trial_per_cond = 6 # how many trials under one condition
 consec_num = 4
-saveDir = '/Users/h/Documents/projects_local/social_influence/design'
 taskname = 'cognitive'
-cue_high_dir = '/Users/h/Documents/projects_local/social_influence/stimuli/cue/task-' + taskname + '/sch'
-cue_low_dir = '/Users/h/Documents/projects_local/social_influence/stimuli/cue/task-' + taskname + '/scl'
+dir_main = '/Users/h/Documents/projects_local/social_influence'
+dir_save = os.path.join(dir_main, 'design','counterbalance')
+dir_cue_high = os.path.join(dir_main,'stimuli','cue','task-' + taskname,'sch')
+dir_cue_low = os.path.join(dir_main,'stimuli','cue','task-' + taskname,'scl')
 # ______________________________________________________________________________
 
 # if task-cognitive_counterbalance_ver-01_block-01.csv exists, delete
-fileList = glob.glob(os.sep.join([saveDir, "task-cognitive_counterbalance*.csv"]))
+fileList = glob.glob(os.sep.join([dir_save, "task-cognitive_counterbalance*.csv"]))
 # Iterate over the list of filepaths & remove each file.
 for filePath in fileList:
     try:
@@ -68,6 +70,8 @@ for filePath in fileList:
     except OSError:
         print("Error while deleting file")
 
+if not os.path.exists(dir_save):
+    os.makedirs(dir_save)
 
 
 # 1. choose 24 numbers out of 48 and create stimuli columns ____________________
@@ -85,14 +89,14 @@ df2 = pd.DataFrame(random.sample(list2,len(list2))  +random.sample(list2,len(lis
 df = pd.DataFrame()
 # shuffle high/low cues ________________________________________________________
 # grab stimuli list (only allow png files in the list)
-high_cue_list = [file for file in os.listdir(cue_high_dir) if file.endswith('.png')]
+high_cue_list = [file for file in os.listdir(dir_cue_high) if file.endswith('.png')]
 # split high into 2 bins - we will use each bin for one block of high cues
 high_sample = random.sample(high_cue_list, int(cond_type*trial_per_cond) )
 random.shuffle(high_sample)
 hCue1 = high_sample[:int(len(high_sample)/2)]
 hCue2 = high_sample[int(len(high_sample)/2):]
 high_cue = [hCue1, hCue2]
-low_cue_list = [file for file in os.listdir(cue_low_dir) if file.endswith('.png')]
+low_cue_list = [file for file in os.listdir(dir_cue_low) if file.endswith('.png')]
 # split high into 2 bins - we will use each bin for one block of high cues
 low_sample = random.sample(low_cue_list, int(cond_type*trial_per_cond) )
 random.shuffle(low_sample)
@@ -140,13 +144,13 @@ for index, df in enumerate([df1, df2]):
             image_filepath = str(df.loc[ind_img,'stimuli_num']) + '_' + str(df.loc[ind_img,'administer']) + '.jpg'
             df.loc[ind_img,'image_filename'] = image_filepath
 
-    mainFileName = saveDir + os.sep + 'task-cognitive_mainDesign_notCounterbalanced.csv'
+    mainFileName = dir_save + os.sep + 'task-cognitive_mainDesign_notCounterbalanced.csv'
     df.to_csv(mainFileName)
 
     for cB_ver in range(1,counterbalance_freq):
         cB = shuffleDataFrame(df, consec_num)
         cB['cB_version'] = cB_ver # assign from for loop number
-        cBverFileName = saveDir + os.sep + \
+        cBverFileName = dir_save + os.sep + \
         'task-cognitive_counterbalance_ver-' + str('%02d' % cB_ver)+ \
          '_block-' +str('%02d' % int(index+1)) +'.csv'
         cB.to_csv(cBverFileName)
