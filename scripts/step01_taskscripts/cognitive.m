@@ -114,7 +114,7 @@ for trl = 1:size(countBalMat,1)
 
 
 %% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
-jitter1 = str2double(countBalMat.ISI1(trl));
+jitter1 = countBalMat.ISI1(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 T.p1_fixation_onset(trl) = Screen('Flip', p.ptb.window);
@@ -146,7 +146,7 @@ T.p3_expect_RT(trl) = RT;
 
 
 %% _________________________ 4. Fixtion Jitter 0-4 sec _________________________
-jitter2 = str2double(countBalMat.ISI2(trl));
+jitter2 = countBalMat.ISI2(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
