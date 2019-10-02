@@ -1,4 +1,4 @@
-function [meanrecipvif, vifs, design_struct] = generate_jittered_er_design_HJ(varargin)
+function [meanrecipvif, vifs, design_struct] = generate_jittered_er_design(varargin)
 % Generate an fMRI design with two temporally dependent events and random
 % 'jitter' between event1 and event2 (ISI1) and/or between event2 and
 % event1 on the subsequent trial (ISI2).
