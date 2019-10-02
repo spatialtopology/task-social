@@ -106,7 +106,7 @@ function pain(sub,input_counterbalance_file, run_num)
   for trl = 1:size(countBalMat,1)
 
   %% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
-  jitter1 = str2double(countBalMat.ISI1(trl));
+  jitter1 = countBalMat.ISI1(trl);
   Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
      p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
   fStart1 = GetSecs;
@@ -124,7 +124,7 @@ function pain(sub,input_counterbalance_file, run_num)
   elseif string(countBalMat.cue_type{trl}) == 'high'
     cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
     cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
-
+  end
   imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
   Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
   T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
@@ -144,7 +144,7 @@ function pain(sub,input_counterbalance_file, run_num)
   %                             4. Fixtion Jitter 0-2 sec
   %-------------------------------------------------------------------------------
   % 1) get jitter
-  jitter2 = str2double(countBalMat.ISI2(trl));
+  jitter2 = countBalMat.ISI2(trl);
   Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
      p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
   fStart2 = GetSecs;
@@ -173,8 +173,15 @@ function pain(sub,input_counterbalance_file, run_num)
   T.p6_actual_responseonset(trl) = buttonPressOnset;
   rating_Trajectory{trl,2} = trajectory;
   T.p6_actual_RT(trl) = RT;
+
   end
-  end
+
+  %% ______________________________ Instructions _________________________________
+  Screen('TextSize',p.ptb.window,72);
+  DrawFormattedText(p.ptb.window,instruct_end,'center',p.ptb.screenYpixels/2+150,255);
+  Screen('Flip',p.ptb.window);
+
+
   %-------------------------------------------------------------------------------
   %                                   save parameter
   %-------------------------------------------------------------------------------

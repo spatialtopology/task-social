@@ -237,9 +237,11 @@ Screen('Flip', p.ptb.window);
 WaitSecs(remainder_time);
 end
 end
-T.p5_administer_responseonset(trl) = secs;
-T.p5_administer_responsekey(trl) = response;
-T.p5_administer_RT(trl) = secs - timing.initialized;
+
+%% ______________________________ Instructions _________________________________
+Screen('TextSize',p.ptb.window,72);
+DrawFormattedText(p.ptb.window,instruct_end,'center',p.ptb.screenYpixels/2+150,255);
+Screen('Flip',p.ptb.window);
 
 
 %% ________________________ 6. post evaluation rating __________________________

@@ -1,8 +1,7 @@
 function vicarious(sub,input_counterbalance_file, run_num)
 %% -----------------------------------------------------------------------------
 %                           Parameters
-% ______________________________________________________________________________
-sca;
+% ------------------------------------------------------------------------------
 
 %% A. Psychtoolbox parameters _________________________________________________
 global p
@@ -33,7 +32,7 @@ taskname                       = 'vicarious';
 dir_video                      = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
 cue_low_dir                    = fullfile(main_dir,'stimuli','cue','scl');
 cue_high_dir                   = fullfile([main_dir,'stimuli','cue','sch']);
-counterbalancefile             = fullfile(main_dir,'design', ['task-',taskname,'_counterbalance_ver-01_block-01.csv']);
+counterbalancefile             = fullfile(main_dir,'design', [input_counterbalance_file, '.csv']);
 countBalMat                    = readtable(counterbalancefile);
 
 %% C. Circular rating scale _____________________________________________________
@@ -87,9 +86,9 @@ TR                             = 0.46;
 instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
 instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
 
-%% ------------------------------------------------------------------------------
+%% -----------------------------------------------------------------------------
 %                              Start Experiment
-%________________________________________________________________________________
+% ------------------------------------------------------------------------------
 
 %% ______________________________ Instructions _________________________________
 Screen('TextSize',p.ptb.window,72);
@@ -107,7 +106,7 @@ for trl = 1:size(countBalMat,1)
 
 
 %% 1. Fixtion Jitter 0-4 sec ____________________________________________________
-jitter1 = str2double(countBalMat.ISI1(trl));
+jitter1 = countBalMat.ISI1(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 fStart1 = GetSecs;
@@ -143,7 +142,7 @@ T.p3_expect_RT(trl) = RT;
 
 
 %% 4. Fixtion Jitter 0-4 sec ___________________________________________________
-jitter2 = str2double(countBalMat.ISI2(trl));
+jitter2 = countBalMat.ISI2(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 fStart2 = GetSecs;
@@ -169,6 +168,11 @@ T.p6_actual_RT(trl) = RT;
 
 end
 end
+
+%% ______________________________ Instructions _________________________________
+Screen('TextSize',p.ptb.window,72);
+DrawFormattedText(p.ptb.window,instruct_end,'center',p.ptb.screenYpixels/2+150,255);
+Screen('Flip',p.ptb.window);
 
 %% save parameter ______________________________________________________________
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 'beh' );
