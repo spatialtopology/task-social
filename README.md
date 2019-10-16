@@ -39,8 +39,8 @@
 
 ## To Dos
 - [x] Overall: Extract jitters from ABCD code
-- [ ] Overall: cue type "high" low"
-- [ ] Overall: limit rating to semi-circle
+- [x] Overall: cue type "high" low"
+- [x] Overall: limit rating to semi-circle
 - [x] Pain: pilot pain stimuli using actual ATS (Aug. 15th)
 - [x] Pain: 4s duration
 - [x] Vicarious: Select new videos. code is in >> social_influence/scripts/experimentDev/create_videos/
