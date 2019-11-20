@@ -1,4 +1,4 @@
-function [trajectory, RT, buttonPressOnset] = circular_rating_output(duration, p, image_scale, rating_type)
+function [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(duration, p, image_scale, rating_type)
 % global screenNumber window windowRect xCenter yCenter screenXpixels screenYpixels
 % shows a circular rating scale and records mouse position
 %
@@ -80,6 +80,7 @@ RATINGTITLES = {'INTENSITY'};
 Screen('TextSize',p.ptb.window,72);
 DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
 timing.initialized = Screen('Flip',p.ptb.window);
+rating_onset = timing.initialized;
 
 cursor.x = cursor.xcenter;
 cursor.y = cursor.ycenter;
@@ -91,7 +92,7 @@ buttonpressed  = false;
 rlim = 250;
 xlim = cursor.xcenter;
 ylim = cursor.ycenter;
-while (GetSecs-timing.initialized) <  + duration
+while (GetSecs-timing.initialized) <  duration
 
     loopstart = GetSecs;
 
@@ -143,7 +144,12 @@ while (GetSecs-timing.initialized) <  + duration
        % cursor changes
        Screen('FillOval',p.ptb.window,[255 0 255],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
        Screen('Flip',p.ptb.window);
+       WaitSecs(0.500);
        remainder_time = duration-0.5-RT;
+       
+       Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+       p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+       Screen('Flip',p.ptb.window);
        WaitSecs(remainder_time);
     end
 
