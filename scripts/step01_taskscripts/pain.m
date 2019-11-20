@@ -37,7 +37,7 @@ function pain(sub,input_counterbalance_file, run_num)
   dir_video = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
   cue_low_dir =  fullfile(main_dir,'stimuli','cue','scl');
   cue_high_dir = fullfile([main_dir,'stimuli','cue','sch']);
-  counterbalancefile = fullfile(main_dir, 'design', [input_counterbalance_file, '.csv']);
+  counterbalancefile = fullfile(main_dir, 'design', 'final_counterbalance_with_jitter',[input_counterbalance_file, '.csv']);
   countBalMat = readtable(counterbalancefile);
 
   %% C. Circular rating scale _____________________________________________________
@@ -185,18 +185,18 @@ function pain(sub,input_counterbalance_file, run_num)
   %-------------------------------------------------------------------------------
   %                                   save parameter
   %-------------------------------------------------------------------------------
-  sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 'beh' );
+  sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );
   if ~exist(sub_save_dir, 'dir')
       mkdir(sub_save_dir)
   end
 
-  saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh.csv' ]);
+  saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_beh.csv' ]);
   writetable(T,saveFileName);
 
-  traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
+  traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
   save(traject_saveFileName, 'rating_Trajectory');
 
-  psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
+  psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
   save(psychtoolbox_saveFileName, 'p');
 
   sca;

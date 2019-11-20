@@ -33,10 +33,10 @@ taskname                        = 'cognitive';
 dir_video                       = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
 cue_low_dir                     = fullfile(main_dir,'stimuli','cue','scl');
 cue_high_dir                    = fullfile([main_dir,'stimuli','cue','sch']);
-counterbalancefile              = fullfile(main_dir, 'design', [input_counterbalance_file, '.csv']);
+counterbalancefile              = fullfile(main_dir, 'design', 'final_counterbalance_with_jitter', [input_counterbalance_file, '.csv']);
 countBalMat                     = readtable(counterbalancefile);
 
-sub_save_dir                    = fullfile(main_dir, 'data', strcat('sub-', sprintf('%03d', sub)), 'beh' );
+sub_save_dir                    = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );
 if ~exist(sub_save_dir, 'dir')
     mkdir(sub_save_dir)
 end
@@ -189,7 +189,7 @@ timing.initialized = Screen('Flip',p.ptb.window);
 T.p5_administer_onset(trl) = timing.initialized;
 duration = 4;
 while GetSecs < timing.initialized + duration
-
+response = 99;
 % 5-5. key press --------------------------------------------------------------------
 [keyIsDown,secs, keyCode] = KbCheck;
 if keyCode(p.keys.esc)
@@ -250,19 +250,19 @@ T.p6_actual_onset(trl) = GetSecs;
 rating_Trajectory{trl,2} = trajectory;
 T.p6_actual_responseonset(trl) = buttonPressOnset;
 T.p6_actual_RT(trl) = RT;
-tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
+tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
 writetable(T,tmpFileName);
 end
 end
 
 %% __________________________ save parameter ___________________________________
-saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh.csv' ]);
+saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_beh.csv' ]);
 writetable(T,saveFileName);
 
-traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
+traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
 save(traject_saveFileName, 'rating_Trajectory');
 
-psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%03d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
+psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 
 close all;
