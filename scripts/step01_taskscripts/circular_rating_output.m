@@ -91,7 +91,7 @@ buttonpressed  = false;
 rlim = 250;
 xlim = cursor.xcenter;
 ylim = cursor.ycenter;
-while GetSecs < timing.initialized + duration
+while (GetSecs-timing.initialized) <  + duration
 
     loopstart = GetSecs;
 
