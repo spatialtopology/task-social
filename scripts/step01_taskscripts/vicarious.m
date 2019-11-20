@@ -82,9 +82,18 @@ p.keys.end                     = KbName('e');
 %% F. fmri Parameters __________________________________________________________
 TR                             = 0.46;
 
-%% G. Instructions _____________________________________________________________
-instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
-instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
+% %% G. Instructions _____________________________________________________________
+% instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
+% instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
+% 
+%% G. instructions _____________________________________________________
+instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
+instruct_start_name            = ['task-', taskname, '_start.png'];
+instruct_end_name              = ['task-', taskname, '_end.png'];
+instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
+instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
+
+
 
 %% -----------------------------------------------------------------------------
 %                              Start Experiment
@@ -92,9 +101,9 @@ instruct_end                   = 'This is the end of the experiment. Please wait
 
 %% ______________________________ Instructions _________________________________
 Screen('TextSize',p.ptb.window,72);
-DrawFormattedText(p.ptb.window,instruct_start,'center',p.ptb.screenYpixels/2+150,255);
+start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
 Screen('Flip',p.ptb.window);
-
 %% _______________________ Wait for Trigger to Begin ___________________________
 DisableKeysForKbCheck([]);
 KbTriggerWait(p.keys.start);
@@ -125,7 +134,7 @@ if string(countBalMat.cue_type{trl}) == 'low'
 elseif string(countBalMat.cue_type{trl}) == 'high'
   cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
   cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
-
+end
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
@@ -134,8 +143,8 @@ WaitSecs(1)
 
 %% 3. expectation rating _______________________________________________________
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-T.p3_expect_onset(trl) = GetSecs;
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
+[trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
+T.p3_expect_onset(trl) = rating_onset;
 rating_Trajectory{trl,1} = trajectory;
 T.p3_expect_responseonset(trl) = buttonPressOnset;
 T.p3_expect_RT(trl) = RT;
@@ -167,12 +176,13 @@ T.p6_actual_responseonset(trl) = buttonPressOnset;
 T.p6_actual_RT(trl) = RT;
 
 end
-end
+
 
 %% ______________________________ Instructions _________________________________
 Screen('TextSize',p.ptb.window,72);
 DrawFormattedText(p.ptb.window,instruct_end,'center',p.ptb.screenYpixels/2+150,255);
 Screen('Flip',p.ptb.window);
+KbTriggerWait(p.keys.end);
 
 %% save parameter ______________________________________________________________
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );

@@ -99,19 +99,14 @@ instruct_end                   = 'This is the end of the experiment. Please wait
 instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
 instruct_start_name            = ['task-', taskname, '_start.png'];
 instruct_end_name              = ['task-', taskname, '_end.png'];
-instruct_start                 = fullfile(image_filepath, instruct_start_name);
-instruct_end                   = fullfile(image_filepath, instruct_end_name);
+instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
+instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 %% -----------------------------------------------------------------------------
 %                              Start Experiment
 % ______________________________________________________________________________
 %% ______________________________ Instructions _________________________________
 Screen('TextSize',p.ptb.window,72);
-% DrawFormattedText(p.ptb.window,instruct_start,'center',p.ptb.screenYpixels/2+150,255);
 start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
-% placement
-% dspl.cscale.rect = [...
-%     [dspl.xcenter dspl.ycenter]-[0.5*dspl.cscale.width 0.5*dspl.cscale.height] ...
-%     [dspl.xcenter dspl.ycenter]+[0.5*dspl.cscale.width 0.5*dspl.cscale.height]];
 Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
 Screen('Flip',p.ptb.window);
 

@@ -83,18 +83,26 @@ function pain(sub,input_counterbalance_file, run_num)
   %% F. fmri Parameters __________________________________________________________
   TR                             = 0.46;
 
-  %% G. Instructions _____________________________________________________________
-  instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
-  instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
+%   %% G. Instructions _____________________________________________________________
+%   instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
+%   instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
+% 
+  %% G. instructions _____________________________________________________
+    instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
+    instruct_start_name            = ['task-', taskname, '_start.png'];
+    instruct_end_name              = ['task-', taskname, '_end.png'];
+    instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
+    instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 
   %% ------------------------------------------------------------------------------
   %                              Start Experiment
   %________________________________________________________________________________
 
-  %% ______________________________ Instructions _________________________________
-  Screen('TextSize',p.ptb.window,72);
-  DrawFormattedText(p.ptb.window,instruct_start,'center',p.ptb.screenYpixels/2+150,255);
-  Screen('Flip',p.ptb.window);
+    %% ______________________________ Instructions _________________________________
+    Screen('TextSize',p.ptb.window,72);
+    start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+    Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
+    Screen('Flip',p.ptb.window);
 
   %% _______________________ Wait for Trigger to Begin ___________________________
   DisableKeysForKbCheck([]);
@@ -180,7 +188,7 @@ function pain(sub,input_counterbalance_file, run_num)
   Screen('TextSize',p.ptb.window,72);
   DrawFormattedText(p.ptb.window,instruct_end,'center',p.ptb.screenYpixels/2+150,255);
   Screen('Flip',p.ptb.window);
-
+  KbTriggerWait(p.keys.end);
 
   %-------------------------------------------------------------------------------
   %                                   save parameter
