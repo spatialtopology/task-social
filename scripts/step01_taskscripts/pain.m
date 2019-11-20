@@ -82,10 +82,6 @@ function pain(sub,input_counterbalance_file, run_num)
 
   %% F. fmri Parameters __________________________________________________________
   TR                             = 0.46;
-
-%   %% G. Instructions _____________________________________________________________
-%   instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
-%   instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
 % 
   %% G. instructions _____________________________________________________
     instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
@@ -164,13 +160,13 @@ function pain(sub,input_counterbalance_file, run_num)
   %-------------------------------------------------------------------------------
   %                            5. pain
   %-------------------------------------------------------------------------------
-  jitter3 = 4;
+  pain_duration = 6;
   TEMP = countBalMat.administer(trl);
   Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
      p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
   Screen('Flip', p.ptb.window);
   T.p5_administer_onset(trl) = TriggerThermodeSocial(TEMP, 'USE_BIOPAC',1);
-  WaitSecs(jitter3);
+  WaitSecs(pain_duration);
   fEnd2 = GetSecs;
 
   %-------------------------------------------------------------------------------
