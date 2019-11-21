@@ -81,7 +81,8 @@ function pain(sub,input_counterbalance_file, run_num)
     p.keys.end                     = KbName('e');
 
   %% F. fmri Parameters __________________________________________________________
-  TR                             = 0.46;
+  TR                               = 0.46;
+  task_duration                    = 6.50;
 % 
   %% G. instructions _____________________________________________________
     instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
@@ -104,6 +105,9 @@ function pain(sub,input_counterbalance_file, run_num)
   DisableKeysForKbCheck([]);
   KbTriggerWait(p.keys.start);
   T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+  Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+Screen('Flip', p.ptb.window);
   WaitSecs(TR*6);
 
   %% ___________________________ 0. Experimental loop ____________________________
@@ -160,13 +164,13 @@ function pain(sub,input_counterbalance_file, run_num)
   %-------------------------------------------------------------------------------
   %                            5. pain
   %-------------------------------------------------------------------------------
-  pain_duration = 6;
+  
   TEMP = countBalMat.administer(trl);
   Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
      p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
   Screen('Flip', p.ptb.window);
   T.p5_administer_onset(trl) = TriggerThermodeSocial(TEMP, 'USE_BIOPAC',1);
-  WaitSecs(pain_duration);
+  WaitSecs(task_duration);
   fEnd2 = GetSecs;
 
   %-------------------------------------------------------------------------------

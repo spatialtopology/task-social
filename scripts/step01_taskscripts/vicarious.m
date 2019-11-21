@@ -81,7 +81,8 @@ p.keys.end                     = KbName('e');
 
 %% F. fmri Parameters __________________________________________________________
 TR                             = 0.46;
-
+task_duration                  = 6.50;
+video_length                   = 4.00;
 % %% G. Instructions _____________________________________________________________
 % instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
 % instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
@@ -108,6 +109,9 @@ Screen('Flip',p.ptb.window);
 DisableKeysForKbCheck([]);
 KbTriggerWait(p.keys.start);
 T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+Screen('Flip', p.ptb.window);
 WaitSecs(TR*6);
 
 %% 0. Experimental loop _________________________________________________________
@@ -166,7 +170,7 @@ video_filename = [countBalMat.video_filename{trl}];
 video_file = fullfile(dir_video, video_filename);
 movie_time = video_play(video_file , p );
 T.p5_administer_onset(trl) = movie_time;
-
+WaitSecs(task_duration-video_length);
 
 %% 6. post evaluation rating ___________________________________________________
 T.p6_actual_onset(trl) = GetSecs;

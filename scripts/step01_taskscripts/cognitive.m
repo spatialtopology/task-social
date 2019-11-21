@@ -90,7 +90,7 @@ p.keys.end                     = KbName('e');
 
 %% F. fmri Parameters __________________________________________________________
 TR                             = 0.46;
-
+task_duration                  = 6.50;
 %% G. Instructions _____________________________________________________________
 instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
 instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
@@ -114,6 +114,9 @@ Screen('Flip',p.ptb.window);
 DisableKeysForKbCheck([]);
 KbTriggerWait(p.keys.start);
 T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+Screen('Flip', p.ptb.window);
 WaitSecs(TR*6);
 
 %% ___________________________ 0. Experimental loop ____________________________
@@ -194,8 +197,8 @@ DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white
 % 5-4. flip screen _____________________________________________________________
 timing.initialized = Screen('Flip',p.ptb.window);
 T.p5_administer_onset(trl) = timing.initialized;
-duration = 4;
-while GetSecs - timing.initialized < duration
+% duration = 4;
+while GetSecs - timing.initialized < task_duration
     response = 99;
     % 5-5. key press --------------------------------------------------------------------
     [keyIsDown,secs, keyCode] = KbCheck;
@@ -217,7 +220,7 @@ while GetSecs - timing.initialized < duration
 
     WaitSecs(0.5);
 
-    remainder_time = duration-0.5-RT;
+    remainder_time = task_duration-0.5-RT;
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
     p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     Screen('Flip', p.ptb.window);
@@ -237,7 +240,7 @@ while GetSecs - timing.initialized < duration
     WaitSecs(0.5);
 
     % fill in with fixation cross
-    remainder_time = duration-0.5-RT;
+    remainder_time = task_duration-0.5-RT;
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
     p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     Screen('Flip', p.ptb.window);
