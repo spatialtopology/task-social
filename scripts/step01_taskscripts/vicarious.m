@@ -183,8 +183,12 @@ end
 
 
 %% ______________________________ Instructions _________________________________
-% Screen('TextSize',p.ptb.window,72);
-DrawFormattedText(p.ptb.window,instruct_end,'center',p.ptb.screenYpixels/2+150,255);
+start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+% placement
+% dspl.cscale.rect = [...
+%     [dspl.xcenter dspl.ycenter]-[0.5*dspl.cscale.width 0.5*dspl.cscale.height] ...
+%     [dspl.xcenter dspl.ycenter]+[0.5*dspl.cscale.width 0.5*dspl.cscale.height]];
+Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
 Screen('Flip',p.ptb.window);
 KbTriggerWait(p.keys.end);
 
