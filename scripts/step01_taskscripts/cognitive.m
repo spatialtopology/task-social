@@ -33,7 +33,7 @@ taskname                        = 'cognitive';
 dir_video                       = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
 cue_low_dir                     = fullfile(main_dir,'stimuli','cue','scl');
 cue_high_dir                    = fullfile([main_dir,'stimuli','cue','sch']);
-counterbalancefile              = fullfile(main_dir, 'design', 'final_counterbalance_with_jitter', [input_counterbalance_file, '.csv']);
+counterbalancefile              = fullfile(main_dir, 'design', 's04_final_counterbalance_with_jitter', [input_counterbalance_file, '.csv']);
 countBalMat                     = readtable(counterbalancefile);
 
 sub_save_dir                    = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );
@@ -92,8 +92,8 @@ p.keys.end                     = KbName('e');
 TR                             = 0.46;
 task_duration                  = 6.50;
 %% G. Instructions _____________________________________________________________
-instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
-instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
+% instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
+% instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
 
 %% G. instructions _____________________________________________________
 instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
@@ -283,7 +283,6 @@ start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
 Screen('Flip',p.ptb.window);
 KbTriggerWait(p.keys.end);
-
 
 close all;
 sca;

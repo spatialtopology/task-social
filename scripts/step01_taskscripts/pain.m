@@ -37,7 +37,7 @@ function pain(sub,input_counterbalance_file, run_num)
   dir_video = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
   cue_low_dir =  fullfile(main_dir,'stimuli','cue','scl');
   cue_high_dir = fullfile([main_dir,'stimuli','cue','sch']);
-  counterbalancefile = fullfile(main_dir, 'design', 'final_counterbalance_with_jitter',[input_counterbalance_file, '.csv']);
+  counterbalancefile = fullfile(main_dir, 'design', 's04_final_counterbalance_with_jitter',[input_counterbalance_file, '.csv']);
   countBalMat = readtable(counterbalancefile);
 
   %% C. Circular rating scale _____________________________________________________
