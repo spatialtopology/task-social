@@ -104,10 +104,11 @@ function pain(sub,input_counterbalance_file, run_num)
   %% _______________________ Wait for Trigger to Begin ___________________________
   DisableKeysForKbCheck([]);
   KbTriggerWait(p.keys.start);
-  T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
-  Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+    Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 Screen('Flip', p.ptb.window);
+  T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+
   WaitSecs(TR*6);
 
   %% ___________________________ 0. Experimental loop ____________________________
