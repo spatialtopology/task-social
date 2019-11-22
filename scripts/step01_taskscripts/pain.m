@@ -102,9 +102,9 @@ function pain(sub,input_counterbalance_file, run_num)
   %% _______________________ Wait for Trigger to Begin ___________________________
   DisableKeysForKbCheck([]);
   KbTriggerWait(p.keys.start);
-    Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-Screen('Flip', p.ptb.window);
+  Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+  p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+  Screen('Flip', p.ptb.window);
   T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
 
   WaitSecs(TR*6);
@@ -151,14 +151,14 @@ Screen('Flip', p.ptb.window);
   %                             4. Fixtion Jitter 0-2 sec
   %-------------------------------------------------------------------------------
   % 1) get jitter
-  jitter2 = countBalMat.ISI2(trl);
-  Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-     p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-  fStart2 = GetSecs;
-  T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
-  WaitSecs(jitter2);
-  fEnd2 = GetSecs;
-  T.p4_fixation_duration(trl) = fEnd2 - fStart2;
+  % jitter2 = countBalMat.ISI2(trl);
+  % Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+  %    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+  % fStart2 = GetSecs;
+  % T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
+  % WaitSecs(jitter2);
+  % fEnd2 = GetSecs;
+  % T.p4_fixation_duration(trl) = fEnd2 - fStart2;
 
   %-------------------------------------------------------------------------------
   %                            5. pain
