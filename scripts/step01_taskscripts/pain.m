@@ -5,8 +5,6 @@ function pain(sub,input_counterbalance_file, run_num)
   %                           Parameters
   % ______________________________________________________________________________
   %% A. Psychtoolbox parameters _________________________________________________
-  sca;
-
   global p
   Screen('Preference', 'SkipSyncTests', 1);
   PsychDefaultSetup(2);
@@ -72,8 +70,8 @@ function pain(sub,input_counterbalance_file, run_num)
   %% E. Keyboard information _____________________________________________________
   KbName('UnifyKeyNames');
     p.keys.confirm                 = KbName('return');
-    p.keys.right                   = KbName('j');
-    p.keys.left                    = KbName('f');
+    p.keys.right                   = KbName('1!');
+    p.keys.left                    = KbName('2@');
     p.keys.space                   = KbName('space');
     p.keys.esc                     = KbName('ESCAPE');
     p.keys.trigger                 = KbName('5%');
@@ -83,7 +81,7 @@ function pain(sub,input_counterbalance_file, run_num)
   %% F. fmri Parameters __________________________________________________________
   TR                               = 0.46;
   task_duration                    = 6.50;
-% 
+%
   %% G. instructions _____________________________________________________
     instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
     instruct_start_name            = ['task-', taskname, '_start.png'];
@@ -165,13 +163,14 @@ Screen('Flip', p.ptb.window);
   %-------------------------------------------------------------------------------
   %                            5. pain
   %-------------------------------------------------------------------------------
-  
+
   TEMP = countBalMat.administer(trl);
   Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
      p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
   Screen('Flip', p.ptb.window);
   T.p5_administer_onset(trl) = TriggerThermodeSocial(TEMP, 'USE_BIOPAC',1);
   WaitSecs(task_duration);
+  %WaitSecs(task_duration-T.p5_administer_onset(trl));
   fEnd2 = GetSecs;
 
   %-------------------------------------------------------------------------------
