@@ -1,5 +1,6 @@
 function cognitive(sub,input_counterbalance_file, run_num)
-
+% [ ] make sure to remove the Line
+% [ ] change the font size for same diff
 %% -----------------------------------------------------------------------------
 %                                Parameters
 % ______________________________________________________________________________
@@ -56,9 +57,12 @@ vnames = {'param_fmriSession', 'param_counterbalanceVer','param_counterbalanceBl
                                 'p3_expect_onset','p3_expect_responseonset','p3_expect_RT', ...
                                 'p4_fixation_onset','p4_fixation_duration',...
                                 'p5_administer_type','p5_administer_filename','p5_administer_onset',...
-                                'p6_actual_onset','p6_actual_responseonset','p6_actual_RT'};
+                                'p6_actual_onset','p6_actual_responseonset','p6_actual_RT', 'param_end_instruct_onset'};
 T                              = array2table(zeros(size(countBalMat,1),size(vnames,2)));
 T.Properties.VariableNames     = vnames;
+T.p2_cue_type                  = cell(size(countBalMat,1),1);
+T.p2_cue_filename              = cell(size(countBalMat,1),1);
+
 
 a                              = split(counterbalancefile,filesep); % full path filename components
 version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
@@ -112,11 +116,11 @@ Screen('Flip',p.ptb.window);
 
 %% _______________________ Wait for Trigger to Begin ___________________________
 DisableKeysForKbCheck([]);
-KbTriggerWait(p.keys.start);
+KbTriggerWait(p.keys.start); % press s
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 Screen('Flip', p.ptb.window);
-T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger); % wait for scanner 5
 WaitSecs(TR*6);
 
 %% ___________________________ 0. Experimental loop ____________________________
@@ -144,6 +148,8 @@ imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
 WaitSecs(1)
+T.p2_cue_type{trl}             = countBalMat.cue_type{trl};
+T.p2_cue_filename{trl}              = countBalMat.cue_image{trl};
 
 
 %% __________________________ 3. expectation rating ____________________________
@@ -177,13 +183,13 @@ rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
 Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
 
 % 5-2. present scale lines _____________________________________________________
-Yc = 300; % Y coord
+Yc = 100; % Y coord
 cDist = 20; % vertical line depth
 lXc = -200; % left X coord
 rXc = 200; % right X coord
 lineCoords = [lXc lXc lXc rXc rXc rXc; Yc-cDist Yc+cDist Yc Yc Yc-cDist Yc+cDist];
-Screen('DrawLines', p.ptb.window, lineCoords,...
-p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+% Screen('DrawLines', p.ptb.window, lineCoords,...
+% p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 
 % 5-3. present same diff text __________________________________________________
 textDiff = 'Diff';
@@ -213,8 +219,8 @@ while GetSecs - timing.initialized < task_duration
     response = 1;
 
     % respToBeMade = false;
-    Screen('DrawLines', p.ptb.window, lineCoords,...
-    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+    % Screen('DrawLines', p.ptb.window, lineCoords,...
+    % p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
     DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, [255 0 0]);
     Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
@@ -233,8 +239,8 @@ while GetSecs - timing.initialized < task_duration
     RT = GetSecs - timing.initialized;
     response = 2;
     % respToBeMade = false;
-    Screen('DrawLines', p.ptb.window, lineCoords,...
-    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+    % Screen('DrawLines', p.ptb.window, lineCoords,...
+    % p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white);
     DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, [255 0 0]);
     Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
@@ -260,6 +266,11 @@ tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_tas
 writetable(T,tmpFileName);
 end
 
+%% ______________________________ Instructions _________________________________
+end_texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+Screen('DrawTexture',p.ptb.window,end_texture,[],[]);
+T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
+KbTriggerWait(p.keys.end);
 
 
 %% __________________________ save parameter ___________________________________
@@ -272,19 +283,7 @@ save(traject_saveFileName, 'rating_Trajectory');
 psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 
-%% ______________________________ Instructions _________________________________
-% Screen('TextSize',p.ptb.window,72);
-% DrawFormattedText(p.ptb.window,instruct_end,'center',p.ptb.screenYpixels/2+150,255);
-% Screen('Flip',p.ptb.window);
 
-start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
-% placement
-% dspl.cscale.rect = [...
-%     [dspl.xcenter dspl.ycenter]-[0.5*dspl.cscale.width 0.5*dspl.cscale.height] ...
-%     [dspl.xcenter dspl.ycenter]+[0.5*dspl.cscale.width 0.5*dspl.cscale.height]];
-Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
-Screen('Flip',p.ptb.window);
-KbTriggerWait(p.keys.end);
 
 close all;
 sca;

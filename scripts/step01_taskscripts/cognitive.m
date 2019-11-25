@@ -80,8 +80,8 @@ T.p5_administer_filename       = countBalMat.image_filename;
 %% E. Keyboard information _____________________________________________________
 KbName('UnifyKeyNames');
 p.keys.confirm                 = KbName('return');
-p.keys.right                   = KbName('j');
-p.keys.left                    = KbName('f');
+p.keys.right                   = KbName('1!');
+p.keys.left                    = KbName('2@');
 p.keys.space                   = KbName('space');
 p.keys.esc                     = KbName('ESCAPE');
 p.keys.trigger                 = KbName('5%');
