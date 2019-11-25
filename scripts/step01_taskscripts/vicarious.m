@@ -52,6 +52,10 @@ vnames = {'param_fmriSession', 'param_counterbalanceVer','param_counterbalanceBl
                                 'p6_actual_onset','p6_actual_responseonset','p6_actual_RT'};
 T                              = array2table(zeros(size(countBalMat,1),size(vnames,2)));
 T.Properties.VariableNames     = vnames;
+T.p2_cue_type                  = cell(size(countBalMat,1),1);
+T.p2_cue_filename              = cell(size(countBalMat,1),1);
+T.p5_administer_type           = cell(size(countBalMat,1),1);
+
 
 a                              = split(counterbalancefile,filesep);
 version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
@@ -71,8 +75,8 @@ T.p5_administer_filename       = countBalMat.video_filename;
 %% E. Keyboard information _____________________________________________________
 KbName('UnifyKeyNames');
 p.keys.confirm                 = KbName('return');
-p.keys.right                   = KbName('j');
-p.keys.left                    = KbName('f');
+p.keys.right                   = KbName('1!');
+p.keys.left                    = KbName('2@');
 p.keys.space                   = KbName('space');
 p.keys.esc                     = KbName('ESCAPE');
 p.keys.trigger                 = KbName('5%');
@@ -86,7 +90,7 @@ video_length                   = 4.00;
 % %% G. Instructions _____________________________________________________________
 % instruct_start                 = 'The mental rotation task is about to start. Please wait for the experimenter';
 % instruct_end                   = 'This is the end of the experiment. Please wait for the experimenter';
-% 
+%
 %% G. instructions _____________________________________________________
 instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
 instruct_start_name            = ['task-', taskname, '_start.png'];
@@ -143,6 +147,9 @@ imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
 WaitSecs(1)
+T.p2_cue_type{trl}                  = countBalMat.cue_type{trl};
+T.p2_cue_filename{trl}              = countBalMat.cue_image{trl};
+
 
 
 %% 3. expectation rating _______________________________________________________
@@ -171,6 +178,7 @@ video_file = fullfile(dir_video, video_filename);
 movie_time = video_play(video_file , p );
 T.p5_administer_onset(trl) = movie_time;
 WaitSecs(task_duration-video_length);
+T.p5_administer_type{trl}           = countBalMat.video_filename{trl};
 
 %% 6. post evaluation rating ___________________________________________________
 T.p6_actual_onset(trl) = GetSecs;
@@ -184,10 +192,6 @@ end
 
 %% ______________________________ Instructions _________________________________
 start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
-% placement
-% dspl.cscale.rect = [...
-%     [dspl.xcenter dspl.ycenter]-[0.5*dspl.cscale.width 0.5*dspl.cscale.height] ...
-%     [dspl.xcenter dspl.ycenter]+[0.5*dspl.cscale.width 0.5*dspl.cscale.height]];
 Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
 Screen('Flip',p.ptb.window);
 KbTriggerWait(p.keys.end);
