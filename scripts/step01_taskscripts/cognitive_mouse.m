@@ -1,4 +1,4 @@
-function cognitive(sub,input_counterbalance_file, run_num)
+function cognitive(sub,input_counterbalance_file, run_num, session)
 % [ ] make sure to remove the Line
 % [ ] change the font size for same diff
 %% -----------------------------------------------------------------------------
@@ -68,6 +68,7 @@ T.p2_cue_filename              = cell(size(countBalMat,1),1);
 a                              = split(counterbalancefile,filesep); % full path filename components
 version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
 block_chunk                    = split(extractAfter(a(end),"block-"),["-", "."]);
+T.param_fmriSession            = session;
 T.param_runNum(:)              = run_num;
 T.param_counterbalanceVer(:)   = str2double(version_chunk{1});
 T.param_counterbalanceBlockNum(:) = str2double(block_chunk{1});
