@@ -49,7 +49,8 @@ vnames = {'param_fmriSession', 'param_counterbalanceVer','param_counterbalanceBl
                                 'p3_expect_onset','p3_expect_responseonset','p3_expect_RT', ...
                                 'p4_fixation_onset','p4_fixation_duration',...
                                 'p5_administer_type','p5_administer_filename','p5_administer_onset',...
-                                'p6_actual_onset','p6_actual_responseonset','p6_actual_RT'};
+                                'p6_actual_onset','p6_actual_responseonset','p6_actual_RT', ...
+                                'param_end_instruct_onset', 'param_experimentDuration'};
 T                              = array2table(zeros(size(countBalMat,1),size(vnames,2)));
 T.Properties.VariableNames     = vnames;
 T.p2_cue_type                  = cell(size(countBalMat,1),1);
@@ -193,8 +194,10 @@ end
 %% ______________________________ Instructions _________________________________
 start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
-Screen('Flip',p.ptb.window);
+T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
 KbTriggerWait(p.keys.end);
+
+T.param_experimentDuration(:) = T.param_end_instruct_onset(1) - T.param_triggerOnset(1);
 
 %% save parameter ______________________________________________________________
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );

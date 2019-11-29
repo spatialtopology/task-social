@@ -8,11 +8,11 @@ function pain(sub,input_counterbalance_file, run_num)
   global p
   Screen('Preference', 'SkipSyncTests', 1);
   PsychDefaultSetup(2);
-  screens                       = Screen('Screens'); % Get the screen numbers
-  p.ptb.screenNumber            = max(screens); % Draw to the external screen if avaliable
-  p.ptb.white                   = WhiteIndex(p.ptb.screenNumber); % Define black and white
-  p.ptb.black                   = BlackIndex(p.ptb.screenNumber);
-  [p.ptb.window, p.ptb.rect]    = PsychImaging('OpenWindow', p.ptb.screenNumber, p.ptb.black);
+  screens                        = Screen('Screens'); % Get the screen numbers
+  p.ptb.screenNumber             = max(screens); % Draw to the external screen if avaliable
+  p.ptb.white                    = WhiteIndex(p.ptb.screenNumber); % Define black and white
+  p.ptb.black                    = BlackIndex(p.ptb.screenNumber);
+  [p.ptb.window, p.ptb.rect]     = PsychImaging('OpenWindow', p.ptb.screenNumber, p.ptb.black);
   [p.ptb.screenXpixels, p.ptb.screenYpixels] = Screen('WindowSize', p.ptb.window);
   p.ptb.ifi                      = Screen('GetFlipInterval', p.ptb.window);
   Screen('BlendFunction', p.ptb.window, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA'); % Set up alpha-blending for smooth (anti-aliased) lines
@@ -28,76 +28,79 @@ function pain(sub,input_counterbalance_file, run_num)
   p.fix.allCoords                = [p.fix.xCoords; p.fix.yCoords];
 
   %% B. Directories ______________________________________________________________
-  task_dir = pwd;
-  main_dir = fileparts(fileparts(task_dir));
-  taskname = 'pain';
+  task_dir                       = pwd;
+  main_dir                       = fileparts(fileparts(task_dir));
+  taskname                       = 'pain';
 
-  dir_video = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
-  cue_low_dir =  fullfile(main_dir,'stimuli','cue','scl');
-  cue_high_dir = fullfile([main_dir,'stimuli','cue','sch']);
-  counterbalancefile = fullfile(main_dir, 'design', 's04_final_counterbalance_with_jitter',[input_counterbalance_file, '.csv']);
-  countBalMat = readtable(counterbalancefile);
+  dir_video                      = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
+  cue_low_dir                    = fullfile(main_dir,'stimuli','cue','scl');
+  cue_high_dir                   = fullfile([main_dir,'stimuli','cue','sch']);
+  counterbalancefile             = fullfile(main_dir, 'design', 's04_final_counterbalance_with_jitter',[input_counterbalance_file, '.csv']);
+  countBalMat                    = readtable(counterbalancefile);
 
   %% C. Circular rating scale _____________________________________________________
-  image_filepath = fullfile(main_dir, 'stimuli', 'ratingscale');
-  image_scale_filename = ['task-', taskname, '_scale.png'];
-  image_scale = fullfile(image_filepath, image_scale_filename);
+  image_filepath                 = fullfile(main_dir, 'stimuli', 'ratingscale');
+  image_scale_filename           = ['task-', taskname, '_scale.png'];
+  image_scale                    = fullfile(image_filepath, image_scale_filename);
 
   %% D. making output table ________________________________________________________
   vnames = {'param_fmriSession','param_runNum','param_counterbalanceVer','param_counterbalanceBlockNum',...
-  'param_cue_type','param_administer_type','param_cond_type',...
-  'p1_fixation_onset','p1_fixation_duration',...
-  'p2_cue_onset','p2_cue_type','p2_cue_filename',...
-  'p3_expect_onset','p3_expect_responseonset','p3_expect_RT', ...
-  'p4_fixation_onset','p4_fixation_duration',...
-  'p5_administer_type','p5_administer_filename','p5_administer_onset',...
-  'p6_actual_onset','p6_actual_responseonset','p6_actual_RT'};
-  T = array2table(zeros(size(countBalMat,1),size(vnames,2)));
-  T.Properties.VariableNames = vnames;
+                                'param_cue_type','param_administer_type','param_cond_type',...
+                                'p1_fixation_onset','p1_fixation_duration',...
+                                'p2_cue_onset','p2_cue_type','p2_cue_filename',...
+                                'p3_expect_onset','p3_expect_responseonset','p3_expect_RT', ...
+                                'p4_fixation_onset','p4_fixation_duration',...
+                                'p5_administer_type','p5_administer_onset',...
+                                'p6_actual_onset','p6_actual_responseonset','p6_actual_RT',...
+                                'param_end_instruct_onset', 'param_experimentDuration'};
+  T                              = array2table(zeros(size(countBalMat,1),size(vnames,2)));
+  T.Properties.VariableNames     = vnames;
+  T.p2_cue_type                  = cell(size(countBalMat,1),1);
+  T.p2_cue_filename              = cell(size(countBalMat,1),1);
 
-  a = split(counterbalancefile,filesep); % full path filename components
-  version_chunk = split(extractAfter(a(end),"ver-"),"_");
-  block_chunk = split(extractAfter(a(end),"block-"),["-", "."]);
-  T.param_runNum(:) = run_num;
-  T.param_counterbalanceVer(:) = str2double(version_chunk{1});
+  a                              = split(counterbalancefile,filesep); % full path filename components
+  version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
+  block_chunk                    = split(extractAfter(a(end),"block-"),["-", "."]);
+  T.param_runNum(:)              = run_num;
+  T.param_counterbalanceVer(:)   = str2double(version_chunk{1});
   T.param_counterbalanceBlockNum(:) = str2double(block_chunk{1});
-  T.param_cue_type = countBalMat.cue_type;
-  T.param_administer_type = countBalMat.administer;
-  T.param_cond_type = countBalMat.cond_type;
-  T.p2_cue_type = countBalMat.cue_type;
-  T.p5_administer_type = countBalMat.administer;
+  T.param_cue_type               = countBalMat.cue_type;
+  T.param_administer_type        = countBalMat.administer;
+  T.param_cond_type              = countBalMat.cond_type;
+  T.p2_cue_type                  = countBalMat.cue_type;
+  T.p5_administer_type           = countBalMat.administer;
 
   %% E. Keyboard information _____________________________________________________
   KbName('UnifyKeyNames');
-    p.keys.confirm                 = KbName('return');
-    p.keys.right                   = KbName('1!');
-    p.keys.left                    = KbName('2@');
-    p.keys.space                   = KbName('space');
-    p.keys.esc                     = KbName('ESCAPE');
-    p.keys.trigger                 = KbName('5%');
-    p.keys.start                   = KbName('s');
-    p.keys.end                     = KbName('e');
+  p.keys.confirm                 = KbName('return');
+  p.keys.right                   = KbName('1!');
+  p.keys.left                    = KbName('2@');
+  p.keys.space                   = KbName('space');
+  p.keys.esc                     = KbName('ESCAPE');
+  p.keys.trigger                 = KbName('5%');
+  p.keys.start                   = KbName('s');
+  p.keys.end                     = KbName('e');
 
   %% F. fmri Parameters __________________________________________________________
   TR                               = 0.46;
   task_duration                    = 6.50;
 %
   %% G. instructions _____________________________________________________
-    instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
-    instruct_start_name            = ['task-', taskname, '_start.png'];
-    instruct_end_name              = ['task-', taskname, '_end.png'];
-    instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
-    instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
+  instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
+  instruct_start_name            = ['task-', taskname, '_start.png'];
+  instruct_end_name              = ['task-', taskname, '_end.png'];
+  instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
+  instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 
   %% ------------------------------------------------------------------------------
   %                              Start Experiment
   %________________________________________________________________________________
 
     %% ______________________________ Instructions _________________________________
-    Screen('TextSize',p.ptb.window,72);
-    start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
-    Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
-    Screen('Flip',p.ptb.window);
+  Screen('TextSize',p.ptb.window,72);
+  start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+  Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
+  Screen('Flip',p.ptb.window);
 
   %% _______________________ Wait for Trigger to Begin ___________________________
   DisableKeysForKbCheck([]);
@@ -105,7 +108,7 @@ function pain(sub,input_counterbalance_file, run_num)
   Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
   Screen('Flip', p.ptb.window);
-  T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+  T.param_triggerOnset(:)        = KbTriggerWait(p.keys.trigger);
 
   WaitSecs(TR*6);
 
@@ -121,8 +124,8 @@ function pain(sub,input_counterbalance_file, run_num)
   WaitSecs(jitter1);
   fEnd1 = GetSecs;
 
-   T.p1_fixation_onset(trl) = fStart1;
-   T.p1_fixation_duration(trl) = fEnd1 - fStart1;
+  T.p1_fixation_onset(trl)      = fStart1;
+  T.p1_fixation_duration(trl)   = fEnd1 - fStart1;
   %% ________________________________ 2. cue 1s __________________________________
   % 1) log cue presentation time
   if string(countBalMat.cue_type{trl}) == 'low'
@@ -134,18 +137,21 @@ function pain(sub,input_counterbalance_file, run_num)
   end
   imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
   Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-  T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
-  WaitSecs(1)
+  T.p2_cue_onset(trl)            = Screen('Flip',p.ptb.window);
+  WaitSecs(1.00)
+  T.p2_cue_type{trl}             = countBalMat.cue_type{trl};
+  T.p2_cue_filename{trl}         = countBalMat.cue_image{trl};
+
 
   %-------------------------------------------------------------------------------
   %                             3. expectation rating
   %-------------------------------------------------------------------------------
   Screen('MakeTexture', p.ptb.window, imread(cueImage));
-  T.p3_expect_onset(trl) = GetSecs;
+  T.p3_expect_onset(trl)         = GetSecs;
   [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
   T.p3_expect_responseonset(trl) = buttonPressOnset;
-  rating_Trajectory{trl,1} = trajectory;
-  T.p3_expect_RT(trl) = RT;
+  rating_Trajectory{trl,1}       = trajectory;
+  T.p3_expect_RT(trl)            = RT;
 
   %-------------------------------------------------------------------------------
   %                             4. Fixtion Jitter 0-2 sec
@@ -172,6 +178,7 @@ function pain(sub,input_counterbalance_file, run_num)
   WaitSecs(task_duration);
   %WaitSecs(task_duration-T.p5_administer_onset(trl));
   fEnd2 = GetSecs;
+  T.p5_administer_type(trl) = countBalMat.administer(trl);
 
   %-------------------------------------------------------------------------------
   %                                6. post evaluation rating
@@ -184,15 +191,14 @@ function pain(sub,input_counterbalance_file, run_num)
 
   end
 
-  %% ______________________________ Instructions _________________________________
-start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
-% placement
-% dspl.cscale.rect = [...
-%     [dspl.xcenter dspl.ycenter]-[0.5*dspl.cscale.width 0.5*dspl.cscale.height] ...
-%     [dspl.xcenter dspl.ycenter]+[0.5*dspl.cscale.width 0.5*dspl.cscale.height]];
-Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
-Screen('Flip',p.ptb.window);
-KbTriggerWait(p.keys.end);
+  %% ______________________________ Ending _________________________________
+  end_texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+  Screen('DrawTexture',p.ptb.window,end_texture,[],[]);
+  T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
+  KbTriggerWait(p.keys.end);
+
+  T.param_experimentDuration(:) = T.param_end_instruct_onset(1) - T.param_triggerOnset(1);
+
 
   %-------------------------------------------------------------------------------
   %                                   save parameter
@@ -237,7 +243,8 @@ KbTriggerWait(p.keys.end);
       % Integer values are simply converted to binary, non integer values are
       % incremented by 128 and converted to binary. So 45 is bin(45) while
       % 45.5 is bin(45+128).
-      temp = temp + 100;
+      temp = temp + 101;
+      % temp = temp + 100;
       if(mod(temp,1))
           % note: this will treat all decimal values the same. Specific
           % temperature mapping is determined in PATHWAY software
