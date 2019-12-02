@@ -75,7 +75,7 @@ taskname = 'vicarious'
 dir_main = '/Users/h/Documents/projects_local/social_influence'
 dir_cue_high = os.path.join(dir_main,'stimuli','cue','task-' + taskname,'sch')
 dir_cue_low = os.path.join(dir_main,'stimuli','cue','task-' + taskname,'scl')
-dir_save = os.path.join(dir_main, 'design','counterbalance')
+dir_save = os.path.join(dir_main, 'design','s03_counterbalance')
 dir_video = os.path.join(dir_main,'stimuli','task-vicarious_videofps-024_dur-4s','selected')
 # ______________________________________________________________________________
 

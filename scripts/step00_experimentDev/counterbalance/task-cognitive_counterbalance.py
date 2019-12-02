@@ -56,7 +56,7 @@ trial_per_cond = 6 # how many trials under one condition
 consec_num = 4
 taskname = 'cognitive'
 dir_main = '/Users/h/Documents/projects_local/social_influence'
-dir_save = os.path.join(dir_main, 'design','counterbalance')
+dir_save = os.path.join(dir_main, 'design','s03_counterbalance')
 dir_cue_high = os.path.join(dir_main,'stimuli','cue','task-' + taskname,'sch')
 dir_cue_low = os.path.join(dir_main,'stimuli','cue','task-' + taskname,'scl')
 # ______________________________________________________________________________
