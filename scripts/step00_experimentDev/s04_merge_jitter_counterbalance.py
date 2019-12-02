@@ -18,4 +18,4 @@ for ind, cb_filename in enumerate(cb_list):
     opti = pd.read_csv(jitter_filename)
     counterbalance = pd.read_csv(cb_filename)
     new_counterbalance = pd.concat([counterbalance,opti['ISI1'], opti['ISI2']], axis=1).copy()
-    new_counterbalance.to_csv(os.path.join(main_dir,'s04_final_counterbalanced_with_jitter', basename ))
+    new_counterbalance.to_csv(os.path.join(main_dir,'s04_final_counterbalance_with_jitter', basename ))
