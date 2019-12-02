@@ -68,7 +68,7 @@ T.p2_cue_filename              = cell(size(countBalMat,1),1);
 a                              = split(counterbalancefile,filesep); % full path filename components
 version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
 block_chunk                    = split(extractAfter(a(end),"block-"),["-", "."]);
-T.param_fmriSession            = session;
+T.param_fmriSession(:)            = session;
 T.param_runNum(:)              = run_num;
 T.param_counterbalanceVer(:)   = str2double(version_chunk{1});
 T.param_counterbalanceBlockNum(:) = str2double(block_chunk{1});
@@ -157,6 +157,7 @@ T.p2_cue_filename{trl}              = countBalMat.cue_image{trl};
 %% __________________________ 3. expectation rating ____________________________
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 T.p3_expect_onset(trl) = GetSecs;
+Screen('TextSize', p.ptb.window, 36);
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
 rating_Trajectory{trl,1} = trajectory;
 T.p3_expect_responseonset(trl) = buttonPressOnset;
@@ -185,7 +186,7 @@ rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
 Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
 
 % 5-2. present scale lines _____________________________________________________
-Yc = 100; % Y coord
+Yc = 180; % Y coord
 cDist = 20; % vertical line depth
 lXc = -200; % left X coord
 rXc = 200; % right X coord
@@ -199,7 +200,8 @@ textSame = 'Same';
 textYc = p.ptb.yCenter + Yc + cDist*4;
 textRXc = p.ptb.xCenter + rXc;
 textLXc = p.ptb.xCenter - rXc;
-DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
+Screen('TextSize', p.ptb.window, 48);
+DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
 DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
 
 % 5-4. flip screen _____________________________________________________________
@@ -224,7 +226,7 @@ while GetSecs - timing.initialized < task_duration
     % Screen('DrawLines', p.ptb.window, lineCoords,...
     % p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
-    DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, [255 0 0]);
+    DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, [255 0 0]);
     Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
     Screen('Flip',p.ptb.window);
 
@@ -243,7 +245,7 @@ while GetSecs - timing.initialized < task_duration
     % respToBeMade = false;
     % Screen('DrawLines', p.ptb.window, lineCoords,...
     % p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-    DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-250-60, textYc, p.ptb.white);
+    DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, p.ptb.white);
     DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, [255 0 0]);
     Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
     Screen('Flip',p.ptb.window);
@@ -260,6 +262,7 @@ end
 
 %% ________________________ 6. post evaluation rating __________________________
 T.p6_actual_onset(trl) = GetSecs;
+Screen('TextSize', p.ptb.window, 36);
 [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
 rating_Trajectory{trl,2} = trajectory;
 T.p6_actual_responseonset(trl) = buttonPressOnset;
