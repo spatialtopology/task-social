@@ -61,7 +61,7 @@ function pain(sub,input_counterbalance_file, run_num, session)
   a                              = split(counterbalancefile,filesep); % full path filename components
   version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
   block_chunk                    = split(extractAfter(a(end),"block-"),["-", "."]);
-  T.param_fmriSession            = session;
+  T.param_fmriSession(:)            = session;
   T.param_runNum(:)              = run_num;
   T.param_counterbalanceVer(:)   = str2double(version_chunk{1});
   T.param_counterbalanceBlockNum(:) = str2double(block_chunk{1});
