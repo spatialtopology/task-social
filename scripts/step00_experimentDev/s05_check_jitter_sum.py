@@ -25,7 +25,7 @@ __status__ = "Production"
 # Parameters _______________________________________________________________________
 main_dir = '/Users/h/Documents/projects_local/social_influence/design'
 
-cb_fn = os.path.join(main_dir,'s04_final_counterbalanced_with_jitter','task-*_ver*_block*.csv')
+cb_fn = os.path.join(main_dir,'s04_final_counterbalance_with_jitter','task-*_ver*_block*.csv')
 cb_list = glob.glob(cb_fn)
 # for loop
 # load csv file
