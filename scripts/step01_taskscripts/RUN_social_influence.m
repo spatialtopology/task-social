@@ -28,41 +28,41 @@ bl_ind = rem(sub,6);
 if session == 1
 switch bl_ind
   case 0 % p1 v1 c2 c1 v2 p2
-    pain(sub,p1,1);vicarious(sub,v1,2);cognitive(sub,c2,3); %cognitive(sub,c1,4);vicarious(sub,v2,5);pain(sub,p2,6);
+    pain(sub,p1,1,1);vicarious(sub,v1,2,1);cognitive(sub,c2,3,1); %cognitive(sub,c1,4);vicarious(sub,v2,5);pain(sub,p2,6);
 
   case 1 % v1 c1 p1 p2 c2 v2
-    vicarious(sub,v1,1);cognitive(sub,c1,2);pain(sub,p1,3); %pain(sub,p2,4);cognitive(sub,c2,5);vicarious(sub,v2,6);
+    vicarious(sub,v1,1,1);cognitive(sub,c1,2,1);pain(sub,p1,3,1); %pain(sub,p2,4);cognitive(sub,c2,5);vicarious(sub,v2,6);
 
   case 2 % c1 p2 v1 v2 p1 c2
-    cognitive(sub,c1,1);pain(sub,p2,2);vicarious(sub,v1,3); %vicarious(sub,v2,4);pain(sub,p1,5);cognitive(sub,c2,6);
+    cognitive(sub,c1,1,1);pain(sub,p2,2,1);vicarious(sub,v1,3,1); %vicarious(sub,v2,4);pain(sub,p1,5);cognitive(sub,c2,6);
 
   case 3 % p2 v2 c1 c2 v1 p1
-    pain(sub,p2,1);vicarious(sub,v2,2);cognitive(sub,c1,3); %cognitive(sub,c2,4);vicarious(sub,v1,5);pain(sub,p1,6);
+    pain(sub,p2,1,1);vicarious(sub,v2,2,1);cognitive(sub,c1,3,1); %cognitive(sub,c2,4);vicarious(sub,v1,5);pain(sub,p1,6);
 
   case 4 % v2 c2 p2 p1 c1 v1
-    vicarious(sub,v2,1);cognitive(sub,c2,2);pain(sub,p2,3); %pain(sub,p1,4);cognitive(sub,c1,5);vicarious(sub,v1,6);
+    vicarious(sub,v2,1,1);cognitive(sub,c2,2,1);pain(sub,p2,3,1); %pain(sub,p1,4);cognitive(sub,c1,5);vicarious(sub,v1,6);
 
   case 5 % c2 p1 v2 v1 p2 c1
-    cognitive(sub,c2,1);pain(sub,p1,2);vicarious(sub,v2,3); %vicarious(sub,v1,4);pain(sub,p2,5);cognitive(sub,c1,6);
+    cognitive(sub,c2,1,1);pain(sub,p1,2,1);vicarious(sub,v2,3,1); %vicarious(sub,v1,4);pain(sub,p2,5);cognitive(sub,c1,6);
 end
 elseif session ~= 1
 switch bl_ind
   case 0 % p1 v1 c2 c1 v2 p2
-    cognitive(sub,c1,4);vicarious(sub,v2,5);pain(sub,p2,6);
+    cognitive(sub,c1,4,session);vicarious(sub,v2,5,session);pain(sub,p2,6,session);
 
   case 1 % v1 c1 p1 p2 c2 v2
-    pain(sub,p2,4);cognitive(sub,c2,5);vicarious(sub,v2,6);
+    pain(sub,p2,4,session);cognitive(sub,c2,5,session);vicarious(sub,v2,6,session);
 
   case 2 % c1 p2 v1 v2 p1 c2
-    vicarious(sub,v2,4);pain(sub,p1,5);cognitive(sub,c2,6);
+    vicarious(sub,v2,4,session);pain(sub,p1,5,session);cognitive(sub,c2,6,session);
 
   case 3 % p2 v2 c1 c2 v1 p1
-    cognitive(sub,c2,4);vicarious(sub,v1,5);pain(sub,p1,6);
+    cognitive(sub,c2,4,session);vicarious(sub,v1,5,session);pain(sub,p1,6,session);
 
   case 4 % v2 c2 p2 p1 c1 v1
-    pain(sub,p1,4);cognitive(sub,c1,5);vicarious(sub,v1,6);
+    pain(sub,p1,4,session);cognitive(sub,c1,5,session);vicarious(sub,v1,6,session);
 
   case 5 % c2 p1 v2 v1 p2 c1
-    vicarious(sub,v1,4);pain(sub,p2,5);cognitive(sub,c1,6);
+    vicarious(sub,v1,4,session);pain(sub,p2,5,session);cognitive(sub,c1,6,session);
 end
 end
