@@ -8,7 +8,7 @@ import ntpath
 import os
 import glob
 main_dir = '/Users/h/Documents/projects_local/social_influence/design'
-cb_fn = os.path.join(main_dir,'counterbalance','task-*_ver*_block*.csv')
+cb_fn = os.path.join(main_dir,'s03_counterbalance','task-*_ver*_block*.csv')
 cb_list = glob.glob(cb_fn)
 # for loop
 # load csv file
