@@ -238,7 +238,7 @@ while GetSecs - timing.initialized < task_duration
     Screen('Flip', p.ptb.window);
     WaitSecs(remainder_time);
 
-    elseif buttonpressed(2)%     elseif keyCode(p.keys.right)
+  elseif buttonpressed(3)%     elseif keyCode(p.keys.right)
 
     RT = GetSecs - timing.initialized;
     response = 2;
