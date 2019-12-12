@@ -1,2 +1,8 @@
 .DS_Store
 
+design/counterbalance/
+design/jitter_old/
+scripts/step00_experimentDev/create_jitter/.ipynb_checkpoints/
+scripts/step00_experimentDev/create_socialcues/.ipynb_checkpoints/Untitled-checkpoint.ipynb
+scripts/step00_experimentDev/create_socialcues/.ipynb_checkpoints/create_social_ratings_ver-02-checkpoint.ipynb
+scripts/step02_calculateDegrees/.ipynb_checkpoints/
