@@ -1,6 +1,6 @@
 function cognitive(sub,input_counterbalance_file, run_num, session)
-% [ ] make sure to remove the Line
-% [ ] change the font size for same diff
+% [x] make sure to remove the Line
+% [x] change the font size for same diff
 %% -----------------------------------------------------------------------------
 %                                Parameters
 % ______________________________________________________________________________
@@ -31,9 +31,6 @@ task_dir                        = pwd;
 main_dir                        = fileparts(fileparts(task_dir));
 taskname                        = 'cognitive';
 
-dir_video                       = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
-cue_low_dir                     = fullfile(main_dir,'stimuli','cue','scl');
-cue_high_dir                    = fullfile([main_dir,'stimuli','cue','sch']);
 counterbalancefile              = fullfile(main_dir, 'design', 's04_final_counterbalance_with_jitter', [input_counterbalance_file, '.csv']);
 countBalMat                     = readtable(counterbalancefile);
 
@@ -86,8 +83,8 @@ T.p5_administer_filename       = countBalMat.image_filename;
 %% E. Keyboard information _____________________________________________________
 KbName('UnifyKeyNames');
 p.keys.confirm                 = KbName('return');
-p.keys.right                   = KbName('1!');
-p.keys.left                    = KbName('2@');
+p.keys.right                   = KbName('3#');
+p.keys.left                    = KbName('1!');
 p.keys.space                   = KbName('space');
 p.keys.esc                     = KbName('ESCAPE');
 p.keys.trigger                 = KbName('5%');
@@ -117,12 +114,14 @@ Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
 Screen('Flip',p.ptb.window);
 
 %% _______________________ Wait for Trigger to Begin ___________________________
-DisableKeysForKbCheck([]);
-KbTriggerWait(p.keys.start); % press s
+% 1) wait for 's' key, once pressed, automatically flips to fixation ___________
+WaitKeyPress(p.keys.start); % press s
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 Screen('Flip', p.ptb.window);
-T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger); % wait for scanner 5
+% 2) wait for trigger '5'
+WaitKeyPress(p.keys.trigger); % wait for scanner 5
+T.param_triggerOnset(:) = GetSecs;
 WaitSecs(TR*6);
 
 %% ___________________________ 0. Experimental loop ____________________________
@@ -164,7 +163,7 @@ T.p3_expect_responseonset(trl) = buttonPressOnset;
 T.p3_expect_RT(trl) = RT;
 
 
-%% _________________________ 4. Fixtion Jitter 0-4 sec _________________________
+%% _________________________ 4. Fixtion Jitter 0-2 sec _________________________
 jitter2 = countBalMat.ISI2(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
@@ -275,7 +274,7 @@ end
 end_texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 Screen('DrawTexture',p.ptb.window,end_texture,[],[]);
 T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
-KbTriggerWait(p.keys.end);
+WaitKeyPress(p.keys.end);
 
 T.param_experimentDuration(:) = T.param_end_instruct_onset(1) - T.param_triggerOnset(1);
 
@@ -294,5 +293,25 @@ save(psychtoolbox_saveFileName, 'p');
 
 close all;
 sca;
+
+function WaitKeyPress(kID)
+while KbCheck(-3); end  % Wait until all keys are released.
+
+while 1
+    % Check the state of the keyboard.
+    [ keyIsDown, ~, keyCode ] = KbCheck(-3);
+    % If the user is pressing a key, then display its code number and name.
+    if keyIsDown
+
+        if keyCode(p.keys.esc)
+            cleanup; break;
+        elseif keyCode(kID)
+            break;
+        end
+        % make sure key's released
+        while KbCheck(-3); end
+    end
+end
+end
 
 end

@@ -74,8 +74,8 @@ function pain(sub,input_counterbalance_file, run_num, session)
   %% E. Keyboard information _____________________________________________________
   KbName('UnifyKeyNames');
   p.keys.confirm                 = KbName('return');
-  p.keys.right                   = KbName('1!');
-  p.keys.left                    = KbName('2@');
+  p.keys.right                   = KbName('3#');
+  p.keys.left                    = KbName('1!');
   p.keys.space                   = KbName('space');
   p.keys.esc                     = KbName('ESCAPE');
   p.keys.trigger                 = KbName('5%');
@@ -105,11 +105,12 @@ function pain(sub,input_counterbalance_file, run_num, session)
 
   %% _______________________ Wait for Trigger to Begin ___________________________
   DisableKeysForKbCheck([]);
-  KbTriggerWait(p.keys.start);
+  WaitKeyPress(p.keys.start);
   Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
   Screen('Flip', p.ptb.window);
-  T.param_triggerOnset(:)        = KbTriggerWait(p.keys.trigger);
+  WaitKeyPress(p.keys.trigger);
+  T.param_triggerOnset(:)        = GetSecs;
 
   WaitSecs(TR*6);
 
@@ -196,7 +197,7 @@ function pain(sub,input_counterbalance_file, run_num, session)
   end_texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
   Screen('DrawTexture',p.ptb.window,end_texture,[],[]);
   T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
-  KbTriggerWait(p.keys.end);
+  WaitKeyPress(p.keys.end);
 
   T.param_experimentDuration(:) = T.param_end_instruct_onset(1) - T.param_triggerOnset(1);
 
@@ -285,5 +286,25 @@ function pain(sub,input_counterbalance_file, run_num, session)
       % Perform the operations/requests
       ljudObj.GoOne(ljhandle);
   end
+
+function WaitKeyPress(kID)
+while KbCheck(-3); end  % Wait until all keys are released.
+
+while 1
+    % Check the state of the keyboard.
+    [ keyIsDown, ~, keyCode ] = KbCheck(-3);
+    % If the user is pressing a key, then display its code number and name.
+    if keyIsDown
+
+        if keyCode(p.keys.esc)
+            cleanup; break;
+        elseif keyCode(kID)
+            break;
+        end
+        % make sure key's released
+        while KbCheck(-3); end
+    end
+end
+end
 
 end

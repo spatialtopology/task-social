@@ -29,6 +29,11 @@ task_dir                       = pwd;
 main_dir                       = fileparts(fileparts(task_dir));
 taskname                       = 'vicarious';
 
+sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );
+if ~exist(sub_save_dir, 'dir')
+    mkdir(sub_save_dir)
+end
+
 dir_video                      = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
 cue_low_dir                    = fullfile(main_dir,'stimuli','cue','scl');
 cue_high_dir                   = fullfile([main_dir,'stimuli','cue','sch']);
@@ -41,7 +46,7 @@ image_scale_filename           = ['task-',taskname,'_scale.png'];
 image_scale                    = fullfile(image_filepath,image_scale_filename);
 
 %% D. making output table ________________________________________________________
-vnames = {'param_fmriSession', 'param_counterbalanceVer','param_counterbalanceBlockNum',...
+vnames = {'param_fmriSession', 'param_counterbalanceVer','param_counterbalanceBlockNum','param_triggerOnset',...
                                 'param_videoSubject','param_videoFilename','param_cue_type',...
                                 'param_administer_type','param_cond_type'...
                                 'p1_fixation_onset','p1_fixation_duration',...
@@ -78,8 +83,8 @@ T.p5_administer_filename       = countBalMat.video_filename;
 %% E. Keyboard information _____________________________________________________
 KbName('UnifyKeyNames');
 p.keys.confirm                 = KbName('return');
-p.keys.right                   = KbName('1!');
-p.keys.left                    = KbName('2@');
+p.keys.right                   = KbName('3#');
+p.keys.left                    = KbName('1!');
 p.keys.space                   = KbName('space');
 p.keys.esc                     = KbName('ESCAPE');
 p.keys.trigger                 = KbName('5%');
@@ -113,12 +118,16 @@ start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
 Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
 Screen('Flip',p.ptb.window);
 %% _______________________ Wait for Trigger to Begin ___________________________
-DisableKeysForKbCheck([]);
-KbTriggerWait(p.keys.start);
+% DisableKeysForKbCheck([]);
+% RestrictKeysForKbCheck(p.keys.start);
+% KbTriggerWait(p.keys.start);
+WaitKeyPress(p.keys.start)
+% FlushEvents(['keyDown']);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 Screen('Flip', p.ptb.window);
-T.param_triggerOnset(:) = KbTriggerWait(p.keys.trigger);
+WaitKeyPress(p.keys.trigger);
+T.param_triggerOnset(:) = GetSecs;
 WaitSecs(TR*6);
 
 %% 0. Experimental loop _________________________________________________________
@@ -190,6 +199,8 @@ rating_Trajectory{trl,2} = trajectory;
 T.p6_actual_responseonset(trl) = buttonPressOnset;
 T.p6_actual_RT(trl) = RT;
 
+tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
+writetable(T,tmpFileName);
 end
 
 
@@ -197,15 +208,12 @@ end
 start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
 T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
-KbTriggerWait(p.keys.end);
-
+% KbTriggerWait(p.keys.end);
+WaitKeyPress(p.keys.end);
 T.param_experimentDuration(:) = T.param_end_instruct_onset(1) - T.param_triggerOnset(1);
 
 %% save parameter ______________________________________________________________
-sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );
-if ~exist(sub_save_dir, 'dir')
-    mkdir(sub_save_dir)
-end
+
 
 saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), ...
 '_task-',taskname,'_beh.csv' ]);
@@ -253,6 +261,30 @@ end
         Screen('Flip', p.ptb.window);
 Screen('PlayMovie', movie, 0);
 Screen('CloseMovie', movie);
+end
+
+
+
+
+
+function WaitKeyPress(kID)
+while KbCheck(-3); end  % Wait until all keys are released.
+
+while 1
+    % Check the state of the keyboard.
+    [ keyIsDown, ~, keyCode ] = KbCheck(-3);
+    % If the user is pressing a key, then display its code number and name.
+    if keyIsDown
+
+        if keyCode(p.keys.esc)
+            cleanup; break;
+        elseif keyCode(kID)
+            break;
+        end
+        % make sure key's released
+        while KbCheck(-3); end
+    end
+end
 end
 
 end
