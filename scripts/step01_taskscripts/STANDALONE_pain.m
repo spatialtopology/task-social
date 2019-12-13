@@ -10,43 +10,45 @@ run_num = input(prompt);
 % random sequence
 r_seq =  [1,3,2,3,5,1,2,4,4,5];
 index = rem(sub,10);
-c1 = ['task-cognitive_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-01'];
-c2 = ['task-cognitive_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-02'];
+% c1 = ['task-cognitive_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-01'];
+% c2 = ['task-cognitive_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-02'];
 p1 = ['task-pain_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-01'];
 p2 = ['task-pain_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-02'];
-v1 = ['task-vicarious_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-01'];
-v2 = ['task-vicarious_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-02'];
+% v1 = ['task-vicarious_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-01'];
+% v2 = ['task-vicarious_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-02'];
 
 bl_ind = rem(sub,6);
 if session == 1
-  switch bl_ind
-    case 0
-      input_counterbalance_file = p1;
-    case 1
-      input_counterbalance_file = p1;
-    case 2
-      input_counterbalance_file = p2;
-    case 3
-      input_counterbalance_file = p2;
-    case 4
-      input_counterbalance_file = p2;
-    case 5
-      input_counterbalance_file = p1;
-if session == 1
-  switch bl_ind
-    case 0
-      input_counterbalance_file = p2;
-    case 1
-      input_counterbalance_file = p2;
-    case 2
-      input_counterbalance_file = p1;
-    case 3
-      input_counterbalance_file = p1;
-    case 4
-      input_counterbalance_file = p1;
-    case 5
-      input_counterbalance_file = p2;
-
+    switch bl_ind
+        case 0
+            input_counterbalance_file = p1;
+        case 1
+            input_counterbalance_file = p1;
+        case 2
+            input_counterbalance_file = p2;
+        case 3
+            input_counterbalance_file = p2;
+        case 4
+            input_counterbalance_file = p2;
+        case 5
+            input_counterbalance_file = p1;
+    end
+elseif session ~= 1
+    switch bl_ind
+        case 0
+            input_counterbalance_file = p2;
+        case 1
+            input_counterbalance_file = p2;
+        case 2
+            input_counterbalance_file = p1;
+        case 3
+            input_counterbalance_file = p1;
+        case 4
+            input_counterbalance_file = p1;
+        case 5
+            input_counterbalance_file = p2;
+    end
+end
 
 
         %% -----------------------------------------------------------------------------
@@ -146,6 +148,7 @@ if session == 1
         %________________________________________________________________________________
 
           %% ______________________________ Instructions _________________________________
+        HideCursor;
         Screen('TextSize',p.ptb.window,72);
         start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
         Screen('DrawTexture',p.ptb.window,start.texture,[],[]);

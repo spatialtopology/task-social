@@ -98,6 +98,7 @@ function pain(sub,input_counterbalance_file, run_num, session)
   %________________________________________________________________________________
 
     %% ______________________________ Instructions _________________________________
+  HideCursor;
   Screen('TextSize',p.ptb.window,72);
   start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
   Screen('DrawTexture',p.ptb.window,start.texture,[],[]);

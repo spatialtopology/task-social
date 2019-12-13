@@ -113,6 +113,7 @@ instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 % ------------------------------------------------------------------------------
 
 %% ______________________________ Instructions _________________________________
+HideCursor;
 Screen('TextSize',p.ptb.window,72);
 start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
 Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
