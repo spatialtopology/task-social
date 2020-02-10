@@ -33,7 +33,7 @@ function cognitive(sub,input_counterbalance_file, run_num, session)
   counterbalancefile              = fullfile(main_dir, 'design', 's04_final_counterbalance_with_jitter', [input_counterbalance_file, '.csv']);
   countBalMat                     = readtable(counterbalancefile);
 
-  sub_save_dir                    = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );
+  sub_save_dir                    = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' ,strcat('_ses-',sprintf('%02d', session)));
   if ~exist(sub_save_dir, 'dir')
       mkdir(sub_save_dir)
   end
@@ -258,6 +258,7 @@ T.p6_actual_responseonset(trl)   = buttonPressOnset;
 T.p6_actual_RT(trl)              = RT;
 tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
 writetable(T,tmpFileName);
+Screen('CloseAll');
 end
 
 
@@ -271,13 +272,13 @@ T.param_experimentDuration(:)    = T.param_end_instruct_onset(1) - T.param_trigg
 
 
 %% _________________________ 8. save parameter _________________________________
-saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_beh.csv' ]);
+saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh.csv' ]);
 writetable(T,saveFileName);
 
-traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
+traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh_trajectory.mat' ]);
 save(traject_saveFileName, 'rating_Trajectory');
 
-psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
+psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)),strcat('_ses-',sprintf('%02d', session)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 
 close all;

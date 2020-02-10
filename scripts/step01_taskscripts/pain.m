@@ -159,15 +159,15 @@ function pain(sub,input_counterbalance_file, run_num, session)
   %-------------------------------------------------------------------------------
   %                             4. Fixtion Jitter 0-2 sec
   %-------------------------------------------------------------------------------
-  % 1) get jitter
-  % jitter2 = countBalMat.ISI2(trl);
-  % Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-  %    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-  % fStart2 = GetSecs;
-  % T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
-  % WaitSecs(jitter2);
-  % fEnd2 = GetSecs;
-  % T.p4_fixation_duration(trl) = fEnd2 - fStart2;
+%   1) get jitter
+  jitter2 = countBalMat.ISI2(trl);
+  Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+     p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+  fStart2 = GetSecs;
+  T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
+  WaitSecs(jitter2);
+  fEnd2 = GetSecs;
+  T.p4_fixation_duration(trl) = fEnd2 - fStart2;
 
   %-------------------------------------------------------------------------------
   %                            5. pain
@@ -191,7 +191,7 @@ function pain(sub,input_counterbalance_file, run_num, session)
   T.p6_actual_responseonset(trl) = buttonPressOnset;
   rating_Trajectory{trl,2} = trajectory;
   T.p6_actual_RT(trl) = RT;
-
+  Screen('CloseAll');
   end
 
   %% ______________________________ Ending _________________________________
@@ -206,18 +206,18 @@ function pain(sub,input_counterbalance_file, run_num, session)
   %-------------------------------------------------------------------------------
   %                                   save parameter
   %-------------------------------------------------------------------------------
-  sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );
+  sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' , strcat('_ses-',sprintf('%02d', session)));
   if ~exist(sub_save_dir, 'dir')
       mkdir(sub_save_dir)
   end
 
-  saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_beh.csv' ]);
+  saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh.csv' ]);
   writetable(T,saveFileName);
 
-  traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_beh_trajectory.mat' ]);
+  traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh_trajectory.mat' ]);
   save(traject_saveFileName, 'rating_Trajectory');
 
-  psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
+  psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)),strcat('_ses-',sprintf('%02d', session)), '_task-',taskname,'_psychtoolbox_params.mat' ]);
   save(psychtoolbox_saveFileName, 'p');
 
   sca;

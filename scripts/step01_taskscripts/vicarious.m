@@ -29,7 +29,7 @@ task_dir                       = pwd;
 main_dir                       = fileparts(fileparts(task_dir));
 taskname                       = 'vicarious';
 
-sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' );
+sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh',strcat('_ses-',sprintf('%02d', session)) );
 if ~exist(sub_save_dir, 'dir')
     mkdir(sub_save_dir)
 end
@@ -66,7 +66,7 @@ T.p5_administer_type           = cell(size(countBalMat,1),1);
 a                              = split(counterbalancefile,filesep);
 version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
 block_chunk                    = split(extractAfter(a(end),"block-"),["-", "."]);
-T.param_fmriSession(:)            = session;
+T.param_fmriSession(:)         = session;
 T.param_runNum(:)              = run_num;
 T.param_counterbalanceVer(:)   = str2double(version_chunk{1});
 T.param_counterbalanceBlockNum(:) = str2double(block_chunk{1});
@@ -122,7 +122,7 @@ Screen('Flip',p.ptb.window);
 % DisableKeysForKbCheck([]);
 % RestrictKeysForKbCheck(p.keys.start);
 % KbTriggerWait(p.keys.start);
-WaitKeyPress(p.keys.start)
+WaitKeyPress(p.keys.start);
 % FlushEvents(['keyDown']);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
@@ -159,7 +159,7 @@ end
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
-WaitSecs(1)
+WaitSecs(1);
 T.p2_cue_type{trl}                  = countBalMat.cue_type{trl};
 T.p2_cue_filename{trl}              = countBalMat.cue_image{trl};
 
@@ -217,15 +217,15 @@ T.param_experimentDuration(:) = T.param_end_instruct_onset(1) - T.param_triggerO
 
 
 saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), ...
-'_task-',taskname,'_beh.csv' ]);
+strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh.csv' ]);
 writetable(T,saveFileName);
 
 traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), ...
-'_task-',taskname,'_beh_trajectory.mat' ]);
+strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh_trajectory.mat' ]);
 save(traject_saveFileName, 'rating_Trajectory');
 
 psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)),...
-'_task-',taskname,'_psychtoolbox_params.mat' ]);
+strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 
 sca;
@@ -236,7 +236,7 @@ sca;
 % Function by Xiaochun Han
 function [Tm] = video_play(moviename,p)
 % [p.ptb.window, rect]  = Screen(p.ptb.screenID, 'OpenWindow',p.ptb.bg);
-Tt = 0;
+% Tt = 0;
 rate = 1;
 [movie, ~, ~, imgw, imgh] = Screen('OpenMovie', p.ptb.window, moviename);
 Screen('PlayMovie', movie, rate);
