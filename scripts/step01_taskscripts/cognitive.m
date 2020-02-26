@@ -1,5 +1,11 @@
 function cognitive(sub,input_counterbalance_file, run_num, session)
 
+
+% code by Heejung Jung
+% heejung.jung@colorado.edu
+% Feb.09.2020
+
+
 %% -----------------------------------------------------------------------------
 %                                Parameters
 % ______________________________________________________________________________
@@ -258,7 +264,6 @@ T.p6_actual_responseonset(trl)   = buttonPressOnset;
 T.p6_actual_RT(trl)              = RT;
 tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
 writetable(T,tmpFileName);
-Screen('CloseAll');
 end
 
 

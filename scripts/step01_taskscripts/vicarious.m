@@ -1,4 +1,8 @@
 function vicarious(sub,input_counterbalance_file, run_num, session)
+
+% code by Heejung Jung
+% heejung.jung@colorado.edu
+% Feb.09.2020
 %% -----------------------------------------------------------------------------
 %                           Parameters
 % ------------------------------------------------------------------------------
