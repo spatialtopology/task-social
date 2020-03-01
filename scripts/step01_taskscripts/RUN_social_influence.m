@@ -1,4 +1,4 @@
-
+clear all;
 % 1. grab participant number ___________________________________________________
 prompt = 'session number : ';
 session = input(prompt);
@@ -66,3 +66,5 @@ elseif session ~= 1
             vicarious(sub,v1,4,session);pain(sub,p2,5,session);cognitive(sub,c1,6,session);
     end
 end
+
+
