@@ -39,5 +39,5 @@ for ind, cb_filename in enumerate(cb_list):
     output.loc[ind,'sum_ISI2']  = np.sum(p['ISI2'])
 
 
-output_filename = os.path.join(main_dir, 's05_checkjitter', 'total-jitter_task-posner_counterbalance.csv')
+output_filename = os.path.join(main_dir, 's05_checkjitter', 'total-jitter_task-socialinfluence_counterbalance.csv')
 output.to_csv(output_filename)
