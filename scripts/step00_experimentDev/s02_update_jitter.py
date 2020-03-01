@@ -68,52 +68,52 @@ for ind in range(30):
     opti_r['ISI1'] = opti_r['ISI1'].apply(lambda x: '{0:0>2}'.format(x))
 
 # ==============================================================================
-    opti_r['ISI2'] = opti_r['ISI2'].astype(float).round(decimals=1)
-    # 3) calculated sum ________________________________________________________
-    total = opti_r['ISI2'].sum()
-
-    # 4) if sum is smaller than 240 sec, _______________________________________
-    # randomly select indices and add 240/number _______________________________
-    if total < total_jitter_length_2:
-        diff = total_jitter_length_2 - total
-        increments3 = diff / num_trials_to_change2
-        print(increments3)
-        subset = opti_r.loc[opti_r.ISI2 > 0.3,].sample(n=num_trials_to_change2)
-        subset.ISI2  = subset.ISI2 + increments3.round(2)
-        for num in range(0,len(subset)):
-            opti_r.iloc[subset.iloc[num].name] = subset.iloc[num]
-
-    # 5) if sum is greater than 240 sec, _______________________________________
-    # identify those greater than 1.5 and subtract 240/number __________________
-    elif total >= total_jitter_length_2:
-        diff = abs(total_jitter_length_2-total)
-        increments4 = diff / num_trials_to_change2
-        print(increments4)
-        subset = opti_r.loc[opti_r.ISI2 > 1.0,].sample(n=num_trials_to_change2)
-        subset.ISI2  = subset.ISI2 - increments4.round(2)
-        for num in range(0,len(subset)):
-            opti_r.iloc[subset.iloc[num].name] = subset.iloc[num]
-
-
-    # if 0 in ISI2
-    # opti_r[(opti_r == 0).all(1)]
-    if (opti_r['ISI1'] == 0).any():
-        subset = opti_r.loc[opti_r.ISI1 == 0,]
-        for ind in list(range(len(subset))):
-            opti_r.loc[subset.index[ind], 'ISI1' ] = 0.1
-        max = opti_r['ISI1'].idxmax()
-        opti_r.loc[max, 'ISI1'] = opti_r.loc[max, 'ISI1']-(0.1*len(subset))
-    if (opti_r['ISI2'] == 0).any():
-        subset2 = opti_r.loc[opti_r.ISI2 == 0,]
-        for ind in list(range(len(subset2))):
-            opti_r.loc[subset2.index[ind], 'ISI2'  ] = 0.1
-        max2 = opti_r['ISI2'].idxmax()
-        opti_r.loc[max2, 'ISI2'] = opti_r.loc[max2, 'ISI2']-(0.1*len(subset2))
-
-# add .1 to every index
-# subtract .1 * number of counts from max isi2
-    opti_r['ISI2'] = opti_r['ISI2'].astype(float).round(decimals=1)
-    opti_r['ISI2'] = opti_r['ISI2'].apply(lambda x: '{0:0>2}'.format(x))
+#     opti_r['ISI2'] = opti_r['ISI2'].astype(float).round(decimals=1)
+#     # 3) calculated sum ________________________________________________________
+#     total = opti_r['ISI2'].sum()
+#
+#     # 4) if sum is smaller than 240 sec, _______________________________________
+#     # randomly select indices and add 240/number _______________________________
+#     if total < total_jitter_length_2:
+#         diff = total_jitter_length_2 - total
+#         increments3 = diff / num_trials_to_change2
+#         print(increments3)
+#         subset = opti_r.loc[opti_r.ISI2 > 0.3,].sample(n=num_trials_to_change2)
+#         subset.ISI2  = subset.ISI2 + increments3.round(2)
+#         for num in range(0,len(subset)):
+#             opti_r.iloc[subset.iloc[num].name] = subset.iloc[num]
+#
+#     # 5) if sum is greater than 240 sec, _______________________________________
+#     # identify those greater than 1.5 and subtract 240/number __________________
+#     elif total >= total_jitter_length_2:
+#         diff = abs(total_jitter_length_2-total)
+#         increments4 = diff / num_trials_to_change2
+#         print(increments4)
+#         subset = opti_r.loc[opti_r.ISI2 > 1.0,].sample(n=num_trials_to_change2)
+#         subset.ISI2  = subset.ISI2 - increments4.round(2)
+#         for num in range(0,len(subset)):
+#             opti_r.iloc[subset.iloc[num].name] = subset.iloc[num]
+#
+#
+#     # if 0 in ISI2
+#     # opti_r[(opti_r == 0).all(1)]
+#     if (opti_r['ISI1'] == 0).any():
+#         subset = opti_r.loc[opti_r.ISI1 == 0,]
+#         for ind in list(range(len(subset))):
+#             opti_r.loc[subset.index[ind], 'ISI1' ] = 0.1
+#         max = opti_r['ISI1'].idxmax()
+#         opti_r.loc[max, 'ISI1'] = opti_r.loc[max, 'ISI1']-(0.1*len(subset))
+#     if (opti_r['ISI2'] == 0).any():
+#         subset2 = opti_r.loc[opti_r.ISI2 == 0,]
+#         for ind in list(range(len(subset2))):
+#             opti_r.loc[subset2.index[ind], 'ISI2'  ] = 0.1
+#         max2 = opti_r['ISI2'].idxmax()
+#         opti_r.loc[max2, 'ISI2'] = opti_r.loc[max2, 'ISI2']-(0.1*len(subset2))
+#
+# # add .1 to every index
+# # subtract .1 * number of counts from max isi2
+#     opti_r['ISI2'] = opti_r['ISI2'].astype(float).round(decimals=1)
+#     opti_r['ISI2'] = opti_r['ISI2'].apply(lambda x: '{0:0>2}'.format(x))
 
 
     opti_r.drop("Unnamed: 7", axis=1, inplace=True)

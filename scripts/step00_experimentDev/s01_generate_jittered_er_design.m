@@ -1,4 +1,4 @@
-function [meanrecipvif, vifs, design_struct] = generate_jittered_er_design(varargin)
+function [meanrecipvif, vifs, design_struct] = s01_generate_jittered_er_design(varargin)
 % Generate an fMRI design with two temporally dependent events and random
 % 'jitter' between event1 and event2 (ISI1) and/or between event2 and
 % event1 on the subsequent trial (ISI2).
@@ -80,7 +80,7 @@ doplot = 1;
 % so, 20 trials/condition total across 2 5-min runs
 
 event1duration = 5;    % duration of cue
-event2duration = 8;    % duration of feedback
+event2duration = 11.5;    % duration of feedback
 
 trialtypes = 6;  %4      % neutral, 2 levels of loss, 2 levels of gain
 trialspertype = 6;
@@ -89,15 +89,15 @@ ISI1constantvalue = 0; % in seconds, used only if ISI2isconstant
 
 % All ISI times in sec.
 isidistribution = 'exponential';  % 'exponential' or 'geometric'
-ISI1min = 0;   %0        % Constraints: Psychological (can subjects process cue) and statistical (longer = less BOLD nonlinearity, which is difficult to model).
+ISI1min = 1;   %0        % Constraints: Psychological (can subjects process cue) and statistical (longer = less BOLD nonlinearity, which is difficult to model).
 ISI1mean = 2;     %2       % For 'exponential' only.  Includes ISImin.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
 ISI1step = .65;          % For 'geometric' only.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
 ISI1max = 4;     %4        % Truncate to avoid VERY long ISIs
 
 ISI2min = 0;   %0        % Constraints: Psychological (can subjects process cue) and statistical (longer = less BOLD nonlinearity, which is difficult to model).
-ISI2mean = 1;     %2       % For 'exponential' only.  Includes ISImin.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
+ISI2mean = 0;     %2       % For 'exponential' only.  Includes ISImin.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
 ISI2step = .65;          % For 'geometric' only.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
-ISI2max = 2;     %4        % Truncate to avoid VERY long ISIs
+ISI2max = 0;     %4        % Truncate to avoid VERY long ISIs
 %
 % ISI3min = 0;   %0        % Constraints: Psychological (can subjects process cue) and statistical (longer = less BOLD nonlinearity, which is difficult to model).
 % ISI3mean = 0;     %2       % For 'exponential' only.  Includes ISImin.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
