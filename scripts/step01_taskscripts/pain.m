@@ -33,7 +33,7 @@ p.fix.allCoords                = [p.fix.xCoords; p.fix.yCoords];
 %% B. Directories ______________________________________________________________
 task_dir                       = pwd;
 main_dir                       = fileparts(fileparts(task_dir));
-sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' , strcat('_ses-',sprintf('%02d', session)));
+sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' , strcat('ses-',sprintf('%02d', session)));
 if ~exist(sub_save_dir, 'dir')
     mkdir(sub_save_dir)
 end
@@ -152,17 +152,19 @@ for trl = 1:size(countBalMat,1)
     imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
     Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
     T.p2_cue_onset(trl)            = Screen('Flip',p.ptb.window);
-    WaitSecs(1.00)
+    TEMP = countBalMat.administer(trl);
+    temp = TEMP + 100;
+    main(ip, port, 1, temp);
+    WaitSecs(1.00);
     T.p2_cue_type{trl}             = countBalMat.cue_type{trl};
     T.p2_cue_filename{trl}         = countBalMat.cue_image{trl};
     
-    TEMP = countBalMat.administer(trl);
-    temp = TEMP + 100;
+
 
     %   T.p5_administer_onset(trl) = TriggerThermodeSocial(TEMP, 'USE_BIOPAC',1);
     
     %         main(ip, port, 1, temp);
-    main(ip, port, 1, temp);
+    
     T.p5_administer_onset(trl) = GetSecs;
     %     main(ip, port, 4, temp);
     %     'trigger'
@@ -212,7 +214,7 @@ for trl = 1:size(countBalMat,1)
     %-------------------------------------------------------------------------------
     T.p6_actual_onset(trl) = GetSecs;
     [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
-    main(ip, port, 5, temp);
+%     main(ip, port, 5, temp);
     T.p6_actual_responseonset(trl) = buttonPressOnset;
     rating_Trajectory{trl,2} = trajectory;
     T.p6_actual_RT(trl) = RT;
@@ -227,8 +229,6 @@ end_texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 Screen('DrawTexture',p.ptb.window,end_texture,[],[]);
 T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
 WaitKeyPress(p.keys.end);
-
-T.param_experimentDuration(:) = T.param_end_instruct_onset(1) - T.param_triggerOnset(1);
 
 
 %-------------------------------------------------------------------------------
