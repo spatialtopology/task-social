@@ -9,7 +9,7 @@ function vicarious(sub,input_counterbalance_file, run_num, session)
 
 %% A. Psychtoolbox parameters _________________________________________________
 global p
-Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference', 'SkipSyncTests', 0);
 PsychDefaultSetup(2);
 screens                        = Screen('Screens'); % Get the screen numbers
 p.ptb.screenNumber             = max(screens); % Draw to the external screen if avaliable
@@ -42,7 +42,7 @@ dir_video                      = fullfile(main_dir,'stimuli','task-vicarious_vid
 cue_low_dir                    = fullfile(main_dir,'stimuli','cue','scl');
 cue_high_dir                   = fullfile([main_dir,'stimuli','cue','sch']);
 counterbalancefile             = fullfile(main_dir,'design','s04_final_counterbalance_with_jitter', [input_counterbalance_file, '.csv']);
-countBalMat                    = readtable(counterbalancefile);
+countBalMat                    = dataframe(counterbalancefile);
 
 %% C. Circular rating scale _____________________________________________________
 image_filepath                 = fullfile(main_dir,'stimuli','ratingscale');
