@@ -9,7 +9,7 @@ function vicarious(sub,input_counterbalance_file, run_num, session)
 
 %% A. Psychtoolbox parameters _________________________________________________
 global p
-Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference', 'SkipSyncTests', 0);
 PsychDefaultSetup(2);
 screens                        = Screen('Screens'); % Get the screen numbers
 p.ptb.screenNumber             = max(screens); % Draw to the external screen if avaliable
@@ -232,6 +232,8 @@ psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d
 strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 
+clear p
+Screen('Close');
 sca;
 
 %% -----------------------------------------------------------------------------
