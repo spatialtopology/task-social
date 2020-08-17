@@ -8,8 +8,11 @@ function pain(sub,input_counterbalance_file, run_num, session)
 %                           Parameters
 % ______________________________________________________________________________
 %% A. Psychtoolbox parameters _________________________________________________
+ip_address = '192.168.0.139'; %ROOM 406 Medoc
+% ip = '10.64.1.10'; % DBIC MRI MEDOC
+
 global p
-Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference', 'SkipSyncTests', 0);
 PsychDefaultSetup(2);
 screens                        = Screen('Screens'); % Get the screen numbers
 p.ptb.screenNumber             = max(screens); % Draw to the external screen if avaliable
@@ -124,8 +127,8 @@ WaitSecs(TR*6);
 
 %% ___________________________ 0. Experimental loop ____________________________
 for trl = 1:size(countBalMat,1)
-    
-    ip = '192.168.0.114';
+    disp(trl)
+    ip = ip_address; 
     port = 20121;
     
     %% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
@@ -153,23 +156,15 @@ for trl = 1:size(countBalMat,1)
     Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
     T.p2_cue_onset(trl)            = Screen('Flip',p.ptb.window);
     TEMP = countBalMat.administer(trl);
-    temp = TEMP + 100;
+    temp = TEMP + 49;
     main(ip, port, 1, temp);
     WaitSecs(1.00);
     T.p2_cue_type{trl}             = countBalMat.cue_type{trl};
     T.p2_cue_filename{trl}         = countBalMat.cue_image{trl};
     
+    
+    % T.p5_administer_onset(trl) = GetSecs;
 
-
-    %   T.p5_administer_onset(trl) = TriggerThermodeSocial(TEMP, 'USE_BIOPAC',1);
-    
-    %         main(ip, port, 1, temp);
-    
-    T.p5_administer_onset(trl) = GetSecs;
-    %     main(ip, port, 4, temp);
-    %     'trigger'
-    %     GetSecs
-    
     %-------------------------------------------------------------------------------
     %                             3. expectation rating
     %-------------------------------------------------------------------------------
@@ -184,14 +179,14 @@ for trl = 1:size(countBalMat,1)
     %                             4. Fixtion Jitter 0-2 sec
     %-------------------------------------------------------------------------------
     %   1) get jitter
-    %     jitter2 = countBalMat.ISI2(trl);
-    %     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-    %         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-    %     fStart2 = GetSecs;
-    %     T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
-    %     WaitSecs(jitter2);
-    %     fEnd2 = GetSecs;
-    %     T.p4_fixation_duration(trl) = fEnd2 - fStart2;
+    jitter2 = countBalMat.ISI1(trl);
+    Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+        p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+    fStart2 = GetSecs;
+    T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
+    WaitSecs(jitter2);
+    fEnd2 = GetSecs;
+    T.p4_fixation_duration(trl) = fEnd2 - fStart2;
     %
     %-------------------------------------------------------------------------------
     %                            5. pain
@@ -201,12 +196,12 @@ for trl = 1:size(countBalMat,1)
     main(ip, port, 4, temp); %start trigger
     T.p5_medoc_onset(trl) = GetSecs;
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+        p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     Screen('Flip', p.ptb.window);
     
-    WaitSecs(task_duration+1);
+    WaitSecs(task_duration);
 
-    fEnd2 = GetSecs;
+%     fEnd2 = GetSecs;
     T.p5_administer_type(trl) = countBalMat.administer(trl);
     
     %-------------------------------------------------------------------------------
@@ -252,9 +247,10 @@ sca;
 %                                   Function
 %-------------------------------------------------------------------------------
     function [t] = triggerThermode_ethernet(temp)
-        ip = '192.168.0.114';
+%         ip = '192.168.0.114';
+        ip = '10.64.1.10';
         port = 20121;
-        temp = temp + 100;
+        temp = temp + 50;
         %         main(ip, port, 1, temp);
         main(ip, port, 4, temp);
         t = GetSecs;
@@ -281,7 +277,7 @@ sca;
         % Integer values are simply converted to binary, non integer values are
         % incremented by 128 and converted to binary. So 45 is bin(45) while
         % 45.5 is bin(45+128).
-        temp = temp + 101;
+        temp = temp + 50;
         % temp = temp + 100;
         if(mod(temp,1))
             % note: this will treat all decimal values the same. Specific
