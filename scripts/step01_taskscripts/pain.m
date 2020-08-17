@@ -201,7 +201,7 @@ for trl = 1:size(countBalMat,1)
     
     WaitSecs(task_duration);
 
-%     fEnd2 = GetSecs;
+
     T.p5_administer_type(trl) = countBalMat.administer(trl);
     
     %-------------------------------------------------------------------------------
