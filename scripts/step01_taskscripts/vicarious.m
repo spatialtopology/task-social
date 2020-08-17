@@ -3,6 +3,7 @@ function vicarious(sub,input_counterbalance_file, run_num, session)
 % code by Heejung Jung
 % heejung.jung@colorado.edu
 % Feb.09.2020
+% updated May.17.2020 for octave compatible code
 %% -----------------------------------------------------------------------------
 %                           Parameters
 % ------------------------------------------------------------------------------
@@ -42,7 +43,7 @@ dir_video                      = fullfile(main_dir,'stimuli','task-vicarious_vid
 cue_low_dir                    = fullfile(main_dir,'stimuli','cue','scl');
 cue_high_dir                   = fullfile([main_dir,'stimuli','cue','sch']);
 counterbalancefile             = fullfile(main_dir,'design','s04_final_counterbalance_with_jitter', [input_counterbalance_file, '.csv']);
-countBalMat                    = dataframe(counterbalancefile);
+countBalMat                    = readtable(counterbalancefile);
 
 %% C. Circular rating scale _____________________________________________________
 image_filepath                 = fullfile(main_dir,'stimuli','ratingscale');
@@ -51,18 +52,19 @@ image_scale                    = fullfile(image_filepath,image_scale_filename);
 
 %% D. making output table ________________________________________________________
 vnames = {'param_fmriSession', 'param_counterbalanceVer','param_counterbalanceBlockNum','param_triggerOnset',...
-                                'param_videoSubject','param_videoFilename','param_cue_type',...
-                                'param_administer_type','param_cond_type'...
-                                'p1_fixation_onset','p1_fixation_duration',...
-                                'p2_cue_onset','p2_cue_type','p2_cue_filename',...
-                                'p3_expect_onset','p3_expect_responseonset','p3_expect_RT', ...
-                                'p4_fixation_onset','p4_fixation_duration',...
-                                'p5_administer_type','p5_administer_filename','p5_administer_onset',...
-                                'p6_actual_onset','p6_actual_responseonset','p6_actual_RT', ...
-                                'param_end_instruct_onset', 'param_experimentDuration'};
+    'param_videoSubject','param_videoFilename','param_cue_type',...
+    'param_administer_type','param_cond_type'...
+    'p1_fixation_onset','p1_fixation_duration',...
+    'p2_cue_onset','p2_cue_type','p2_cue_filename',...
+    'p3_expect_onset','p3_expect_responseonset','p3_expect_RT', ...
+    'p4_fixation_onset','p4_fixation_duration',...
+    'p5_administer_type','p5_administer_filename','p5_administer_onset',...
+    'p6_actual_onset','p6_actual_responseonset','p6_actual_RT', ...
+    'param_end_instruct_onset', 'param_experimentDuration'};
 T                              = array2table(zeros(size(countBalMat,1),size(vnames,2)));
-T.Properties.VariableNames     = vnames;
-T.p2_cue_type                  = cell(size(countBalMat,1),1);
+% T = dataframe(zeros(size(countBalMat,1),size(vnames,2)),"colnames", vnames); 
+% T.Properties.VariableNames     = vnames;
+
 T.p2_cue_filename              = cell(size(countBalMat,1),1);
 T.p5_administer_type           = cell(size(countBalMat,1),1);
 
@@ -129,7 +131,7 @@ Screen('Flip',p.ptb.window);
 WaitKeyPress(p.keys.start);
 % FlushEvents(['keyDown']);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 Screen('Flip', p.ptb.window);
 WaitKeyPress(p.keys.trigger);
 T.param_triggerOnset(:) = GetSecs;
@@ -137,75 +139,88 @@ WaitSecs(TR*6);
 
 %% 0. Experimental loop _________________________________________________________
 for trl = 1:size(countBalMat,1)
-
-
-%% 1. Fixtion Jitter 0-4 sec ____________________________________________________
-jitter1 = countBalMat.ISI1(trl);
-Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-fStart1 = GetSecs;
-Screen('Flip', p.ptb.window);
-WaitSecs(jitter1);
-fEnd1 = GetSecs;
-
- T.p1_fixation_onset(trl) = fStart1;
- T.p1_fixation_duration(trl) = fEnd1 - fStart1;
-
-
-%% 2. cue 1s ___________________________________________________________________
-if string(countBalMat.cue_type{trl}) == 'low'
-  cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
-  cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
-elseif string(countBalMat.cue_type{trl}) == 'high'
-  cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
-  cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
-end
-imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
-WaitSecs(1);
-T.p2_cue_type{trl}                  = countBalMat.cue_type{trl};
-T.p2_cue_filename{trl}              = countBalMat.cue_image{trl};
-
-
-
-%% 3. expectation rating _______________________________________________________
-imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-[trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
-T.p3_expect_onset(trl) = rating_onset;
-rating_Trajectory{trl,1} = trajectory;
-T.p3_expect_responseonset(trl) = buttonPressOnset;
-T.p3_expect_RT(trl) = RT;
-
-
-%% 4. Fixtion Jitter 0-4 sec ___________________________________________________
-jitter2 = countBalMat.ISI2(trl);
-Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-   p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-fStart2 = GetSecs;
-Screen('Flip', p.ptb.window);
-WaitSecs(jitter2);
-fEnd2 = GetSecs;
-T.p4_fixation_onset(trl) = fStart2;
-T.p4_fixation_duration(trl) = fEnd2 - fStart2;
-
-%% 5. vicarious ________________________________________________________________
-video_filename = [countBalMat.video_filename{trl}];
-video_file = fullfile(dir_video, video_filename);
-movie_time = video_play(video_file , p );
-T.p5_administer_onset(trl) = movie_time;
-WaitSecs(task_duration-video_length);
-T.p5_administer_type{trl}           = countBalMat.video_filename{trl};
-
-%% 6. post evaluation rating ___________________________________________________
-T.p6_actual_onset(trl) = GetSecs;
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
-rating_Trajectory{trl,2} = trajectory;
-T.p6_actual_responseonset(trl) = buttonPressOnset;
-T.p6_actual_RT(trl) = RT;
-
-tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
-writetable(T,tmpFileName);
+    
+    
+    %% 1. Fixtion Jitter 0-4 sec ____________________________________________________
+    jitter1 = countBalMat.ISI1(trl);
+%     jitter1 = countBalMat.array(trl, "ISI1"); % OCTAVE
+    Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+        p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+    fStart1 = GetSecs;
+    Screen('Flip', p.ptb.window);
+    WaitSecs(jitter1);
+    fEnd1 = GetSecs;
+    
+    T.p1_fixation_onset(trl) = fStart1;
+    T.p1_fixation_duration(trl) = fEnd1 - fStart1;
+    
+    
+    %% 2. cue 1s ___________________________________________________________________
+    if string(countBalMat.cue_type{trl}) == 'low'
+        %     if strcmp(countBalMat.array(trl, "cue_type") , "low") % OCTAVE
+        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+        cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+    elseif string(countBalMat.cue_type{trl}) == 'high'
+        %     else strcmp(countBalMat.array(trl, "cue_type"), "high") % OCTAVE
+        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+        cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+        % endif % OCTAVE
+    end
+    
+    imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+    Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
+    T.p2_cue_onset(trl) = Screen('Flip',p.ptb.window);
+    WaitSecs(1);
+    T.p2_cue_type{trl}                  = countBalMat.cue_type{trl};
+    T.p2_cue_filename{trl}              = countBalMat.cue_image{trl};
+%     T.p2_cue_type{trl}                  = countBalMat.array(trl,"cue_type"); %OCTAVE
+%     T.p2_cue_filename{trl}              = countBalMat.array(trl,"cue_image"); %OCTAVE
+%     
+%     
+    
+    
+    %% 3. expectation rating _______________________________________________________
+    imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
+    T.p3_expect_onset(trl) = rating_onset;
+    rating_Trajectory{trl,1} = trajectory;
+    T.p3_expect_responseonset(trl) = buttonPressOnset;
+    T.p3_expect_RT(trl) = RT;
+    
+    
+    %% 4. Fixtion Jitter 0-4 sec ___________________________________________________
+    jitter2 = countBalMat.ISI2(trl);
+%     jitter2 = countBalMat.array(trl,"ISI2");
+    Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+        p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+    fStart2 = GetSecs;
+    Screen('Flip', p.ptb.window);
+    WaitSecs(jitter2);
+    fEnd2 = GetSecs;
+    T.p4_fixation_onset(trl) = fStart2;
+    T.p4_fixation_duration(trl) = fEnd2 - fStart2;
+    
+    %% 5. vicarious ________________________________________________________________
+    video_filename = [countBalMat.video_filename{trl}];
+%     video_filename = [countBalMat.array(trl, "video_filename")]; % OCTAVE
+    video_file = fullfile(dir_video, video_filename);
+    movie_time = video_play(video_file , p );
+    T.p5_administer_onset(trl) = movie_time;
+    WaitSecs(task_duration-video_length);
+    T.p5_administer_type{trl}           = countBalMat.video_filename{trl};
+%     T.p5_administer_type{trl}           = countBalMat.array(trl,
+%     "video_filename"); % OCTAVE
+    
+    %% 6. post evaluation rating ___________________________________________________
+    T.p6_actual_onset(trl) = GetSecs;
+    [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
+    rating_Trajectory{trl,2} = trajectory;
+    
+    T.p6_actual_responseonset(trl) = buttonPressOnset;
+    T.p6_actual_RT(trl) = RT;
+    
+    tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
+    writetable(T,tmpFileName);
 end
 
 
@@ -217,19 +232,20 @@ T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
 WaitKeyPress(p.keys.end);
 T.param_experimentDuration(:) = T.param_end_instruct_onset(1) - T.param_triggerOnset(1);
 
+
 %% save parameter ______________________________________________________________
 
 
 saveFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), ...
-strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh.csv' ]);
+    strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh.csv' ]);
 writetable(T,saveFileName);
 
 traject_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)), ...
-strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh_trajectory.mat' ]);
+    strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_beh_trajectory.mat' ]);
 save(traject_saveFileName, 'rating_Trajectory');
 
 psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d', sub)),...
-strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_psychtoolbox_params.mat' ]);
+    strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 
 sca;
@@ -238,58 +254,60 @@ sca;
 %                                   Function
 %-------------------------------------------------------------------------------
 % Function by Xiaochun Han
-function [Tm] = video_play(moviename,p)
-% [p.ptb.window, rect]  = Screen(p.ptb.screenID, 'OpenWindow',p.ptb.bg);
-% Tt = 0;
-rate = 1;
-[movie, ~, ~, imgw, imgh] = Screen('OpenMovie', p.ptb.window, moviename);
-Screen('PlayMovie', movie, rate);
-Tm = GetSecs;
-t = 0; dur = 0;
-while 1
-if ((imgw>0) && (imgh>0))
-        tex = Screen('GetMovieImage', p.ptb.window, movie, 1);
-t = t + tex;
-if tex < 0
-break;
-end
-
-if tex == 0
-WaitSecs('YieldSecs', 0.005);
-continue;
-end
-        Screen('DrawTexture', p.ptb.window, tex);
-Screen('Flip', p.ptb.window);
-Screen('Close', tex);
-end
-end
-        Screen('Flip', p.ptb.window);
-Screen('PlayMovie', movie, 0);
-Screen('CloseMovie', movie);
-end
-
-
-
-
-
-function WaitKeyPress(kID)
-while KbCheck(-3); end  % Wait until all keys are released.
-
-while 1
-    % Check the state of the keyboard.
-    [ keyIsDown, ~, keyCode ] = KbCheck(-3);
-    % If the user is pressing a key, then display its code number and name.
-    if keyIsDown
-
-        if keyCode(p.keys.esc)
-            cleanup; break;
-        elseif keyCode(kID)
-            break;
+    function [Tm] = video_play(moviename,p)
+        % [p.ptb.window, rect]  = Screen(p.ptb.screenID, 'OpenWindow',p.ptb.bg);
+        % Tt = 0;
+        rate = 1;
+        [movie, ~, ~, imgw, imgh] = Screen('OpenMovie', p.ptb.window, moviename);
+        Screen('PlayMovie', movie, rate);
+        Tm = GetSecs;
+        t = 0; dur = 0;
+        while 1
+            if ((imgw>0) && (imgh>0))
+                tex = Screen('GetMovieImage', p.ptb.window, movie, 1);
+                t = t + tex;
+                if tex < 0
+                    break;
+                end
+                
+                if tex == 0
+                    WaitSecs('YieldSecs', 0.005);
+                    continue;
+                end
+                Screen('DrawTexture', p.ptb.window, tex);
+                Screen('Flip', p.ptb.window);
+                Screen('Close', tex);
+            end
         end
-        % make sure key's released
-        while KbCheck(-3); end
+        Screen('Flip', p.ptb.window);
+        Screen('PlayMovie', movie, 0);
+        Screen('CloseMovie', movie);
     end
-end
-end
+
+
+
+
+
+    function WaitKeyPress(kID)
+        while KbCheck(-3); end  % Wait until all keys are released.
+        
+        while 1
+            % Check the state of the keyboard.
+            [ keyIsDown, ~, keyCode ] = KbCheck(-3);
+            % If the user is pressing a key, then display its code number and name.
+            if keyIsDown
+                
+                if keyCode(p.keys.esc)
+                    cleanup; break;
+                else keyCode(kID)
+                    break;
+                end
+                % make sure key's released
+                while KbCheck(-3); end
+            end
+        end
+    end
 
 end
+
+  
