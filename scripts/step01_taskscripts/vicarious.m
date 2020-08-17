@@ -248,6 +248,8 @@ psychtoolbox_saveFileName = fullfile(sub_save_dir, [strcat('sub-', sprintf('%04d
     strcat('_ses-',sprintf('%02d', session)),'_task-',taskname,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 
+clear p
+Screen('Close');
 sca;
 
 %% -----------------------------------------------------------------------------
