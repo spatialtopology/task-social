@@ -53,18 +53,20 @@ function cognitive(sub,input_counterbalance_file, run_num, session)
   %% D. making output table ________________________________________________________
   vnames = {'param_fmriSession', 'param_counterbalanceVer','param_counterbalanceBlockNum',...
                                   'param_cue_type',...
-                                  'param_administer_type','param_cond_type', 'param_triggerOnset',...
-                                  'p1_fixation_onset','p1_fixation_duration',...
-                                  'p2_cue_onset','p2_cue_type','p2_cue_filename',...
-                                  'p3_expect_onset','p3_expect_responseonset','p3_expect_RT', ...
-                                  'p4_fixation_onset','p4_fixation_duration',...
-                                  'p5_administer_type','p5_administer_filename','p5_administer_onset',...
-                                  'p6_actual_onset','p6_actual_responseonset','p6_actual_RT',...
-                                  'param_end_instruct_onset', 'param_experimentDuration'};
+                                  'param_administer_type','param_cond_type', 'param_trigger_onset',...
+                                  'event01_fixation_onset','event01_fixation_biopac','event01_fixation_duration',...
+                                  'event02_cue_onset','event02_cue_biopac','event02_cue_type','event02_cue_filename',...
+                                  'event03_expect_onset','event03_rating_biopac','event03_expect_responseonset','event03_expect_RT', ...
+                                  'event04_fixation_onset','event04_fixation_biopac','event04_fixation_duration',...
+                                  'event05_administer_type','event05_administer_filename','event05_administer_onset','event05_stimulus_biopac'...
+                                  'event05_administer_response','event05_administer_reseponseonset','event05_response_biopac','event05_administer_RT',...
+                                  'event06_actual_onset','event06_actual_responseonset','event06_actual_RT','event06_actual_biopac'...
+                                  'param_end_instruct_onset','param_end_biopac','param_experiment_duration'};
+
   T                              = array2table(zeros(size(countBalMat,1),size(vnames,2)));
   T.Properties.VariableNames     = vnames;
-  T.p2_cue_type                  = cell(size(countBalMat,1),1);
-  T.p2_cue_filename              = cell(size(countBalMat,1),1);
+  T.event02_cue_type                  = cell(size(countBalMat,1),1);
+  T.event02_cue_filename              = cell(size(countBalMat,1),1);
 
   a                              = split(counterbalancefile,filesep); % full path filename components
   version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
@@ -79,10 +81,10 @@ function cognitive(sub,input_counterbalance_file, run_num, session)
   T.param_cue_type               = countBalMat.cue_type;
   T.param_administer_type        = countBalMat.administer;
   T.param_cond_type              = countBalMat.cond_type;
-  T.p2_cue_type                  = countBalMat.cue_type;
-  T.p2_cue_filename              = countBalMat.cue_image;
-  T.p5_administer_type           = countBalMat.administer;
-  T.p5_administer_filename       = countBalMat.image_filename;
+  T.event02_cue_type             = countBalMat.cue_type;
+  T.event02_cue_filename         = countBalMat.cue_image;
+  T.event05_administer_type      = countBalMat.administer;
+  T.event05_administer_filename  = countBalMat.image_filename;
 
   %% E. Keyboard information _____________________________________________________
   KbName('UnifyKeyNames');
@@ -128,7 +130,7 @@ Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 Screen('Flip', p.ptb.window);
 WaitKeyPress(p.keys.trigger);
-T.param_triggerOnset(:)          = GetSecs;
+T.param_trigger_onset(:)          = GetSecs;
 WaitSecs(TR*6);
 
 
@@ -140,10 +142,11 @@ for trl = 1:size(countBalMat,1)
 jitter1 = countBalMat.ISI1(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-T.p1_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
+T.event01_fixation_onset(trl)     = Screen('Flip', p.ptb.window);
+T.event01_fixation_biopac(trl) = TriggerBiopac4(jitter1, 1);
 WaitSecs(jitter1);
 fEnd1 = GetSecs;
-T.p1_fixation_duration(trl)      = fEnd1 - T.p1_fixation_onset(trl);
+T.event01_fixation_duration(trl)  = fEnd1 - T.event01_fixation_onset(trl);
 
 
 %% ________________________________ 2. cue 1s __________________________________
@@ -156,30 +159,34 @@ elseif string(countBalMat.cue_type{trl}) == 'high'
 end
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-T.p2_cue_onset(trl)              = Screen('Flip',p.ptb.window);
+T.event02_cue_onset(trl)          = Screen('Flip',p.ptb.window);
+T.event02_cue_biopac(trl)             = TriggerBiopac4(1, 21);
 WaitSecs(1)
-T.p2_cue_type{trl}               = countBalMat.cue_type{trl};
-T.p2_cue_filename{trl}           = countBalMat.cue_image{trl};
+T.event02_cue_type{trl}           = countBalMat.cue_type{trl};
+T.event02_cue_filename{trl}       = countBalMat.cue_image{trl};
 
 
 %% __________________________ 3. expectation rating ____________________________
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-T.p3_expect_onset(trl)           = GetSecs;
+% T.event03_expect_onset(trl)         = GetSecs;
 Screen('TextSize', p.ptb.window, 36);
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
+T.event03_rating_biopac(trl)             = TriggerBiopac4(1, 31);
+[trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
 rating_Trajectory{trl,1} = trajectory;
-T.p3_expect_responseonset(trl)   = buttonPressOnset;
-T.p3_expect_RT(trl)              = RT;
+T.event03_expect_onset(trl)         = rating_onset;
+T.event03_expect_responseonset(trl) = buttonPressOnset;
+T.event03_expect_RT(trl)            = RT;
 
 
 %% _________________________ 4. Fixtion Jitter 0-2 sec _________________________
 jitter2 = countBalMat.ISI2(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-T.p4_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
+T.event04_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
+T.event04_fixation_biopac(trl)        = TriggerBiopac4(1, 41);
 WaitSecs(jitter2);
 fEnd2 = GetSecs;
-T.p4_fixation_duration(trl)      = fEnd2- T.p4_fixation_onset(trl);
+T.event04_fixation_duration(trl)      = fEnd2- T.event04_fixation_onset(trl);
 
 
 %% ____________________________ 5. cognitive ___________________________________
@@ -213,7 +220,9 @@ DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white
 
 % 5-4. flip screen _____________________________________________________________
 timing.initialized = Screen('Flip',p.ptb.window);
-T.p5_administer_onset(trl)       = timing.initialized;
+T.event05_administer_onset(trl)       = timing.initialized;
+T.event05_stimulus_biopac(trl)        = TriggerBiopac4(1, 51);
+
 % duration = 4;
 while GetSecs - timing.initialized < task_duration
     response = 99;
@@ -221,6 +230,7 @@ while GetSecs - timing.initialized < task_duration
     [~,~,buttonpressed] = GetMouse;
     FlushEvents('keyDown');
     if buttonpressed(1) % equivalent of elseif keyCode(p.keys.left)
+      T.event05_response_biopac(trl)        = TriggerBiopac4(1, 52);
       RT = GetSecs - timing.initialized;
       response = 1;
       DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
@@ -237,6 +247,7 @@ while GetSecs - timing.initialized < task_duration
       WaitSecs(remainder_time);
 
     elseif buttonpressed(3)%     elseif keyCode(p.keys.right)
+      T.event05_response_biopac(trl)        = TriggerBiopac4(1, 52);
       RT = GetSecs - timing.initialized;
       response = 2;
       DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, p.ptb.white);
@@ -254,14 +265,19 @@ while GetSecs - timing.initialized < task_duration
     end
 end
 
+T.event05_administer_response(trl)       = response;
+T.event05_administer_reseponseonset(trl) = GetSecs;
+T.event05_administer_RT(trl)             = RT;
 
 %% ________________________ 6. post evaluation rating __________________________
-T.p6_actual_onset(trl)           = GetSecs;
 Screen('TextSize', p.ptb.window, 36);
-[trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
-rating_Trajectory{trl,2} = trajectory;
-T.p6_actual_responseonset(trl)   = buttonPressOnset;
-T.p6_actual_RT(trl)              = RT;
+T.event06_actual_biopac(trl)             = TriggerBiopac4(1, 61);
+[trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
+rating_Trajectory{trl,2}                 = trajectory;
+
+T.event06_actual_onset(trl)              = rating_onset
+T.event06_actual_responseonset(trl)      = buttonPressOnset;
+T.event06_actual_RT(trl)                 = RT;
 tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
 writetable(T,tmpFileName);
 end
@@ -270,10 +286,11 @@ end
 %% _________________________ 7. End Instructions _______________________________
 end_texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 Screen('DrawTexture',p.ptb.window,end_texture,[],[]);
-T.param_end_instruct_onset(:)    = Screen('Flip',p.ptb.window);
+T.param_end_instruct_onset(:)         = Screen('Flip',p.ptb.window);
+T.param_end_biopac(trl)               = TriggerBiopac4(2, 71);
 WaitKeyPress(p.keys.end);
 
-T.param_experimentDuration(:)    = T.param_end_instruct_onset(1) - T.param_triggerOnset(1);
+T.param_experiment_duration(:)        = T.param_end_instruct_onset(1) - T.param_trigger_onset(1);
 
 
 %% _________________________ 8. save parameter _________________________________
@@ -310,6 +327,56 @@ while 1
         while KbCheck(-3); end
     end
 end
+end
+
+% Trigger biopac
+% USAGE: [time] = TriggerBiopac4(seconds)
+%
+% Delivers 255 in binary (1111 1111) to Labjack CI03-EI07 channels
+%
+% To recieve binary data in biopac use the acqknowledge software interface
+% and configure the acquisition channels to recieve on the digital channels
+% D8-D15
+%
+% version 4
+% Changelog:
+%   - updated to use Labjack UD libraries instead of io32
+%   - updated to only output on CI03-EI07, not also FI00-FI07. The former
+%     connect to biopac, the latter connect to Medoc.
+%   - eliminated fliplr() operation on bytecode and instead flipped index
+%     order when loading bytecode onto stack (in AddRequestS() call).
+%
+% Updated to v4 by Bogdan Petre on 7/20/2018
+function [t] = TriggerBiopac4(dur, byte_num)
+    delay = dur*1000000; % delay is communicated in microseconds, so lets scale
+
+    ljasm = NET.addAssembly('LJUDDotNet');
+    ljudObj = LabJack.LabJackUD.LJUD;
+
+    [~, ljhandle] = ljudObj.OpenLabJackS('LJ_dtU3', 'LJ_ctUSB', '0', true, 0);
+    ljudObj.ePutS(ljhandle, 'LJ_ioPIN_CONFIGURATION_RESET', 0, 0, 0);
+
+    % calculate byte code
+    bytecode=sprintf('%08.0f',str2double(dec2bin(byte_num)))-'0';
+
+    for i=0:7
+        %Initiate CIO3-EIO7 output
+        ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8, bytecode(8-i), 0, 0);
+    end
+
+    %Wait for 1 second. The delay is performed in the U3 hardware, and delay time is in microseconds.
+    %Valid delay values are 0 to 4194176 microseconds, and resolution is 128 microseconds.
+    ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_WAIT', 0, delay, 0, 0);
+
+
+    for i=0:7
+          %Terminate CIO3-EIO7 output (reset to 0)
+          ljudObj.AddRequest(ljhandle, LabJack.LabJackUD.IO.PUT_DIGITAL_BIT, i+8,0, 0, 0);
+    end
+
+    t = GetSecs;
+    %Perform the operations/requests
+    ljudObj.GoOne(ljhandle);
 end
 
 end

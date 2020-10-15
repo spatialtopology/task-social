@@ -54,32 +54,32 @@ image_scale_filename           = ['task-', taskname, '_scale.png'];
 image_scale                    = fullfile(image_filepath, image_scale_filename);
 
 %% D. making output table ________________________________________________________
-vnames = {'param_fmriSession','param_runNum','param_counterbalanceVer','param_counterbalanceBlockNum',...
-    'param_cue_type','param_administer_type','param_cond_type','param_triggerOnset',...
-    'p1_fixation_onset','p1_fixation_duration',...
-    'p2_cue_onset','p2_cue_type','p2_cue_filename',...
-    'p3_expect_onset','p3_expect_responseonset','p3_expect_RT', ...
-    'p4_fixation_onset','p4_fixation_duration',...
-    'p5_administer_type','p5_administer_onset', 'p5_medoc_onset',...
-    'p6_actual_onset','p6_actual_responseonset','p6_actual_RT',...
-    'param_end_instruct_onset', 'param_experimentDuration'};
+vnames = {'src_subject_id', 'session_id','param_runNum','param_counterbalanceVer','param_counterbalanceBlockNum',...
+    'param_cue_type','param_administer_type','param_cond_type','param_trigger_onset',...
+    'event01_fixation_onset','event01_fixation_duration',...
+    'event02_cue_onset','event02_cue_type','event02_cue_filename',...
+    'event03_expect_onset','event03_expect_responseonset','event03_expect_RT', ...
+    'event04_fixation_onset','event04_fixation_duration',...
+    'event05_administer_type','p5_administer_onset', 'event05_administer_onset',...
+    'event06_actual_onset','event06_actual_responseonset','event06_actual_RT',...
+    'param_end_instruct_onset', 'param_experiment_duration'};
 T                              = array2table(zeros(size(countBalMat,1),size(vnames,2)));
 T.Properties.VariableNames     = vnames;
-T.p2_cue_type                  = cell(size(countBalMat,1),1);
-T.p2_cue_filename              = cell(size(countBalMat,1),1);
+T.event02_cue_type                  = cell(size(countBalMat,1),1);
+T.event02_cue_filename              = cell(size(countBalMat,1),1);
 
 a                              = split(counterbalancefile,filesep); % full path filename components
 version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
 block_chunk                    = split(extractAfter(a(end),"block-"),["-", "."]);
-T.param_fmriSession(:)            = session;
+T.session_id(:)            = session;
 T.param_runNum(:)              = run_num;
 T.param_counterbalanceVer(:)   = str2double(version_chunk{1});
 T.param_counterbalanceBlockNum(:) = str2double(block_chunk{1});
 T.param_cue_type               = countBalMat.cue_type;
 T.param_administer_type        = countBalMat.administer;
 T.param_cond_type              = countBalMat.cond_type;
-T.p2_cue_type                  = countBalMat.cue_type;
-T.p5_administer_type           = countBalMat.administer;
+T.event02_cue_type                  = countBalMat.cue_type;
+T.event05_administer_type           = countBalMat.administer;
 
 %% E. Keyboard information _____________________________________________________
 KbName('UnifyKeyNames');
@@ -121,7 +121,7 @@ Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
     p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 Screen('Flip', p.ptb.window);
 WaitKeyPress(p.keys.trigger);
-T.param_triggerOnset(:)        = GetSecs;
+T.param_trigger_onset(:)        = GetSecs;
 
 WaitSecs(TR*6);
 
@@ -141,8 +141,8 @@ for trl = 1:size(countBalMat,1)
     fEnd1 = GetSecs;
     
     
-    T.p1_fixation_onset(trl)      = fStart1;
-    T.p1_fixation_duration(trl)   = fEnd1 - fStart1;
+    T.event01_fixation_onset(trl)      = fStart1;
+    T.event01_fixation_duration(trl)   = fEnd1 - fStart1;
     %% ________________________________ 2. cue 1s __________________________________
     % 1) log cue presentation time
     if string(countBalMat.cue_type{trl}) == 'low'
@@ -154,13 +154,13 @@ for trl = 1:size(countBalMat,1)
     end
     imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
     Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
-    T.p2_cue_onset(trl)            = Screen('Flip',p.ptb.window);
+    T.event02_cue_onset(trl)            = Screen('Flip',p.ptb.window);
     TEMP = countBalMat.administer(trl);
     temp = TEMP + 49;
     main(ip, port, 1, temp);
     WaitSecs(1.00);
-    T.p2_cue_type{trl}             = countBalMat.cue_type{trl};
-    T.p2_cue_filename{trl}         = countBalMat.cue_image{trl};
+    T.event02_cue_type{trl}             = countBalMat.cue_type{trl};
+    T.event02_cue_filename{trl}         = countBalMat.cue_image{trl};
     
     
     % T.p5_administer_onset(trl) = GetSecs;
@@ -169,11 +169,11 @@ for trl = 1:size(countBalMat,1)
     %                             3. expectation rating
     %-------------------------------------------------------------------------------
     Screen('MakeTexture', p.ptb.window, imread(cueImage));
-    T.p3_expect_onset(trl)         = GetSecs;
+    T.event03_expect_onset(trl)         = GetSecs;
     [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
-    T.p3_expect_responseonset(trl) = buttonPressOnset;
+    T.event03_expect_responseonset(trl) = buttonPressOnset;
     rating_Trajectory{trl,1}       = trajectory;
-    T.p3_expect_RT(trl)            = RT;
+    T.event03_expect_RT(trl)            = RT;
     
     %-------------------------------------------------------------------------------
     %                             4. Fixtion Jitter 0-2 sec
@@ -183,10 +183,10 @@ for trl = 1:size(countBalMat,1)
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     fStart2 = GetSecs;
-    T.p4_fixation_onset(trl) = Screen('Flip', p.ptb.window);
+    T.event04_fixation_onset(trl) = Screen('Flip', p.ptb.window);
     WaitSecs(jitter2);
     fEnd2 = GetSecs;
-    T.p4_fixation_duration(trl) = fEnd2 - fStart2;
+    T.event04_fixation_duration(trl) = fEnd2 - fStart2;
     %
     %-------------------------------------------------------------------------------
     %                            5. pain
@@ -194,7 +194,7 @@ for trl = 1:size(countBalMat,1)
     
     
     main(ip, port, 4, temp); %start trigger
-    T.p5_medoc_onset(trl) = GetSecs;
+    T.event05_administer_onset(trl) = GetSecs;
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     Screen('Flip', p.ptb.window);
@@ -202,17 +202,17 @@ for trl = 1:size(countBalMat,1)
     WaitSecs(task_duration);
 
 
-    T.p5_administer_type(trl) = countBalMat.administer(trl);
+    T.event05_administer_type(trl) = countBalMat.administer(trl);
     
     %-------------------------------------------------------------------------------
     %                                6. post evaluation rating
     %-------------------------------------------------------------------------------
-    T.p6_actual_onset(trl) = GetSecs;
+    T.event06_actual_onset(trl) = GetSecs;
     [trajectory, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
 %     main(ip, port, 5, temp);
-    T.p6_actual_responseonset(trl) = buttonPressOnset;
+    T.event06_actual_responseonset(trl) = buttonPressOnset;
     rating_Trajectory{trl,2} = trajectory;
-    T.p6_actual_RT(trl) = RT;
+    T.event06_actual_RT(trl) = RT;
     
     tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
     writetable(T,tmpFileName);
