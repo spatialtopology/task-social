@@ -12,6 +12,11 @@ function vicarious(sub,input_counterbalance_file, run_num, session)
 global p
 Screen('Preference', 'SkipSyncTests', 0);
 PsychDefaultSetup(2);
+debug = 0;
+if debug
+    ListenChar(0);
+    PsychDebugWindowConfiguration;
+end
 screens                        = Screen('Screens'); % Get the screen numbers
 p.ptb.screenNumber             = max(screens); % Draw to the external screen if avaliable
 p.ptb.white                    = WhiteIndex(p.ptb.screenNumber); % Define black and white
@@ -34,7 +39,8 @@ task_dir                       = pwd;
 main_dir                       = fileparts(fileparts(task_dir));
 taskname                       = 'vicarious';
 
-sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh',strcat('_ses-',sprintf('%02d', session)) );
+sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
+    'beh', strcat('ses-',sprintf('%02d', session)) );
 if ~exist(sub_save_dir, 'dir')
     mkdir(sub_save_dir)
 end

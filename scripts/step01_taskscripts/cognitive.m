@@ -14,6 +14,11 @@ function cognitive(sub,input_counterbalance_file, run_num, session)
   global p
   Screen('Preference', 'SkipSyncTests', 1);
   PsychDefaultSetup(2);
+  debug = 1;
+if debug
+    ListenChar(0);
+    PsychDebugWindowConfiguration;
+end
   screens                         = Screen('Screens'); % Get the screen numbers
   p.ptb.screenNumber              = max(screens); % Draw to the external screen if avaliable
   p.ptb.white                     = WhiteIndex(p.ptb.screenNumber); % Define black and white
@@ -39,7 +44,8 @@ function cognitive(sub,input_counterbalance_file, run_num, session)
   counterbalancefile              = fullfile(main_dir, 'design', 's04_final_counterbalance_with_jitter', [input_counterbalance_file, '.csv']);
   countBalMat                     = readtable(counterbalancefile);
 
-  sub_save_dir                    = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' ,strcat('_ses-',sprintf('%02d', session)));
+  sub_save_dir                    = fullfile(main_dir, 'data', ...
+      strcat('sub-', sprintf('%04d', sub)), 'beh', strcat('ses-',sprintf('%02d', session)));
   if ~exist(sub_save_dir, 'dir')
       mkdir(sub_save_dir)
   end
@@ -143,7 +149,7 @@ jitter1 = countBalMat.ISI1(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 T.event01_fixation_onset(trl)     = Screen('Flip', p.ptb.window);
-T.event01_fixation_biopac(trl) = TriggerBiopac4(jitter1, 1);
+%T.event01_fixation_biopac(trl) = TriggerBiopac4(jitter1, 1);
 WaitSecs(jitter1);
 fEnd1 = GetSecs;
 T.event01_fixation_duration(trl)  = fEnd1 - T.event01_fixation_onset(trl);
@@ -160,7 +166,7 @@ end
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
 T.event02_cue_onset(trl)          = Screen('Flip',p.ptb.window);
-T.event02_cue_biopac(trl)             = TriggerBiopac4(1, 21);
+% T.event02_cue_biopac(trl)             = TriggerBiopac4(1, 21);
 WaitSecs(1)
 T.event02_cue_type{trl}           = countBalMat.cue_type{trl};
 T.event02_cue_filename{trl}       = countBalMat.cue_image{trl};
@@ -170,7 +176,7 @@ T.event02_cue_filename{trl}       = countBalMat.cue_image{trl};
 imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
 % T.event03_expect_onset(trl)         = GetSecs;
 Screen('TextSize', p.ptb.window, 36);
-T.event03_rating_biopac(trl)             = TriggerBiopac4(1, 31);
+% T.event03_rating_biopac(trl)             = TriggerBiopac4(1, 31);
 [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
 rating_Trajectory{trl,1} = trajectory;
 T.event03_expect_onset(trl)         = rating_onset;
@@ -183,7 +189,7 @@ jitter2 = countBalMat.ISI2(trl);
 Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
 T.event04_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
-T.event04_fixation_biopac(trl)        = TriggerBiopac4(1, 41);
+% T.event04_fixation_biopac(trl)        = TriggerBiopac4(1, 41);
 WaitSecs(jitter2);
 fEnd2 = GetSecs;
 T.event04_fixation_duration(trl)      = fEnd2- T.event04_fixation_onset(trl);
@@ -221,7 +227,7 @@ DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white
 % 5-4. flip screen _____________________________________________________________
 timing.initialized = Screen('Flip',p.ptb.window);
 T.event05_administer_onset(trl)       = timing.initialized;
-T.event05_stimulus_biopac(trl)        = TriggerBiopac4(1, 51);
+% T.event05_stimulus_biopac(trl)        = TriggerBiopac4(1, 51);
 
 % duration = 4;
 while GetSecs - timing.initialized < task_duration
@@ -230,7 +236,7 @@ while GetSecs - timing.initialized < task_duration
     [~,~,buttonpressed] = GetMouse;
     FlushEvents('keyDown');
     if buttonpressed(1) % equivalent of elseif keyCode(p.keys.left)
-      T.event05_response_biopac(trl)        = TriggerBiopac4(1, 52);
+%       T.event05_response_biopac(trl)        = TriggerBiopac4(1, 52);
       RT = GetSecs - timing.initialized;
       response = 1;
       DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
@@ -247,7 +253,7 @@ while GetSecs - timing.initialized < task_duration
       WaitSecs(remainder_time);
 
     elseif buttonpressed(3)%     elseif keyCode(p.keys.right)
-      T.event05_response_biopac(trl)        = TriggerBiopac4(1, 52);
+%       T.event05_response_biopac(trl)        = TriggerBiopac4(1, 52);
       RT = GetSecs - timing.initialized;
       response = 2;
       DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, p.ptb.white);
@@ -271,11 +277,11 @@ T.event05_administer_RT(trl)             = RT;
 
 %% ________________________ 6. post evaluation rating __________________________
 Screen('TextSize', p.ptb.window, 36);
-T.event06_actual_biopac(trl)             = TriggerBiopac4(1, 61);
+% T.event06_actual_biopac(trl)             = TriggerBiopac4(1, 61);
 [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
 rating_Trajectory{trl,2}                 = trajectory;
 
-T.event06_actual_onset(trl)              = rating_onset
+T.event06_actual_onset(trl)              = rating_onset;
 T.event06_actual_responseonset(trl)      = buttonPressOnset;
 T.event06_actual_RT(trl)                 = RT;
 tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
@@ -287,7 +293,7 @@ end
 end_texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 Screen('DrawTexture',p.ptb.window,end_texture,[],[]);
 T.param_end_instruct_onset(:)         = Screen('Flip',p.ptb.window);
-T.param_end_biopac(trl)               = TriggerBiopac4(2, 71);
+% T.param_end_biopac(trl)               = TriggerBiopac4(2, 71);
 WaitKeyPress(p.keys.end);
 
 T.param_experiment_duration(:)        = T.param_end_instruct_onset(1) - T.param_trigger_onset(1);

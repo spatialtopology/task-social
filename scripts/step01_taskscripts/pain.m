@@ -8,12 +8,17 @@ function pain(sub,input_counterbalance_file, run_num, session)
 %                           Parameters
 % ______________________________________________________________________________
 %% A. Psychtoolbox parameters _________________________________________________
-ip_address = '192.168.0.139'; %ROOM 406 Medoc
-% ip = '10.64.1.10'; % DBIC MRI MEDOC
+% ip_address = '192.168.0.114'; %ROOM 406 Medoc
+ip_address = '10.64.1.10'; % DBIC MRI MEDOC
 
 global p
 Screen('Preference', 'SkipSyncTests', 0);
 PsychDefaultSetup(2);
+debug = 0;
+if debug
+    ListenChar(0);
+    PsychDebugWindowConfiguration;
+end
 screens                        = Screen('Screens'); % Get the screen numbers
 p.ptb.screenNumber             = max(screens); % Draw to the external screen if avaliable
 p.ptb.white                    = WhiteIndex(p.ptb.screenNumber); % Define black and white
@@ -36,7 +41,8 @@ p.fix.allCoords                = [p.fix.xCoords; p.fix.yCoords];
 %% B. Directories ______________________________________________________________
 task_dir                       = pwd;
 main_dir                       = fileparts(fileparts(task_dir));
-sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)), 'beh' , strcat('ses-',sprintf('%02d', session)));
+sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
+    'beh' , strcat('ses-',sprintf('%02d', session)));
 if ~exist(sub_save_dir, 'dir')
     mkdir(sub_save_dir)
 end
@@ -128,9 +134,9 @@ WaitSecs(TR*6);
 %% ___________________________ 0. Experimental loop ____________________________
 for trl = 1:size(countBalMat,1)
     disp(trl)
-    ip = ip_address; 
+    ip = ip_address;
     port = 20121;
-    
+
     %% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
     jitter1 = countBalMat.ISI1(trl);
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
@@ -139,8 +145,8 @@ for trl = 1:size(countBalMat,1)
     Screen('Flip', p.ptb.window);
     WaitSecs(jitter1);
     fEnd1 = GetSecs;
-    
-    
+
+
     T.event01_fixation_onset(trl)      = fStart1;
     T.event01_fixation_duration(trl)   = fEnd1 - fStart1;
     %% ________________________________ 2. cue 1s __________________________________
@@ -161,8 +167,8 @@ for trl = 1:size(countBalMat,1)
     WaitSecs(1.00);
     T.event02_cue_type{trl}             = countBalMat.cue_type{trl};
     T.event02_cue_filename{trl}         = countBalMat.cue_image{trl};
-    
-    
+
+
     % T.p5_administer_onset(trl) = GetSecs;
 
     %-------------------------------------------------------------------------------
@@ -174,12 +180,12 @@ for trl = 1:size(countBalMat,1)
     T.event03_expect_responseonset(trl) = buttonPressOnset;
     rating_Trajectory{trl,1}       = trajectory;
     T.event03_expect_RT(trl)            = RT;
-    
+
     %-------------------------------------------------------------------------------
     %                             4. Fixtion Jitter 0-2 sec
     %-------------------------------------------------------------------------------
     %   1) get jitter
-    jitter2 = countBalMat.ISI1(trl);
+    jitter2 = countBalMat.ISI2(trl);
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     fStart2 = GetSecs;
@@ -191,19 +197,19 @@ for trl = 1:size(countBalMat,1)
     %-------------------------------------------------------------------------------
     %                            5. pain
     %-------------------------------------------------------------------------------
-    
-    
+
+
     main(ip, port, 4, temp); %start trigger
     T.event05_administer_onset(trl) = GetSecs;
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     Screen('Flip', p.ptb.window);
-    
+
     WaitSecs(task_duration);
 
 
     T.event05_administer_type(trl) = countBalMat.administer(trl);
-    
+
     %-------------------------------------------------------------------------------
     %                                6. post evaluation rating
     %-------------------------------------------------------------------------------
@@ -213,10 +219,11 @@ for trl = 1:size(countBalMat,1)
     T.event06_actual_responseonset(trl) = buttonPressOnset;
     rating_Trajectory{trl,2} = trajectory;
     T.event06_actual_RT(trl) = RT;
-    
-    tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
+
+    tmpFileName = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), ...
+        '_task-',taskname,'_TEMPbeh.csv' ]);
     writetable(T,tmpFileName);
-    
+
 end
 
 %% ______________________________ Ending _________________________________
@@ -259,20 +266,20 @@ sca;
 
     function [t] = TriggerThermodeSocial(temp, varargin)
         USE_BIOPAC = false;
-        
+
         for i = 1:length(varargin)
             switch varargin{i}
                 case 'USE_BIOPAC'
                     USE_BIOPAC = varargin{i+1};
             end
         end
-        
+
         ljasm = NET.addAssembly('LJUDDotNet');
         ljudObj = LabJack.LabJackUD.LJUD;
-        
+
         [~, ljhandle] = ljudObj.OpenLabJackS('LJ_dtU3', 'LJ_ctUSB', '0', true, 0);
         ljudObj.ePutS(ljhandle, 'LJ_ioPIN_CONFIGURATION_RESET', 0, 0, 0);
-        
+
         % calculate byte code
         % Integer values are simply converted to binary, non integer values are
         % incremented by 128 and converted to binary. So 45 is bin(45) while
@@ -285,27 +292,27 @@ sca;
             temp = floor(temp) + 128;
         end
         bytecode=sprintf('%08.0f',str2double(dec2bin(temp)))-'0';
-        
+
         for i=0:7
             % Initiate FIO0 to FIO7 output
             ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT',i, bytecode(i+1), 0, 0);
-            
+
             if USE_BIOPAC
                 % Initiate CIO3 and EIO7 output (biopac)
                 ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8, bytecode(i+1), 0, 0);
             end
         end
-        
+
         % Wait for 1 second. The delay is performed in the U3 hardware, and delay time is in microseconds.
         % Valid delay values are 0 to 4194176 microseconds, and resolution is 128 microseconds.
         ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_WAIT', 0, 1000000, 0, 0);
-        
-        
-        
+
+
+
         for i=0:7
             % Terminate FIO0 to FIO7 output (reset to 0)
             ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i, 0, 0, 0);
-            
+
             if USE_BIOPAC
                 % Terminate CIO3 and EIO7 output (reset to 0)
                 % Note: this sends a binary code to biopac channels (likely
@@ -313,7 +320,7 @@ sca;
                 ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8,0, 0, 0);
             end
         end
-        
+
         t = GetSecs;
         % Perform the operations/requests
         ljudObj.GoOne(ljhandle);
@@ -321,13 +328,13 @@ sca;
 
     function WaitKeyPress(kID)
         while KbCheck(-3); end  % Wait until all keys are released.
-        
+
         while 1
             % Check the state of the keyboard.
             [ keyIsDown, ~, keyCode ] = KbCheck(-3);
             % If the user is pressing a key, then display its code number and name.
             if keyIsDown
-                
+
                 if keyCode(p.keys.esc)
                     cleanup; break;
                 elseif keyCode(kID)
