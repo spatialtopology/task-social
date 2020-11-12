@@ -11,20 +11,7 @@ function cognitive(sub,input_counterbalance_file, run_num, session, biopac, debu
 % ------------------------------------------------------------------------------
 
 %% 0. Biopac parameters ________________________________________________________
-task_dir = pwd;
-cd('/home/spacetop/repos/labjackpython');
-pe = pyenv;
-py.importlib.import_module('u3');
-% Check to see if u3 was imported correctly
-% py.help('u3')
-d = py.u3.U3();
-% set every channel to 0
-for FIO = 0:7
-d.setFIOState(pyargs('fioNum', int64(FIO), 'state', int64(0)));
-end
-
-cd(task_dir);
-
+script_dir = pwd;
 % biopac channel
 channel_trigger    = 0;
 channel_fixation_1 = 1;
@@ -33,6 +20,21 @@ channel_expect     = 3;
 channel_fixation_2 = 4;
 channel_administer = 5;
 channel_actual     = 6;
+
+if biopac == 1
+    script_dir = pwd;
+    cd('/home/spacetop/repos/labjackpython');
+    pe = pyenv;
+    py.importlib.import_module('u3');
+    % Check to see if u3 was imported correctly
+    % py.help('u3')
+    d = py.u3.U3();
+    % set every channel to 0
+    d.configIO(pyargs('FIOAnalog', int64(0), 'EIOAnalog', int64(0)));
+    for FIONUM = 0:7
+        d.setFIOState(pyargs('fioNum', int64(FIONUM), 'state', int64(0)));
+    end
+    cd(script_dir);end
 
 %% A. Psychtoolsbox parameters _________________________________________________
 global p
@@ -151,7 +153,37 @@ instruct_end_name              = ['task-', taskname, '_end.png'];
 instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
 instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 
+% H. Make Images Into Textures ________________________________________________
+DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n0%% complete'),'center','center',p.ptb.white );
+Screen('Flip',p.ptb.window);
+for trl = 1:length(countBalMat.cue_type)
+% cue texture
+  if string(countBalMat.cue_type{trl}) == 'low'
+      cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+      cue_image = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+  elseif string(countBalMat.cue_type{trl}) == 'high'
+      cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+      cue_image = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+  end
 
+% expect image texture
+  expect_tex{trl}                          = Screen('MakeTexture', p.ptb.window, imread(cue_image));
+  DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(countBalMat.cue_type))),'center','center',p.ptb.white);
+  Screen('Flip',p.ptb.window);
+
+% mental rotation texture
+  image_filepath = fullfile(main_dir,'stimuli','cognitive');
+  image_filename = char(countBalMat.image_filename(trl));
+  image_rotation = fullfile(image_filepath,image_filename);
+
+  % 5-1. present rotate image ____________________________________________________
+  rotTexture{trl} = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
+
+  actual_tex = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
+  start_tex = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+  end_tex                               = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+
+end
 
 %% -----------------------------------------------------------------------------
 %                              Start Experiment
@@ -197,15 +229,15 @@ for trl = 1:size(countBalMat,1)
 
 
     %% ________________________________ 2. cue 1s __________________________________
-    if string(countBalMat.cue_type{trl}) == 'low'
-        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
-        cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
-    elseif string(countBalMat.cue_type{trl}) == 'high'
-        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
-        cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
-    end
-    imageTexture                          = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-    Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
+%     if string(countBalMat.cue_type{trl}) == 'low'
+%         cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+%         cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+%     elseif string(countBalMat.cue_type{trl}) == 'high'
+%         cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+%         cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+%     end
+    % imageTexture                          = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+    Screen('DrawTexture', p.ptb.window, expect_tex{trl}, [], [], 0);
     T.event02_cue_onset(trl)              = Screen('Flip',p.ptb.window);
     T.event02_cue_biopac(trl)             = biopac_linux_matlab(biopac, channel_cue, 1);
     WaitSecs(1.00);
@@ -215,14 +247,14 @@ for trl = 1:size(countBalMat,1)
 
 
     %% __________________________ 3. expectation rating ____________________________
-    imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+  %  imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
     % T.event03_expect_onset(trl)         = GetSecs;
     Screen('TextSize', p.ptb.window, 36);
     T.event03_expect_biopac(trl)          = biopac_linux_matlab(biopac, channel_expect, 1);
-    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
+    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,expect_tex{trl},'expect');
     biopac_linux_matlab(biopac, channel_expect, 0);
     rating_Trajectory{trl,1}              = trajectory;
-    T.event03_expect_onset(trl)           = rating_onset;
+    T.event03_expect_displayonset(trl)    = rating_onset;
     T.event03_expect_responseonset(trl)   = buttonPressOnset;
     T.event03_expect_RT(trl)              = RT;
 
@@ -231,21 +263,21 @@ for trl = 1:size(countBalMat,1)
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     T.event04_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
-
+    T.event04_fixation_biopac(trl)        = biopac_linux_matlab(biopac, channel_fixation_2, 1);
     WaitSecs(jitter2);
-    fEnd2 = GetSecs;
-    T.event04_fixation_duration(trl)      = fEnd2- T.event04_fixation_onset(trl);
+    end_jitter2                           = biopac_linux_matlab(biopac, channel_fixation_2, 0)
+    T.event04_fixation_duration(trl)      = end_jitter2- T.event04_fixation_onset(trl);
 
 
     %% ____________________________ 5. cognitive ___________________________________
     respToBeMade = true;
-    image_filepath = fullfile(main_dir,'stimuli','cognitive');
-    image_filename = char(countBalMat.image_filename(trl));
-    image_rotation = fullfile(image_filepath,image_filename);
+    %image_filepath = fullfile(main_dir,'stimuli','cognitive');
+    %image_filename = char(countBalMat.image_filename(trl));
+    %image_rotation = fullfile(image_filepath,image_filename);
 
     % 5-1. present rotate image ____________________________________________________
-    rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
-    Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
+    %rotTexture = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
+    Screen('DrawTexture', p.ptb.window, rotTexture{trl}, [], [], 0);
 
     % 5-2. present scale lines _____________________________________________________
     Yc = 180; % Y coord
@@ -282,7 +314,7 @@ for trl = 1:size(countBalMat,1)
             response = 1;
             DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
             DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, [255 0 0]);
-            Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
+            Screen('DrawTexture', p.ptb.window, rotTexture{trl}, [], [], 0);
             Screen('Flip',p.ptb.window);
 
             WaitSecs(0.5);
@@ -299,7 +331,7 @@ for trl = 1:size(countBalMat,1)
             response = 2;
             DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, p.ptb.white);
             DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, [255 0 0]);
-            Screen('DrawTexture', p.ptb.window, rotTexture, [], [], 0);
+            Screen('DrawTexture', p.ptb.window, rotTexture{trl}, [], [], 0);
             Screen('Flip',p.ptb.window);
             WaitSecs(0.5);
 
@@ -319,7 +351,7 @@ for trl = 1:size(countBalMat,1)
     %% ________________________ 6. post evaluation rating __________________________
     Screen('TextSize', p.ptb.window, 36);
     T.event06_actual_biopac(trl)          = biopac_linux_matlab(biopac, channel_actual, 1);
-    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
+    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,actual_tex,'actual');
     biopac_linux_matlab(biopac, channel_actual, 0);
     rating_Trajectory{trl,2}                 = trajectory;
     T.event06_actual_onset(trl)              = rating_onset;
@@ -329,7 +361,6 @@ for trl = 1:size(countBalMat,1)
     %% _________________________ 7. temporarily save file _______________________
     tmp_file_name = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
     writetable(T,tmp_file_name);
-    Screen('Close');
 end
 
 
@@ -387,6 +418,15 @@ clear p; clearvars; Screen('Close'); close all; sca;
         end
     end
 
+        function [time] = biopac_linux_matlab(biopac, channel_num, state_num)
+            if biopac
+                d.setFIOState(pyargs('fioNum', int64(channel_num), 'state', int64(state_num)))
+                time = GetSecs;
+            else
+                time = GetSecs;
+                return
+            end
+        end
 % Trigger biopac
 % USAGE: [time] = TriggerBiopac4(seconds)
 %
