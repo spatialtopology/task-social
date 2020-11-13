@@ -155,6 +155,28 @@ instruct_end_name              = ['task-', taskname, '_end.png'];
 instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
 instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 
+HideCursor;
+% H. Make Images Into Textures ________________________________________________
+DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n0%% complete'),'center','center',p.ptb.white );
+Screen('Flip',p.ptb.window);
+for trl = 1:length(countBalMat.cue_type)
+  if string(countBalMat.cue_type{trl}) == 'low'
+      cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+      cue_image = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+  elseif string(countBalMat.cue_type{trl}) == 'high'
+      cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+      cue_image = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+  end
+
+  expect_tex{trl}                          = Screen('MakeTexture', p.ptb.window, imread(cue_image));
+  actual_tex = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
+  start_tex = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+  end_tex   = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+  DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(countBalMat.cue_type))),'center','center',p.ptb.white);
+  Screen('Flip',p.ptb.window);
+
+  end
+
 %% -----------------------------------------------------------------------------
 %                              Start Experiment
 % ------------------------------------------------------------------------------
@@ -162,8 +184,8 @@ instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 %% ______________________________ Instructions _________________________________
 HideCursor;
 Screen('TextSize',p.ptb.window,72);
-start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
-Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
+%DEL% start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+Screen('DrawTexture',p.ptb.window,start_tex,[],[]);
 Screen('Flip',p.ptb.window);
 
 %% _______________________ Wait for Trigger to Begin ___________________________
@@ -200,14 +222,14 @@ for trl = 1:size(countBalMat,1)
 
     %% ________________________________ 2. cue 1s __________________________________
     % 1) log cue presentation time
-    if string(countBalMat.cue_type{trl}) == 'low'
-        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
-        cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
-    elseif string(countBalMat.cue_type{trl}) == 'high'
-        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
-        cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
-    end
-    imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
+%    if string(countBalMat.cue_type{trl}) == 'low'%
+%        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+%        cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+%    elseif string(countBalMat.cue_type{trl}) == 'high'
+%        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+%        cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+%    end
+%    imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
     Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
     T.event02_cue_onset(trl)            = Screen('Flip',p.ptb.window);
     T.event02_cue_biopac(trl)             = biopac_linux_matlab(biopac, channel_cue, 1);
@@ -220,10 +242,10 @@ for trl = 1:size(countBalMat,1)
 
 
     %% __________________________ 3. expectation rating ____________________________
-    Screen('MakeTexture', p.ptb.window, imread(cueImage));
+    %DEL% Screen('MakeTexture', p.ptb.window, imread(cueImage));
     Screen('TextSize', p.ptb.window, 36);
     T.event03_expect_biopac(trl)          = biopac_linux_matlab(biopac, channel_expect, 1);
-    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
+    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,expect_tex{trl},'expect');
     biopac_linux_matlab(biopac, channel_expect, 0);
     rating_Trajectory{trl,1} = trajectory;
     T.event03_expect_onset(trl)         = rating_onset;
@@ -256,7 +278,7 @@ for trl = 1:size(countBalMat,1)
     %% ________________________ 6. post evaluation rating ______________________
     Screen('TextSize', p.ptb.window, 36);
     T.event06_actual_biopac(trl)          = biopac_linux_matlab(biopac, channel_actual, 1);
-    [trajectory, rating_onset, RT, buttonPressOnset]  = circular_rating_output(4,p,image_scale,'actual');
+    [trajectory, rating_onset, RT, buttonPressOnset]  = circular_rating_output(4,p,actual_tex,'actual');
     biopac_linux_matlab(biopac, channel_actual, 0);
     rating_Trajectory{trl,2}                 = trajectory;
     T.event06_actual_onset(trl)              = rating_onset;
