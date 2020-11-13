@@ -34,7 +34,8 @@ if biopac == 1
     for FIONUM = 0:7
         d.setFIOState(pyargs('fioNum', int64(FIONUM), 'state', int64(0)));
     end
-    cd(script_dir);end
+    cd(script_dir);
+    end
 
 %% A. Psychtoolsbox parameters _________________________________________________
 global p
@@ -168,8 +169,7 @@ for trl = 1:length(countBalMat.cue_type)
 
 % expect image texture
   expect_tex{trl}                          = Screen('MakeTexture', p.ptb.window, imread(cue_image));
-  DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(countBalMat.cue_type))),'center','center',p.ptb.white);
-  Screen('Flip',p.ptb.window);
+
 
 % mental rotation texture
   image_filepath = fullfile(main_dir,'stimuli','cognitive');
@@ -182,7 +182,8 @@ for trl = 1:length(countBalMat.cue_type)
   actual_tex = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
   start_tex = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
   end_tex                               = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
-
+  DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(countBalMat.cue_type))),'center','center',p.ptb.white);
+  Screen('Flip',p.ptb.window);
 end
 
 %% -----------------------------------------------------------------------------
@@ -312,6 +313,7 @@ for trl = 1:size(countBalMat,1)
         if buttonpressed(1) % equivalent of elseif keyCode(p.keys.left)
             RT = GetSecs - timing.initialized;
             response = 1;
+            biopac_linux_matlab(biopac, channel_administer, 0);
             DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
             DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, [255 0 0]);
             Screen('DrawTexture', p.ptb.window, rotTexture{trl}, [], [], 0);
@@ -319,16 +321,17 @@ for trl = 1:size(countBalMat,1)
 
             WaitSecs(0.5);
 
-            remainder_time = task_duration-0.5-RT;
+            %remainder_time = task_duration-0.5-RT;
             Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
                 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
             Screen('Flip', p.ptb.window);
-            WaitSecs(remainder_time);
+            biopac_linux_matlab(biopac, channel_fixation, 1);
+            %WaitSecs(remainder_time);
 
         elseif buttonpressed(3)%     elseif keyCode(p.keys.right)
-            %       T.event05_response_biopac(trl)        = TriggerBiopac4(1, 52);
             RT = GetSecs - timing.initialized;
             response = 2;
+            biopac_linux_matlab(biopac, channel_administer, 0);
             DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, p.ptb.white);
             DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, [255 0 0]);
             Screen('DrawTexture', p.ptb.window, rotTexture{trl}, [], [], 0);
@@ -336,14 +339,16 @@ for trl = 1:size(countBalMat,1)
             WaitSecs(0.5);
 
             % fill in with fixation cross
-            remainder_time = task_duration-0.5-RT;
+            %remainder_time = task_duration-0.5-RT;
             Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
                 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
             Screen('Flip', p.ptb.window);
-            WaitSecs(remainder_time);
+            biopac_linux_matlab(biopac, channel_fixation, 1);
+            %WaitSecs(remainder_time);
         end
     end
     biopac_linux_matlab(biopac, channel_administer, 0);
+    biopac_linux_matlab(biopac, channel_fixation, 0);
     T.event05_administer_response(trl)       = response;
     T.event05_administer_reseponseonset(trl) = GetSecs;
     T.event05_administer_RT(trl)             = RT;
@@ -427,54 +432,6 @@ clear p; clearvars; Screen('Close'); close all; sca;
                 return
             end
         end
-% Trigger biopac
-% USAGE: [time] = TriggerBiopac4(seconds)
-%
-% Delivers 255 in binary (1111 1111) to Labjack CI03-EI07 channels
-%
-% To recieve binary data in biopac use the acqknowledge software interface
-% and configure the acquisition channels to recieve on the digital channels
-% D8-D15
-%
-% version 4
-% Changelog:
-%   - updated to use Labjack UD libraries instead of io32
-%   - updated to only output on CI03-EI07, not also FI00-FI07. The former
-%     connect to biopac, the latter connect to Medoc.
-%   - eliminated fliplr() operation on bytecode and instead flipped index
-%     order when loading bytecode onto stack (in AddRequestS() call).
-%
-% Updated to v4 by Bogdan Petre on 7/20/2018
-    function [t] = TriggerBiopac4(dur, byte_num)
-        delay = dur*1000000; % delay is communicated in microseconds, so lets scale
 
-        ljasm = NET.addAssembly('LJUDDotNet');
-        ljudObj = LabJack.LabJackUD.LJUD;
-
-        [~, ljhandle] = ljudObj.OpenLabJackS('LJ_dtU3', 'LJ_ctUSB', '0', true, 0);
-        ljudObj.ePutS(ljhandle, 'LJ_ioPIN_CONFIGURATION_RESET', 0, 0, 0);
-
-        % calculate byte code
-        bytecode=sprintf('%08.0f',str2double(dec2bin(byte_num)))-'0';
-
-        for i=0:7
-            %Initiate CIO3-EIO7 output
-            ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8, bytecode(8-i), 0, 0);
-        end
-
-        %Wait for 1 second. The delay is performed in the U3 hardware, and delay time is in microseconds.
-        %Valid delay values are 0 to 4194176 microseconds, and resolution is 128 microseconds.
-        ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_WAIT', 0, delay, 0, 0);
-
-
-        for i=0:7
-            %Terminate CIO3-EIO7 output (reset to 0)
-            ljudObj.AddRequest(ljhandle, LabJack.LabJackUD.IO.PUT_DIGITAL_BIT, i+8,0, 0, 0);
-        end
-
-        t = GetSecs;
-        %Perform the operations/requests
-        ljudObj.GoOne(ljhandle);
-    end
 
 end
