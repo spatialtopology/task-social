@@ -25,7 +25,13 @@ if biopac == 1
     script_dir = pwd;
     cd('/home/spacetop/repos/labjackpython');
     pe = pyenv;
-    py.importlib.import_module('u3');
+    try
+        py.importlib.import_module('u3');
+    catch
+        warning("u3 already imported!");
+    end
+    
+    % py.importlib.import_module('u3');
     % Check to see if u3 was imported correctly
     % py.help('u3')
     d = py.u3.U3();
@@ -250,7 +256,7 @@ for trl = 1:size(countBalMat,1)
     [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cue_tex{trl},'expect');
     biopac_linux_matlab(biopac, channel_expect, 0);
     rating_Trajectory{trl,1}              = trajectory;
-    T.event04_expect_displayonset(trl)    = rating_onset;
+    T.event03_expect_displayonset(trl)    = rating_onset;
     T.event03_expect_responseonset(trl)   = buttonPressOnset;
     T.event03_expect_RT(trl)              = RT;
 
@@ -323,7 +329,8 @@ psychtoolbox_repoFileName = fullfile(repo_save_dir, [bids_string,'_psychtoolbox_
 save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
 
-clear p; Screen('Close'); close all; sca;
+clear p; Screen('Close'); close all; sca; 
+d.close()
 %% -----------------------------------------------------------------------------
 %                                   Function
 %-------------------------------------------------------------------------------

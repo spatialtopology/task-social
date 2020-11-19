@@ -14,7 +14,11 @@ if biopac == 1
     script_dir = pwd;
     cd('/home/spacetop/repos/labjackpython');
     pe = pyenv;
-    py.importlib.import_module('u3');
+    try
+        py.importlib.import_module('u3');
+    catch
+        warning("u3 already imported!");
+    end
     % Check to see if u3 was imported correctly
     % py.help('u3')
     d = py.u3.U3();
