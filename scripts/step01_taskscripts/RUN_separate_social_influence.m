@@ -1,13 +1,22 @@
 clear all;
+Screen('Close');
+clearvars;
+sca;
 % 1. grab participant number ___________________________________________________
-prompt = 'session number : ';
+prompt = 'SESSION (1 or 4): ';
 session = input(prompt);
-prompt = 'subject number (in raw number form, e.g. 1, 2,...,98): ';
+prompt = 'PARTICIPANT (in raw number form, e.g. 1, 2,...,98): ';
 sub_num = input(prompt);
-prompt = 'run biopac YES=1 NO=0 : ';
+prompt = 'BIOPAC YES=1 NO=0 : ';
 biopac = input(prompt);
 
 debug = 0; %DEBUG_MODE = 1, Actual_experiment = 0
+% pe = pyenv;
+% if pe.Status == "Loaded"
+%     break
+% else
+%     pe = pyenv;
+% end
 
 % 2. counterbalance version ____________________________________________________
 % random sequence
@@ -94,7 +103,7 @@ elseif session ~= 1
             %             cognitive(sub,c2,4,session);vicarious(sub,v1,5,session);pain(sub,p1,6,session);
             
         case 4 % v2 c2 p2 p1 c1 v1
-            task1 = 'pain'; task2 = 'cognitive'; task3 = 'vicarious_copy';
+            task1 = 'pain_test'; task2 = 'cognitive'; task3 = 'vicarious_copy';
             task1_cb = p1; task2_cb = c1; task3_cb = v1;
             task1_order = 4; task2_order = 5; task3_order = 6;
             %             pain(sub,p1,4,session);cognitive(sub,c1,5,session);vicarious(sub,v1,6,session);
@@ -114,9 +123,9 @@ task3_line = strcat(' .    3)  ', task3 );
 boxTop(1:length(line))='=';
 fprintf('\n%s\n\n %s\n %s\n %s\n %s\n \n%s\n',boxTop,line,task1_line,task2_line,task3_line,boxTop)
 
-if ~exist('py_env')
-py_env = pyenv('ExecutionMode', 'InProcess');
-end
+% if ~exist('py_env')
+% py_env = pyenv('ExecutionMode', 'InProcess');
+% end
 % B. Directories ______________________________________________________________
 main_dir  = pwd;
 
