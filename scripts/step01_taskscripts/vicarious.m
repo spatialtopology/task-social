@@ -11,22 +11,7 @@ function vicarious(sub,input_counterbalance_file, run_num, session, biopac, debu
 
 
 %% 0. Biopac parameters _________________________________________________
-task_dir = pwd;
-cd('/home/spacetop/repos/labjackpython');
-pe = pyenv;
-py.importlib.import_module('u3');
-% Check to see if u3 was imported correctly
-% py.help('u3')
-d = py.u3.U3();
-% set every channel to 0
-d.configIO(pyargs('FIOAnalog', int64(0), 'EIOAnalog', int64(0)));
-for FIONUM = 0:7
-d.setFIOState(pyargs('fioNum', int64(FIONUM), 'state', int64(0)));
-end
-
-
-cd(task_dir);
-
+script_dir = pwd;
 % biopac channel
 channel_trigger    = 0;
 channel_fixation_1 = 1;
@@ -36,9 +21,25 @@ channel_fixation_2 = 4;
 channel_administer = 5;
 channel_actual     = 6;
 
+if biopac == 1
+    script_dir = pwd;
+    cd('/home/spacetop/repos/labjackpython');
+    pe = pyenv;
+    py.importlib.import_module('u3');
+    % Check to see if u3 was imported correctly
+    % py.help('u3')
+    d = py.u3.U3();
+    % set every channel to 0
+    d.configIO(pyargs('FIOAnalog', int64(0), 'EIOAnalog', int64(0)));
+    for FIONUM = 0:7
+        d.setFIOState(pyargs('fioNum', int64(FIONUM), 'state', int64(0)));
+    end
+    cd(script_dir);
+end
+
 %% A. Psychtoolbox parameters _________________________________________________
 global p
-Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference', 'SkipSyncTests', 0);
 PsychDefaultSetup(2);
 
 if debug
@@ -49,6 +50,8 @@ screens                        = Screen('Screens'); % Get the screen numbers
 p.ptb.screenNumber             = max(screens); % Draw to the external screen if avaliable
 p.ptb.white                    = WhiteIndex(p.ptb.screenNumber); % Define black and white
 p.ptb.black                    = BlackIndex(p.ptb.screenNumber);
+PsychImaging('PrepareConfiguration');
+PsychImaging('AddTask', 'General', 'UseFastOffscreenWindows');
 [p.ptb.window, p.ptb.rect]     = PsychImaging('OpenWindow',p.ptb.screenNumber,p.ptb.black);
 [p.ptb.screenXpixels, p.ptb.screenYpixels] = Screen('WindowSize',p.ptb.window);
 p.ptb.ifi                      = Screen('GetFlipInterval',p.ptb.window);
@@ -67,18 +70,26 @@ task_dir                       = pwd;
 main_dir                       = fileparts(fileparts(task_dir));
 repo_dir                       = fileparts(fileparts(fileparts(task_dir)));
 taskname                       = 'vicarious';
-bids_string                    = [strcat('spacetop_task-social'),...
-    strcat('_ses-',sprintf('%02d', session)),...
-    strcat('_sub-', sprintf('%04d', sub)), ...
-    '_run-',taskname];
+% bids_string
+%sub-0001_ses-01_task-social_run-cognitive-01
+%bids_string                    = [strcat('spacetop_task-social'),...
+%    strcat('_ses-',sprintf('%02d', session)),...
+%    strcat('_sub-', sprintf('%04d', sub)), ...
+%    '_run-',taskname];
+bids_string                     = [strcat('sub-', sprintf('%04d', sub)), ...
+strcat('_ses-',sprintf('%02d', session)),...
+strcat('_task-social'),...
+strcat('_run-', taskname, sprintf('-%02d', run_num))];
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
-    'beh' , strcat('ses-',sprintf('%02d', session)));
+strcat('ses-',sprintf('%02d', session)),...
+    'beh'  );
 repo_save_dir = fullfile(repo_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
-    'task-social');
+    'task-social', strcat('ses-',sprintf('%02d', session)));
 if ~exist(sub_save_dir, 'dir');    mkdir(sub_save_dir);     end
 if ~exist(repo_save_dir, 'dir');    mkdir(repo_save_dir);   end
 
 dir_video                      = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s','selected');
+%dir_video                      = fullfile(main_dir,'stimuli','task-vicarious_videofps-024_dur-4s_converted');
 cue_low_dir                    = fullfile(main_dir,'stimuli','cue','scl');
 cue_high_dir                   = fullfile([main_dir,'stimuli','cue','sch']);
 counterbalancefile             = fullfile(main_dir,'design','s04_final_counterbalance_with_jitter', [input_counterbalance_file, '.csv']);
@@ -96,7 +107,7 @@ vnames = {'src_subject_id', 'session_id', 'param_run_num','param_counterbalance_
     'param_cond_type','param_trigger_onset','param_start_biopac'...
     'event01_fixation_onset','event01_fixation_biopac','event01_fixation_duration',...
     'event02_cue_onset','event02_cue_biopac','event02_cue_type','event02_cue_filename',...
-    'event04_expect_displayonset','event03_expect_biopac','event03_expect_responseonset','event03_expect_RT', ...
+    'event03_expect_displayonset','event03_expect_biopac','event03_expect_responseonset','event03_expect_RT', ...
     'event04_fixation_onset','event04_fixation_biopac','event04_fixation_duration',...
     'event05_administer_type','event05_administer_filename','event05_administer_onset','event05_administer_biopac',...
     'event06_actual_displayonset','event06_actual_biopac','event06_actual_responseonset','event06_actual_RT', ...
@@ -157,6 +168,31 @@ instruct_end_name              = ['task-', taskname, '_end.png'];
 instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
 instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 
+HideCursor;
+
+% H. Make Images Into Textures ________________________________________________
+DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n0%% complete'),'center','center',p.ptb.white );
+Screen('Flip',p.ptb.window);
+
+for trl = 1:length(countBalMat.cue_type)
+    if string(countBalMat.cue_type{trl}) == 'low'
+        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+        cue_image = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+    elseif string(countBalMat.cue_type{trl}) == 'high'
+        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+        cue_image = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+    end
+
+    cue_tex{trl} = Screen('MakeTexture', p.ptb.window, imread(cue_image));
+    video_filename  = [countBalMat.video_filename{trl}];
+    video_file      = fullfile(dir_video, video_filename);
+    [movie{trl}, ~, ~, imgw{trl}, imgh{trl}] = Screen('OpenMovie', p.ptb.window, video_file, [], 1);
+    actual_tex      = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
+    start_tex       = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+    end_tex         = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+    DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(countBalMat.cue_type))),'center','center',p.ptb.white);
+    Screen('Flip',p.ptb.window);
+end
 
 
 %% -----------------------------------------------------------------------------
@@ -164,10 +200,9 @@ instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 % ------------------------------------------------------------------------------
 
 %% ______________________________ Instructions _________________________________
-HideCursor;
+
 Screen('TextSize',p.ptb.window,72);
-start.texture = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
-Screen('DrawTexture',p.ptb.window,start.texture,[],[]);
+Screen('DrawTexture',p.ptb.window,start_tex,[],[]);
 Screen('Flip',p.ptb.window);
 
 %% _______________________ Wait for Trigger to Begin ___________________________
@@ -190,7 +225,6 @@ for trl = 1:size(countBalMat,1)
 
     %% _________________________ 1. Fixtion Jitter 0-4 sec _____________________
     jitter1 = countBalMat.ISI1(trl);
-    %     jitter1 = countBalMat.array(trl, "ISI1"); % OCTAVE
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     T.event01_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
@@ -200,19 +234,8 @@ for trl = 1:size(countBalMat,1)
     T.event01_fixation_duration(trl)      = jitter1_end - T.event01_fixation_onset(trl);
 
     %% ________________________________ 2. cue 1s ______________________________
-    if string(countBalMat.cue_type{trl}) == 'low'
-        %     if strcmp(countBalMat.array(trl, "cue_type") , "low") % OCTAVE
-        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
-        cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
-    elseif string(countBalMat.cue_type{trl}) == 'high'
-        %     else strcmp(countBalMat.array(trl, "cue_type"), "high") % OCTAVE
-        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
-        cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
-        % endif % OCTAVE
-    end
 
-    imageTexture                          = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-    Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
+    Screen('DrawTexture', p.ptb.window, cue_tex{trl}, [], [], 0);
     T.event02_cue_onset(trl)              = Screen('Flip',p.ptb.window);
     T.event02_cue_biopac(trl)             = biopac_linux_matlab(biopac, channel_cue, 1);
     WaitSecs(1.00);
@@ -221,14 +244,13 @@ for trl = 1:size(countBalMat,1)
     T.event02_cue_filename{trl}           = countBalMat.cue_image{trl};
 
     %% __________________________ 3. expectation rating ________________________
-    Screen('MakeTexture', p.ptb.window, imread(cueImage));
-    Screen('TextSize', p.ptb.window, 36);
 
+    Screen('TextSize', p.ptb.window, 36);
     T.event03_expect_biopac(trl)          = biopac_linux_matlab(biopac, channel_expect, 1);
-    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cueImage,'expect');
+    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cue_tex{trl},'expect');
     biopac_linux_matlab(biopac, channel_expect, 0);
     rating_Trajectory{trl,1}              = trajectory;
-    T.event04_expect_displayonset(trl)           = rating_onset;
+    T.event04_expect_displayonset(trl)    = rating_onset;
     T.event03_expect_responseonset(trl)   = buttonPressOnset;
     T.event03_expect_RT(trl)              = RT;
 
@@ -246,31 +268,30 @@ for trl = 1:size(countBalMat,1)
 
     %% ____________________________ 5. vicarious _______________________________
     video_filename                        = [countBalMat.video_filename{trl}];
-    %     video_filename = [countBalMat.array(trl, "video_filename")]; % OCTAVE
 
     WaitSecs((task_duration-video_length)/2);
     T.event05_administer_biopac(trl)      = biopac_linux_matlab(biopac, channel_administer, 1);
     video_file                            = fullfile(dir_video, video_filename);
-    movie_time                            = video_play(video_file , p );
+    movie_time                            = video_play(video_file , p , movie{trl}, imgw{trl}, imgh{trl});
     T.event05_administer_onset(trl)       = movie_time;  % 4sec
     biopac_linux_matlab(biopac, channel_administer, 0);
     WaitSecs((task_duration-video_length)/2);
     T.event05_administer_type{trl}        = countBalMat.video_filename{trl};
 
     %% ________________________ 6. post evaluation rating ______________________
-    Screen('TextSize', p.ptb.window, 36);
+
     T.event06_actual_biopac(trl)          = biopac_linux_matlab(biopac, channel_actual, 1);
-    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,image_scale,'actual');
+    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,actual_tex,'actual');
     biopac_linux_matlab(biopac, channel_actual, 0);
     rating_Trajectory{trl,2}              = trajectory;
-    T.event06_actual_displayonset(trl)           = rating_onset;
+    T.event06_actual_displayonset(trl)    = rating_onset;
     T.event06_actual_responseonset(trl)   = buttonPressOnset;
     T.event06_actual_RT(trl)              = RT;
 
     %% ________________________ 7. temporarily save file _______________________
     tmp_file_name = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
     writetable(T,tmp_file_name);
-    Screen('Close');
+    %Screen('Close');
 end
 
 
@@ -302,16 +323,17 @@ psychtoolbox_repoFileName = fullfile(repo_save_dir, [bids_string,'_psychtoolbox_
 save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
 
-clear p; clearvars; Screen('Close'); close all; sca;
+clear p; Screen('Close'); close all; sca;
 %% -----------------------------------------------------------------------------
 %                                   Function
 %-------------------------------------------------------------------------------
 % Function by Xiaochun Han
-    function [Tm] = video_play(moviename,p)
+function [Tm] = video_play(moviename,p, movie, imgw, imgh)
+%     function [Tm] = video_play(moviename,p, movie, imgw, imgh)
         % [p.ptb.window, rect]  = Screen(p.ptb.screenID, 'OpenWindow',p.ptb.bg);
         % Tt = 0;
         rate = 1;
-        [movie, ~, ~, imgw, imgh] = Screen('OpenMovie', p.ptb.window, moviename);
+        %[movie, ~, ~, imgw, imgh] = Screen('OpenMovie', p.ptb.window, moviename);
         Screen('PlayMovie', movie, rate);
         Tm = GetSecs;
         t = 0; dur = 0;
@@ -319,6 +341,7 @@ clear p; clearvars; Screen('Close'); close all; sca;
             if ((imgw>0) && (imgh>0))
                 tex = Screen('GetMovieImage', p.ptb.window, movie, 1);
                 t = t + tex;
+
                 if tex < 0
                     break;
                 end
@@ -338,16 +361,16 @@ clear p; clearvars; Screen('Close'); close all; sca;
     end
 
 
+
     function [time] = biopac_linux_matlab(biopac, channel_num, state_num)
         if biopac
             d.setFIOState(pyargs('fioNum', int64(channel_num), 'state', int64(state_num)))
             time = GetSecs;
         else
+            time = GetSecs;
             return
         end
     end
-
-
     function WaitKeyPress(kID)
         while KbCheck(-3); end  % Wait until all keys are released.
 
