@@ -10,18 +10,22 @@ function pain(sub,input_counterbalance_file, run_num, session, biopac, debug)
 
 
 %% 0. Biopac parameters _________________________________________________
-task_dir = pwd;
-cd('/home/spacetop/repos/labjackpython');
-pe = pyenv;
-py.importlib.import_module('u3');
-% Check to see if u3 was imported correctly
-% py.help('u3')
-d = py.u3.U3();
-% set every channel to 0
-d.configIO(pyargs('FIOAnalog', int64(0), 'EIOAnalog', int64(0)));
-for FIONUM = 0:7
-d.setFIOState(pyargs('fioNum', int64(FIONUM), 'state', int64(0)));
+if biopac == 1
+    script_dir = pwd;
+    cd('/home/spacetop/repos/labjackpython');
+    pe = pyenv;
+    py.importlib.import_module('u3');
+    % Check to see if u3 was imported correctly
+    % py.help('u3')
+    d = py.u3.U3();
+    % set every channel to 0
+    d.configIO(pyargs('FIOAnalog', int64(0), 'EIOAnalog', int64(0)));
+    for FIONUM = 0:7
+        d.setFIOState(pyargs('fioNum', int64(FIONUM), 'state', int64(0)));
+    end
+    cd(script_dir);
 end
+
 
 
 cd(task_dir);
@@ -100,9 +104,9 @@ vnames = {'src_subject_id', 'session_id','param_run_num','param_counterbalance_v
     'param_cond_type','param_trigger_onset','param_start_biopac',...
     'event01_fixation_onset','event01_fixation_biopac','event01_fixation_duration',...
     'event02_cue_onset','event02_cue_biopac','event02_cue_type','event02_cue_filename',...
-    'event03_expect_onset','event03_rating_biopac','event03_expect_responseonset','event03_expect_RT', ...
+    'event03_expect_displayonset','event03_rating_biopac','event03_expect_responseonset','event03_expect_RT', ...
     'event04_fixation_onset','event04_fixation_biopac','event04_fixation_duration',...
-    'event05_administer_type','event05_administer_onset','event05_stimulus_biopac',...
+    'event05_administer_type','event05_administer_displayonset','event05_administer_biopac',...
     'event06_actual_onset','event06_actual_biopac','event06_actual_responseonset','event06_actual_RT',...
     'param_end_instruct_onset','param_end_biopac', 'param_experiment_duration'};
 T                              = array2table(zeros(size(countBalMat,1),size(vnames,2)));
@@ -113,12 +117,11 @@ T.event02_cue_filename         = cell(size(countBalMat,1),1);
 a                              = split(counterbalancefile,filesep); % full path filename components
 version_chunk                  = split(extractAfter(a(end),"ver-"),"_");
 block_chunk                    = split(extractAfter(a(end),"block-"),["-", "."]);
-T.session_id(:)            = session;
-if session == 4
-    run_num = run_num-3;
-end
-T.param_run_num(:)              = run_num;
-T.param_counterbalance_ver(:)   = str2double(version_chunk{1});
+T.src_subject_id(:)            = sub;
+T.session_id(:)                = session;
+if session == 4;       run_num = run_num-3; end
+T.param_run_num(:)             = run_num;
+T.param_counterbalance_ver(:)  = str2double(version_chunk{1});
 T.param_counterbalance_block_num(:) = str2double(block_chunk{1});
 T.param_cue_type               = countBalMat.cue_type;
 T.param_administer_type        = countBalMat.administer;
@@ -156,26 +159,27 @@ instruct_start                 = fullfile(instruct_filepath, instruct_start_name
 instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 
 HideCursor;
+
 % H. Make Images Into Textures ________________________________________________
 DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n0%% complete'),'center','center',p.ptb.white );
 Screen('Flip',p.ptb.window);
 for trl = 1:length(countBalMat.cue_type)
-  if string(countBalMat.cue_type{trl}) == 'low'
-      cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
-      cue_image = fullfile(cue_low_dir,countBalMat.cue_image{trl});
-  elseif string(countBalMat.cue_type{trl}) == 'high'
-      cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
-      cue_image = fullfile(cue_high_dir,countBalMat.cue_image{trl});
-  end
-
-  expect_tex{trl}                          = Screen('MakeTexture', p.ptb.window, imread(cue_image));
-  actual_tex = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
-  start_tex = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
-  end_tex   = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
-  DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(countBalMat.cue_type))),'center','center',p.ptb.white);
-  Screen('Flip',p.ptb.window);
-
-  end
+    if string(countBalMat.cue_type{trl}) == 'low'
+        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
+        cue_image = fullfile(cue_low_dir,countBalMat.cue_image{trl});
+    elseif string(countBalMat.cue_type{trl}) == 'high'
+        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
+        cue_image = fullfile(cue_high_dir,countBalMat.cue_image{trl});
+    end
+    
+    cue_tex{trl} = Screen('MakeTexture', p.ptb.window, imread(cue_image));
+    actual_tex      = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
+    start_tex       = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+    end_tex         = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+    DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(countBalMat.cue_type))),'center','center',p.ptb.white);
+    Screen('Flip',p.ptb.window);
+    
+end
 
 %% -----------------------------------------------------------------------------
 %                              Start Experiment
@@ -209,7 +213,7 @@ for trl = 1:size(countBalMat,1)
     disp(trl)
     ip = ip_address;
     port = 20121;
-
+    
     %% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
     jitter1 = countBalMat.ISI1(trl);
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
@@ -219,18 +223,10 @@ for trl = 1:size(countBalMat,1)
     WaitSecs(jitter1);
     jitter1_end                           = biopac_linux_matlab(biopac, channel_fixation_1, 0);
     T.event01_fixation_duration(trl)      = jitter1_end - T.event01_fixation_onset(trl);
-
+    
     %% ________________________________ 2. cue 1s __________________________________
-    % 1) log cue presentation time
-%    if string(countBalMat.cue_type{trl}) == 'low'%
-%        cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
-%        cueImage = fullfile(cue_low_dir,countBalMat.cue_image{trl});
-%    elseif string(countBalMat.cue_type{trl}) == 'high'
-%        cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
-%        cueImage = fullfile(cue_high_dir,countBalMat.cue_image{trl});
-%    end
-%    imageTexture = Screen('MakeTexture', p.ptb.window, imread(cueImage));
-    Screen('DrawTexture', p.ptb.window, imageTexture, [], [], 0);
+    
+    Screen('DrawTexture', p.ptb.window, cue_tex{trl}, [], [], 0);
     T.event02_cue_onset(trl)            = Screen('Flip',p.ptb.window);
     T.event02_cue_biopac(trl)             = biopac_linux_matlab(biopac, channel_cue, 1);
     temp = countBalMat.administer(trl) + 49;
@@ -239,22 +235,22 @@ for trl = 1:size(countBalMat,1)
     biopac_linux_matlab(biopac, channel_cue, 0);
     T.event02_cue_type{trl}             = countBalMat.cue_type{trl};
     T.event02_cue_filename{trl}         = countBalMat.cue_image{trl};
-
-
+    
+    
     %% __________________________ 3. expectation rating ____________________________
-    %DEL% Screen('MakeTexture', p.ptb.window, imread(cueImage));
+    
     Screen('TextSize', p.ptb.window, 36);
     T.event03_expect_biopac(trl)          = biopac_linux_matlab(biopac, channel_expect, 1);
-    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,expect_tex{trl},'expect');
+    [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cue_tex{trl},'expect');
     biopac_linux_matlab(biopac, channel_expect, 0);
     rating_Trajectory{trl,1} = trajectory;
     T.event03_expect_onset(trl)         = rating_onset;
     T.event03_expect_responseonset(trl) = buttonPressOnset;
     T.event03_expect_RT(trl)            = RT;
-
-
+    
+    
     %% _________________________ 4. Fixtion Jitter 0-2 sec _________________________
-
+    
     jitter2 = countBalMat.ISI2(trl);
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
@@ -263,18 +259,18 @@ for trl = 1:size(countBalMat,1)
     WaitSecs(jitter2);
     end_jitter2                           = biopac_linux_matlab(biopac, channel_fixation_2, 0);
     T.event04_fixation_duration(trl)      = end_jitter2 - T.event04_fixation_onset(trl) ;
-
+    
     %% ____________________________ 5. pain ___________________________________
     main(ip, port, 4, temp); %start trigger
-    %     T.event05_administer_onset(trl) = GetSecs;
+    %     T.event05_administer_displayonset(trl) = GetSecs;
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-    T.event05_administer_onset(trl) = Screen('Flip', p.ptb.window);
+    T.event05_administer_displayonset(trl) = Screen('Flip', p.ptb.window);
     T.event05_administer_biopac(trl)      = biopac_linux_matlab(biopac, channel_administer, 1);
     WaitSecs(task_duration);
     biopac_linux_matlab(biopac, channel_administer, 0);
     T.event05_administer_type(trl) = countBalMat.administer(trl);
-
+    
     %% ________________________ 6. post evaluation rating ______________________
     Screen('TextSize', p.ptb.window, 36);
     T.event06_actual_biopac(trl)          = biopac_linux_matlab(biopac, channel_actual, 1);
@@ -284,20 +280,20 @@ for trl = 1:size(countBalMat,1)
     T.event06_actual_onset(trl)              = rating_onset;
     T.event06_actual_responseonset(trl)      = buttonPressOnset;
     T.event06_actual_RT(trl)                 = RT;
-
-
+    
+    
     %% ________________________ 7. temporarily save file _______________________
     tmpFileName = fullfile(sub_save_dir,[strcat('spacetop_task-social'),...
         strcat('_ses-',sprintf('%02d', session)),...
         strcat('_sub-', sprintf('%04d', sub)), ...
         '_run-',taskname,'_TEMP_beh.csv' ]);
     writetable(T,tmpFileName);
-
+    
 end
 
 %% _________________________ 8. End Instructions _______________________________
-end_texture = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
-Screen('DrawTexture',p.ptb.window,end_texture,[],[]);
+
+Screen('DrawTexture',p.ptb.window,end_tex,[],[]);
 T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
 T.param_end_biopac(:)                     = biopac_linux_matlab(biopac, channel_trigger, 0);
 WaitKeyPress(p.keys.end);
@@ -401,24 +397,25 @@ clear p; clearvars; Screen('Close'); close all; sca;
 %         % Perform the operations/requests
 %         ljudObj.GoOne(ljhandle);
 %     end
-function [time] = biopac_linux_matlab(biopac, channel_num, state_num)
-    if biopac
-        d.setFIOState(pyargs('fioNum', int64(channel_num), 'state', int64(state_num)))
-        time = GetSecs;
-    else
-        return
+    function [time] = biopac_linux_matlab(biopac, channel_num, state_num)
+        if biopac
+            d.setFIOState(pyargs('fioNum', int64(channel_num), 'state', int64(state_num)))
+            time = GetSecs;
+        else
+            time = GetSecs;
+            return
+        end
     end
-end
 
     function WaitKeyPress(kID)
         while KbCheck(-3); end  % Wait until all keys are released.
-
+        
         while 1
             % Check the state of the keyboard.
             [ keyIsDown, ~, keyCode ] = KbCheck(-3);
             % If the user is pressing a key, then display its code number and name.
             if keyIsDown
-
+                
                 if keyCode(p.keys.esc)
                     cleanup; break;
                 elseif keyCode(kID)
