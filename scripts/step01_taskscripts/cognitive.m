@@ -171,16 +171,16 @@ for trl = 1:length(countBalMat.cue_type)
         cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
         cue_image = fullfile(cue_high_dir,countBalMat.cue_image{trl});
     end
-    
+
     % expect image texture
     cue_tex{trl}                          = Screen('MakeTexture', p.ptb.window, imread(cue_image));
-    
+
     % mental rotation texture
     image_filepath = fullfile(main_dir,'stimuli','cognitive');
     image_filename = char(countBalMat.image_filename(trl));
     image_rotation = fullfile(image_filepath,image_filename);
     rotation_tex{trl} = Screen('MakeTexture', p.ptb.window, imread(image_rotation));
-    
+
     % instruction, actual texture
     actual_tex = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
     start_tex = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
@@ -219,7 +219,7 @@ WaitSecs(TR*6);
 
 %% ___________________________ 0. Experimental loop ____________________________
 for trl = 1:size(countBalMat,1)
-    
+
     %% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
     jitter1 = countBalMat.ISI1(trl);
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
@@ -229,10 +229,10 @@ for trl = 1:size(countBalMat,1)
     WaitSecs(jitter1);
     jitter1_end                           = biopac_linux_matlab(biopac, channel_fixation_1, 0);
     T.event01_fixation_duration(trl)      = jitter1_end - T.event01_fixation_onset(trl);
-    
-    
+
+
     %% ________________________________ 2. cue 1s __________________________________
-    
+
     Screen('DrawTexture', p.ptb.window, cue_tex{trl}, [], [], 0);
     T.event02_cue_onset(trl)              = Screen('Flip',p.ptb.window);
     T.event02_cue_biopac(trl)             = biopac_linux_matlab(biopac, channel_cue, 1);
@@ -240,10 +240,10 @@ for trl = 1:size(countBalMat,1)
     biopac_linux_matlab(biopac, channel_cue, 0);
     %T.event02_cue_type{trl}               = countBalMat.cue_type{trl};
     %T.event02_cue_filename{trl}           = countBalMat.cue_image{trl};
-    
-    
+
+
     %% __________________________ 3. expectation rating ____________________________
-    
+
     Screen('TextSize', p.ptb.window, 36);
     T.event03_expect_biopac(trl)          = biopac_linux_matlab(biopac, channel_expect, 1);
     [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cue_tex{trl},'expect');
@@ -252,7 +252,7 @@ for trl = 1:size(countBalMat,1)
     T.event03_expect_displayonset(trl)    = rating_onset;
     T.event03_expect_responseonset(trl)   = buttonPressOnset;
     T.event03_expect_RT(trl)              = RT;
-    
+
     %% _________________________ 4. Fixtion Jitter 0-2 sec _________________________
     jitter2 = countBalMat.ISI2(trl);
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
@@ -262,14 +262,14 @@ for trl = 1:size(countBalMat,1)
     WaitSecs(jitter2);
     end_jitter2                           = biopac_linux_matlab(biopac, channel_fixation_2, 0);
     T.event04_fixation_duration(trl)      = end_jitter2- T.event04_fixation_onset(trl);
-    
-    
+
+
     %% ____________________________ 5. cognitive ___________________________________
     respToBeMade = true;
-    
+
     % 5-1. present rotate image ____________________________________________________
     Screen('DrawTexture', p.ptb.window, rotation_tex{trl}, [], [], 0);
-    
+
     % 5-2. present scale lines _____________________________________________________
     Yc = 180; % Y coord
     cDist = 20; % vertical line depth
@@ -278,7 +278,7 @@ for trl = 1:size(countBalMat,1)
     lineCoords = [lXc lXc lXc rXc rXc rXc; Yc-cDist Yc+cDist Yc Yc Yc-cDist Yc+cDist];
     % Screen('DrawLines', p.ptb.window, lineCoords,...
     % p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-    
+
     % 5-3. present same diff text __________________________________________________
     textDiff = 'Diff';
     textSame = 'Same';
@@ -288,13 +288,13 @@ for trl = 1:size(countBalMat,1)
     Screen('TextSize', p.ptb.window, 48);
     DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
     DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
-    
+
     % 5-4. flip screen _____________________________________________________________
     timing.initialized = Screen('Flip',p.ptb.window);
     T.event05_administer_displayonset(trl)       = timing.initialized;
     T.event05_administer_biopac(trl)      = biopac_linux_matlab(biopac, channel_administer, 1);
-    
-    
+
+
     while GetSecs - timing.initialized < task_duration
         response = 99;
         % 5-5. key press _____________________________________________________________
@@ -308,16 +308,16 @@ for trl = 1:size(countBalMat,1)
             DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, [255 0 0]);
             Screen('DrawTexture', p.ptb.window, rotation_tex{trl}, [], [], 0);
             Screen('Flip',p.ptb.window);
-            
+
             WaitSecs(0.5);
-            
+
             %remainder_time = task_duration-0.5-RT;
             Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
                 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
             Screen('Flip', p.ptb.window);
             biopac_linux_matlab(biopac, channel_fixation_2, 1);
             %WaitSecs(remainder_time);
-            
+
         elseif buttonpressed(3)%     elseif keyCode(p.keys.right)
             RT = GetSecs - timing.initialized;
             response = 2;
@@ -327,7 +327,7 @@ for trl = 1:size(countBalMat,1)
             Screen('DrawTexture', p.ptb.window, rotation_tex{trl}, [], [], 0);
             Screen('Flip',p.ptb.window);
             WaitSecs(0.5);
-            
+
             % fill in with fixation cross
             %remainder_time = task_duration-0.5-RT;
             Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
@@ -342,7 +342,7 @@ for trl = 1:size(countBalMat,1)
     T.event05_administer_response(trl)       = response;
     T.event05_administer_reseponseonset(trl) = GetSecs;
     T.event05_administer_RT(trl)             = RT;
-    
+
     %% ________________________ 6. post evaluation rating __________________________
     Screen('TextSize', p.ptb.window, 36);
     T.event06_actual_biopac(trl)          = biopac_linux_matlab(biopac, channel_actual, 1);
@@ -352,7 +352,7 @@ for trl = 1:size(countBalMat,1)
     T.event06_actual_onset(trl)              = rating_onset;
     T.event06_actual_responseonset(trl)      = buttonPressOnset;
     T.event06_actual_RT(trl)                 = RT;
-    
+
     %% _________________________ 7. temporarily save file _______________________
     tmp_file_name = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
     writetable(T,tmp_file_name);
@@ -389,19 +389,19 @@ save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
 
 clear p; clearvars; Screen('Close'); close all; sca;
-
+d.close()
 %% -----------------------------------------------------------------------------
 %                                Function
 % ______________________________________________________________________________
     function WaitKeyPress(kID)
         while KbCheck(-3); end  % Wait until all keys are released.
-        
+
         while 1
             % Check the state of the keyboard.
             [ keyIsDown, ~, keyCode ] = KbCheck(-3);
             % If the user is pressing a key, then display its code number and name.
             if keyIsDown
-                
+
                 if keyCode(p.keys.esc)
                     cleanup; break;
                 elseif keyCode(kID)

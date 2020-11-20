@@ -32,7 +32,6 @@ end
 
 
 
-cd(task_dir);
 
 % biopac channel
 channel_trigger    = 0;
@@ -84,7 +83,7 @@ bids_string                    = [strcat('spacetop_task-social'),...
     strcat('_sub-', sprintf('%04d', sub)), ...
     '_run-',taskname];
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
-    'beh' , strcat('ses-',sprintf('%02d', session)));
+    strcat('ses-',sprintf('%02d', session)), 'beh' );
 repo_save_dir = fullfile(repo_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
     'task-social');
 
@@ -175,14 +174,14 @@ for trl = 1:length(countBalMat.cue_type)
         cue_high_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname],'sch');
         cue_image = fullfile(cue_high_dir,countBalMat.cue_image{trl});
     end
-    
+
     cue_tex{trl} = Screen('MakeTexture', p.ptb.window, imread(cue_image));
     actual_tex      = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
     start_tex       = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
     end_tex         = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
     DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(countBalMat.cue_type))),'center','center',p.ptb.white);
     Screen('Flip',p.ptb.window);
-    
+
 end
 
 %% -----------------------------------------------------------------------------
@@ -217,7 +216,7 @@ for trl = 1:size(countBalMat,1)
     disp(trl)
     ip = ip_address;
     port = 20121;
-    
+
     %% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
     jitter1 = countBalMat.ISI1(trl);
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
@@ -227,9 +226,9 @@ for trl = 1:size(countBalMat,1)
     WaitSecs(jitter1);
     jitter1_end                           = biopac_linux_matlab(biopac, channel_fixation_1, 0);
     T.event01_fixation_duration(trl)      = jitter1_end - T.event01_fixation_onset(trl);
-    
+
     %% ________________________________ 2. cue 1s __________________________________
-    
+
     Screen('DrawTexture', p.ptb.window, cue_tex{trl}, [], [], 0);
     T.event02_cue_onset(trl)            = Screen('Flip',p.ptb.window);
     T.event02_cue_biopac(trl)             = biopac_linux_matlab(biopac, channel_cue, 1);
@@ -239,10 +238,10 @@ for trl = 1:size(countBalMat,1)
     biopac_linux_matlab(biopac, channel_cue, 0);
     T.event02_cue_type{trl}             = countBalMat.cue_type{trl};
     T.event02_cue_filename{trl}         = countBalMat.cue_image{trl};
-    
-    
+
+
     %% __________________________ 3. expectation rating ____________________________
-    
+
     Screen('TextSize', p.ptb.window, 36);
     T.event03_expect_biopac(trl)          = biopac_linux_matlab(biopac, channel_expect, 1);
     [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cue_tex{trl},'expect');
@@ -251,10 +250,10 @@ for trl = 1:size(countBalMat,1)
     T.event03_expect_onset(trl)         = rating_onset;
     T.event03_expect_responseonset(trl) = buttonPressOnset;
     T.event03_expect_RT(trl)            = RT;
-    
-    
+
+
     %% _________________________ 4. Fixtion Jitter 0-2 sec _________________________
-    
+
     jitter2 = countBalMat.ISI2(trl);
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
@@ -263,7 +262,7 @@ for trl = 1:size(countBalMat,1)
     WaitSecs(jitter2);
     end_jitter2                           = biopac_linux_matlab(biopac, channel_fixation_2, 0);
     T.event04_fixation_duration(trl)      = end_jitter2 - T.event04_fixation_onset(trl) ;
-    
+
     %% ____________________________ 5. pain ___________________________________
     main(ip, port, 4, temp); %start trigger
     %     T.event05_administer_displayonset(trl) = GetSecs;
@@ -274,7 +273,7 @@ for trl = 1:size(countBalMat,1)
     WaitSecs(task_duration);
     biopac_linux_matlab(biopac, channel_administer, 0);
     T.event05_administer_type(trl) = countBalMat.administer(trl);
-    
+
     %% ________________________ 6. post evaluation rating ______________________
     Screen('TextSize', p.ptb.window, 36);
     T.event06_actual_biopac(trl)          = biopac_linux_matlab(biopac, channel_actual, 1);
@@ -284,15 +283,15 @@ for trl = 1:size(countBalMat,1)
     T.event06_actual_onset(trl)              = rating_onset;
     T.event06_actual_responseonset(trl)      = buttonPressOnset;
     T.event06_actual_RT(trl)                 = RT;
-    
-    
+
+
     %% ________________________ 7. temporarily save file _______________________
     tmpFileName = fullfile(sub_save_dir,[strcat('spacetop_task-social'),...
         strcat('_ses-',sprintf('%02d', session)),...
         strcat('_sub-', sprintf('%04d', sub)), ...
         '_run-',taskname,'_TEMP_beh.csv' ]);
     writetable(T,tmpFileName);
-    
+
 end
 
 %% _________________________ 8. End Instructions _______________________________
@@ -325,82 +324,11 @@ save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
 
 clear p; clearvars; Screen('Close'); close all; sca;
-
+d.close()
 %-------------------------------------------------------------------------------
 %                                   Function
 %-------------------------------------------------------------------------------
-%     function [t] = triggerThermode_ethernet(temp)
-% %         ip = '192.168.0.114';
-%         ip = '10.64.1.10';
-%         port = 20121;
-%         temp = temp + 50;
-%         %         main(ip, port, 1, temp);
-%         main(ip, port, 4, temp);
-%         t = GetSecs;
-%         %         main(ip, port, 5, temp);
-%     end
-%
-%     function [t] = TriggerThermodeSocial(temp, varargin)
-%         USE_BIOPAC = false;
-%
-%         for i = 1:length(varargin)
-%             switch varargin{i}
-%                 case 'USE_BIOPAC'
-%                     USE_BIOPAC = varargin{i+1};
-%             end
-%         end
-%
-%         ljasm = NET.addAssembly('LJUDDotNet');
-%         ljudObj = LabJack.LabJackUD.LJUD;
-%
-%         [~, ljhandle] = ljudObj.OpenLabJackS('LJ_dtU3', 'LJ_ctUSB', '0', true, 0);
-%         ljudObj.ePutS(ljhandle, 'LJ_ioPIN_CONFIGURATION_RESET', 0, 0, 0);
-%
-%         % calculate byte code
-%         % Integer values are simply converted to binary, non integer values are
-%         % incremented by 128 and converted to binary. So 45 is bin(45) while
-%         % 45.5 is bin(45+128).
-%         temp = temp + 50;
-%         % temp = temp + 100;
-%         if(mod(temp,1))
-%             % note: this will treat all decimal values the same. Specific
-%             % temperature mapping is determined in PATHWAY software
-%             temp = floor(temp) + 128;
-%         end
-%         bytecode=sprintf('%08.0f',str2double(dec2bin(temp)))-'0';
-%
-%         for i=0:7
-%             % Initiate FIO0 to FIO7 output
-%             ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT',i, bytecode(i+1), 0, 0);
-%
-%             if USE_BIOPAC
-%                 % Initiate CIO3 and EIO7 output (biopac)
-%                 ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8, bytecode(i+1), 0, 0);
-%             end
-%         end
-%
-%         % Wait for 1 second. The delay is performed in the U3 hardware, and delay time is in microseconds.
-%         % Valid delay values are 0 to 4194176 microseconds, and resolution is 128 microseconds.
-%         ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_WAIT', 0, 1000000, 0, 0);
-%
-%
-%
-%         for i=0:7
-%             % Terminate FIO0 to FIO7 output (reset to 0)
-%             ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i, 0, 0, 0);
-%
-%             if USE_BIOPAC
-%                 % Terminate CIO3 and EIO7 output (reset to 0)
-%                 % Note: this sends a binary code to biopac channels (likely
-%                 % D8-D15).
-%                 ljudObj.AddRequestS(ljhandle, 'LJ_ioPUT_DIGITAL_BIT', i+8,0, 0, 0);
-%             end
-%         end
-%
-%         t = GetSecs;
-%         % Perform the operations/requests
-%         ljudObj.GoOne(ljhandle);
-%     end
+
     function [time] = biopac_linux_matlab(biopac, channel_num, state_num)
         if biopac
             d.setFIOState(pyargs('fioNum', int64(channel_num), 'state', int64(state_num)))
@@ -413,13 +341,13 @@ clear p; clearvars; Screen('Close'); close all; sca;
 
     function WaitKeyPress(kID)
         while KbCheck(-3); end  % Wait until all keys are released.
-        
+
         while 1
             % Check the state of the keyboard.
             [ keyIsDown, ~, keyCode ] = KbCheck(-3);
             % If the user is pressing a key, then display its code number and name.
             if keyIsDown
-                
+
                 if keyCode(p.keys.esc)
                     cleanup; break;
                 elseif keyCode(kID)
