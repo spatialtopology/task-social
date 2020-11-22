@@ -22,13 +22,19 @@ channel_administer = 5;
 channel_actual     = 6;
 
 if biopac == 1
-    script_dir = pwd;
-    cd('/home/spacetop/repos/labjackpython');
+
+
     pe = pyenv;
-    py.importlib.import_module('u3');
+    if pe.Status ~= "Loaded"
+        script_dir = pwd;
+        cd('/home/spacetop/repos/labjackpython');
+        py.importlib.import_module('u3');
+        d = py.u3.U3();
+        fprintf("u3 loaded");
+        endccc
     % Check to see if u3 was imported correctly
     % py.help('u3')
-    d = py.u3.U3();
+    % d = py.u3;
     % set every channel to 0
     d.configIO(pyargs('FIOAnalog', int64(0), 'EIOAnalog', int64(0)));
     for FIONUM = 0:7
@@ -127,7 +133,7 @@ vnames = {'src_subject_id', 'session_id', 'param_run_num','param_counterbalance_
     'param_cond_type','param_trigger_onset','param_start_biopac'...
     'event01_fixation_onset','event01_fixation_biopac','event01_fixation_duration',...
     'event02_cue_onset','event02_cue_biopac','event02_cue_type','event02_cue_filename',...
-    'event04_expect_displayonset','event03_expect_biopac','event03_expect_responseonset','event03_expect_RT', ...
+    'event03_expect_displayonset','event03_expect_biopac','event03_expect_responseonset','event03_expect_RT', ...
     'event04_fixation_onset','event04_fixation_biopac','event04_fixation_duration',...
     'event05_administer_type','event05_administer_filename','event05_administer_onset','event05_administer_biopac',...
     'event06_actual_displayonset','event06_actual_biopac','event06_actual_responseonset','event06_actual_RT', ...
@@ -259,7 +265,7 @@ T.param_start_biopac(:)                   = biopac_linux_matlab(biopac, channel_
 % WaitSecs(TR*6);
 
 %% 0. Experimental loop ________________________________________________________
-for trl = 1:size(countBalMat,1)
+for trl = 1:2%size(countBalMat,1)
 
     %% _________________________ 1. Fixtion Jitter 0-4 sec _____________________
      jitter1 = countBalMat.ISI1(trl);
