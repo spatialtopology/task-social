@@ -107,7 +107,7 @@ vnames = {'src_subject_id', 'session_id','param_run_num','param_counterbalance_v
     'param_cond_type','param_trigger_onset','param_start_biopac',...
     'event01_fixation_onset','event01_fixation_biopac','event01_fixation_duration',...
     'event02_cue_onset','event02_cue_biopac','event02_cue_type','event02_cue_filename',...
-    'event03_expect_displayonset','event03_rating_biopac','event03_expect_responseonset','event03_expect_RT', ...
+    'event03_expect_displayonset','event03_expect_biopac','event03_expect_responseonset','event03_expect_RT', ...
     'event04_fixation_onset','event04_fixation_biopac','event04_fixation_duration',...
     'event05_administer_type','event05_administer_displayonset','event05_administer_biopac',...
     'event06_actual_onset','event06_actual_biopac','event06_actual_responseonset','event06_actual_RT',...
@@ -163,7 +163,7 @@ instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 
 HideCursor;
 
-% H. Make Images Into Textures ________________________________________________
+%% H. Make Images Into Textures ________________________________________________
 DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n0%% complete'),'center','center',p.ptb.white );
 Screen('Flip',p.ptb.window);
 for trl = 1:length(countBalMat.cue_type)
@@ -179,6 +179,7 @@ for trl = 1:length(countBalMat.cue_type)
     actual_tex      = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
     start_tex       = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
     end_tex         = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+
     DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(countBalMat.cue_type))),'center','center',p.ptb.white);
     Screen('Flip',p.ptb.window);
 
@@ -218,12 +219,13 @@ for trl = 1:size(countBalMat,1)
     port = 20121;
 
     %% _________________________ 1. Fixtion Jitter 0-4 sec _________________________
-    jitter1 = countBalMat.ISI1(trl);
+    %jitter1 = countBalMat.ISI1(trl);
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-    T.event01_fixation_onset(trl)     = Screen('Flip', p.ptb.window);
+    T.event01_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
     T.event01_fixation_biopac(trl)        = biopac_linux_matlab(biopac, channel_fixation_1, 1);
-    WaitSecs(jitter1);
+    %WaitSecs(jitter1);
+    WaitSecs('UntilTime', T.event01_fixation_onset(trl) + countBalMat.ISI1(trl));
     jitter1_end                           = biopac_linux_matlab(biopac, channel_fixation_1, 0);
     T.event01_fixation_duration(trl)      = jitter1_end - T.event01_fixation_onset(trl);
 
@@ -234,7 +236,7 @@ for trl = 1:size(countBalMat,1)
     T.event02_cue_biopac(trl)             = biopac_linux_matlab(biopac, channel_cue, 1);
     temp = countBalMat.administer(trl) + 49;
     main(ip, port, 1, temp);
-    WaitSecs(1.00);
+    WaitSecs('UntilTime', T.event01_fixation_onset(trl) + countBalMat.ISI1(trl) + 1.00);
     biopac_linux_matlab(biopac, channel_cue, 0);
     T.event02_cue_type{trl}             = countBalMat.cue_type{trl};
     T.event02_cue_filename{trl}         = countBalMat.cue_image{trl};
@@ -247,7 +249,7 @@ for trl = 1:size(countBalMat,1)
     [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(4,p,cue_tex{trl},'expect');
     biopac_linux_matlab(biopac, channel_expect, 0);
     rating_Trajectory{trl,1} = trajectory;
-    T.event03_expect_onset(trl)         = rating_onset;
+    T.event03_expect_displayonset(trl)         = rating_onset;
     T.event03_expect_responseonset(trl) = buttonPressOnset;
     T.event03_expect_RT(trl)            = RT;
 
@@ -259,18 +261,22 @@ for trl = 1:size(countBalMat,1)
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     T.event04_fixation_onset(trl) = Screen('Flip', p.ptb.window);
     T.event04_fixation_biopac(trl)        = biopac_linux_matlab(biopac, channel_fixation_2, 1);
-    WaitSecs(jitter2);
+    %WaitSecs(jitter2);
+    WaitSecs('UntilTime', T.event04_fixation_onset(trl)  + countBalMat.ISI2(trl));
     end_jitter2                           = biopac_linux_matlab(biopac, channel_fixation_2, 0);
     T.event04_fixation_duration(trl)      = end_jitter2 - T.event04_fixation_onset(trl) ;
 
     %% ____________________________ 5. pain ___________________________________
     main(ip, port, 4, temp); %start trigger
+    T.delay_between_medoc(trl) = GetSecs - end_jitter2 ;
     %     T.event05_administer_displayonset(trl) = GetSecs;
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+
     T.event05_administer_displayonset(trl) = Screen('Flip', p.ptb.window);
     T.event05_administer_biopac(trl)      = biopac_linux_matlab(biopac, channel_administer, 1);
-    WaitSecs(task_duration);
+    WaitSecs('UntilTime', T.event05_administer_displayonset(trl) + 6.50);
+    % WaitSecs(task_duration);
     biopac_linux_matlab(biopac, channel_administer, 0);
     T.event05_administer_type(trl) = countBalMat.administer(trl);
 
@@ -299,9 +305,9 @@ end
 Screen('DrawTexture',p.ptb.window,end_tex,[],[]);
 T.param_end_instruct_onset(:) = Screen('Flip',p.ptb.window);
 T.param_end_biopac(:)                     = biopac_linux_matlab(biopac, channel_trigger, 0);
-WaitKeyPress(p.keys.end);
-T.param_experiment_duration(:)        = T.param_end_instruct_onset(1) - T.param_trigger_onset(1);
 
+T.param_experiment_duration(:)        = T.param_end_instruct_onset(1) - T.param_trigger_onset(1);
+WaitKeyPress(p.keys.end);
 
 %% _________________________ 9. save parameter _________________________________
 
@@ -322,9 +328,9 @@ psychtoolbox_saveFileName = fullfile(sub_save_dir, [bids_string,'_psychtoolbox_p
 psychtoolbox_repoFileName = fullfile(repo_save_dir, [bids_string,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
-
+d.close();
 clear p; clearvars; Screen('Close'); close all; sca;
-d.close()
+
 %-------------------------------------------------------------------------------
 %                                   Function
 %-------------------------------------------------------------------------------

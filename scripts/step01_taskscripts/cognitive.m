@@ -388,8 +388,9 @@ psychtoolbox_repoFileName = fullfile(repo_save_dir, [bids_string,'_psychtoolbox_
 save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
 
+d.close();
 clear p; clearvars; Screen('Close'); close all; sca;
-d.close()
+
 %% -----------------------------------------------------------------------------
 %                                Function
 % ______________________________________________________________________________
