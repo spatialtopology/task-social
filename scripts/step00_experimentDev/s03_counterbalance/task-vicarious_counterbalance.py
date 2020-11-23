@@ -17,13 +17,13 @@ def noConsecutiveShuffle(list_key, list_dict, consec_num):
 
     while orderTest == False:
         for i in range(len(list_key)):
-            # if ''.join(list_key).count('same'* consec_num) > 0 or ''.join(list_key).count('diff' * consec_num) >0:
-            if ''.join(list_key).count('c1'* consec_num) > 0 or \
-            ''.join(list_key).count('c2' * consec_num) >0 or \
-            ''.join(list_key).count('c3' * consec_num) >0 or \
-            ''.join(list_key).count('c4' * consec_num) >0 or \
-            ''.join(list_key).count('c5' * consec_num) >0 or \
-            ''.join(list_key).count('c6' * consec_num) >0:
+            if ''.join(list_key).count('low'* consec_num) > 0 or ''.join(list_key).count('high' * consec_num) >0:
+            # if ''.join(list_key).count('c1'* consec_num) > 0 or \
+            # ''.join(list_key).count('c2' * consec_num) >0 or \
+            # ''.join(list_key).count('c3' * consec_num) >0 or \
+            # ''.join(list_key).count('c4' * consec_num) >0 or \
+            # ''.join(list_key).count('c5' * consec_num) >0 or \
+            # ''.join(list_key).count('c6' * consec_num) >0:
                 random.shuffle(list_key)
                 break
             else:
@@ -35,24 +35,33 @@ def noConsecutiveShuffle(list_key, list_dict, consec_num):
 
     return trialList
 
+# def generateListKey(trial_per_cond):
+#     list_stim1 = list(range(1,trial_per_cond+1))    # e.g. range(1,8)
+#     list_stim2 = list(range(trial_per_cond+1,trial_per_cond*2+1)) # e.g. range(8,15)
+#     list_stim3 = list(range(trial_per_cond*2+1, trial_per_cond*3+1 ))# e.g. range(1,8)
+#     list_stim4 = list(range(trial_per_cond*3+1, trial_per_cond*4+1 ))# e.g. range(8,15)
+#     list_stim5 = list(range(trial_per_cond*4+1, trial_per_cond*5+1 ))# e.g. range(8,15)
+#     list_stim6 = list(range(trial_per_cond*5+1, trial_per_cond*6+1 ))# e.g. range(8,15)
+#     list_dict = {'c1':list_stim1, 'c2':list_stim2, 'c3':list_stim3, 'c4':list_stim4, 'c5':list_stim5, 'c6':list_stim6}
+#     random.shuffle(list_stim1)
+#     random.shuffle(list_stim2)
+#     random.shuffle(list_stim3)
+#     random.shuffle(list_stim4)
+#     random.shuffle(list_stim5)
+#     random.shuffle(list_stim6)
+#     x = ['c1','c2', 'c3', 'c4', 'c5', 'c6']
+#     list_key  = [item for item in x for i in range(trial_per_cond)]
+#     return list_key, list_dict
+
 def generateListKey(trial_per_cond):
-    list_stim1 = list(range(1,trial_per_cond+1))    # e.g. range(1,8)
-    list_stim2 = list(range(trial_per_cond+1,trial_per_cond*2+1)) # e.g. range(8,15)
-    list_stim3 = list(range(trial_per_cond*2+1, trial_per_cond*3+1 ))# e.g. range(1,8)
-    list_stim4 = list(range(trial_per_cond*3+1, trial_per_cond*4+1 ))# e.g. range(8,15)
-    list_stim5 = list(range(trial_per_cond*4+1, trial_per_cond*5+1 ))# e.g. range(8,15)
-    list_stim6 = list(range(trial_per_cond*5+1, trial_per_cond*6+1 ))# e.g. range(8,15)
-    list_dict = {'c1':list_stim1, 'c2':list_stim2, 'c3':list_stim3, 'c4':list_stim4, 'c5':list_stim5, 'c6':list_stim6}
+    list_stim1 = list(range(1,trial_per_cond+1)) + list(range(trial_per_cond*2+1, trial_per_cond*3+1 )) + list(range(trial_per_cond*4+1, trial_per_cond*5+1 ))# e.g. range(1,8)
+    list_stim2 = list(range(trial_per_cond+1,trial_per_cond*2+1)) + list(range(trial_per_cond*3+1, trial_per_cond*4+1 )) + list(range(trial_per_cond*5+1, trial_per_cond*6+1 ))## e.g. range(8,15)
+    list_dict = {'high':list_stim1, 'low':list_stim2}
     random.shuffle(list_stim1)
     random.shuffle(list_stim2)
-    random.shuffle(list_stim3)
-    random.shuffle(list_stim4)
-    random.shuffle(list_stim5)
-    random.shuffle(list_stim6)
-    x = ['c1','c2', 'c3', 'c4', 'c5', 'c6']
-    list_key  = [item for item in x for i in range(trial_per_cond)]
+    x = ['high','low']
+    list_key  = [item for item in x for i in range(trial_per_cond*3)]
     return list_key, list_dict
-
 
 def shuffleDataFrame(df_subset, consec_num):
     list_key, list_dict = generateListKey(trial_per_cond)
@@ -124,15 +133,28 @@ for cB_ver in range(1,counterbalance_freq):
     # shuffle high/low cues ________________________________________________________
     # grab stimuli list (only allow png files in the list)
     high_cue_list = [file for file in os.listdir(dir_cue_high) if file.endswith('.png')]
-    # split high into 2 bins - we will use each bin for one block of high cues
-    # high_sample = random.sample(high_cue_list, int(cond_type*trial_per_cond/2))
-    random.shuffle(high_cue_list)
-    # high_samplehigh_cue_list[:int(cond_type*trial_per_cond/2)]
+    high_sample = random.sample(high_cue_list, cond_type*trial_per_cond)
+    random.shuffle(high_sample)
+    hCue1 = high_sample[:int(len(high_sample)/2)]
+    hCue2 = high_sample[int(len(high_sample)/2):]
+    high_cue = [hCue1, hCue2]
 
     low_cue_list = [file for file in os.listdir(dir_cue_low) if file.endswith('.png')]
     # split high into 2 bins - we will use each bin for one block of high cues
-    # low_sample = random.sample(low_cue_list, int(cond_type*trial_per_cond/2))
-    random.shuffle(low_cue_list)
+    low_sample = random.sample(low_cue_list, cond_type*trial_per_cond)
+    random.shuffle(low_sample)
+    lCue1 = low_sample[:int(len(low_sample)/2)]
+    lCue2 = low_sample[int(len(low_sample)/2):]
+    low_cue = [lCue1, lCue2]
+    # # split high into 2 bins - we will use each bin for one block of high cues
+    # # high_sample = random.sample(high_cue_list, int(cond_type*trial_per_cond/2))
+    # random.shuffle(high_cue_list)
+    # # high_samplehigh_cue_list[:int(cond_type*trial_per_cond/2)]
+    #
+    # low_cue_list = [file for file in os.listdir(dir_cue_low) if file.endswith('.png')]
+    # # split high into 2 bins - we will use each bin for one block of high cues
+    # # low_sample = random.sample(low_cue_list, int(cond_type*trial_per_cond/2))
+    # random.shuffle(low_cue_list)
 
 
     for ind, sub_list in enumerate([flattenlist1, flattenlist2]):

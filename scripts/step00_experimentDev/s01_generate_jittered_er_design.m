@@ -80,7 +80,7 @@ doplot = 1;
 % so, 20 trials/condition total across 2 5-min runs
 
 event1duration = 5;    % duration of cue
-event2duration = 11.5;    % duration of feedback
+event2duration = 10.5;    % duration of feedback
 
 trialtypes = 6;  %4      % neutral, 2 levels of loss, 2 levels of gain
 trialspertype = 6;
@@ -92,12 +92,12 @@ isidistribution = 'exponential';  % 'exponential' or 'geometric'
 ISI1min = 1;   %0        % Constraints: Psychological (can subjects process cue) and statistical (longer = less BOLD nonlinearity, which is difficult to model).
 ISI1mean = 2;     %2       % For 'exponential' only.  Includes ISImin.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
 ISI1step = .65;          % For 'geometric' only.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
-ISI1max = 4;     %4        % Truncate to avoid VERY long ISIs
+ISI1max = 6;     %4        % Truncate to avoid VERY long ISIs
 
-ISI2min = 0;   %0        % Constraints: Psychological (can subjects process cue) and statistical (longer = less BOLD nonlinearity, which is difficult to model).
-ISI2mean = 0;     %2       % For 'exponential' only.  Includes ISImin.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
+ISI2min = 0.5;   %0        % Constraints: Psychological (can subjects process cue) and statistical (longer = less BOLD nonlinearity, which is difficult to model).
+ISI2mean = 1;     %2       % For 'exponential' only.  Includes ISImin.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
 ISI2step = .65;          % For 'geometric' only.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
-ISI2max = 0;     %4        % Truncate to avoid VERY long ISIs
+ISI2max = 4;     %4        % Truncate to avoid VERY long ISIs
 %
 % ISI3min = 0;   %0        % Constraints: Psychological (can subjects process cue) and statistical (longer = less BOLD nonlinearity, which is difficult to model).
 % ISI3mean = 0;     %2       % For 'exponential' only.  Includes ISImin.  There is an optimal empirical value -- longer is better for deconvolution/FIR, but we also need to fit within total scan time constraints.
@@ -158,8 +158,8 @@ switch isidistribution
     case 'exponential'
         % truncated exponential, in sec
         % -----------------------------------
-        % ISI1 = ISI1min + exprnd(ISI1mean - ISI1min, ntrials, 1);  % one column for fixed ISI, two cols for variable
-        % ISI1(ISI1 > ISI1max) = ISI1max;
+        ISI1 = ISI1min + exprnd(ISI1mean - ISI1min, ntrials, 1);  % one column for fixed ISI, two cols for variable
+        ISI1(ISI1 > ISI1max) = ISI1max;
 
         ISI2 = ISI2min + exprnd(ISI2mean - ISI2min, ntrials, 1);  % one column for fixed ISI, two cols for variable
         ISI2(ISI2 > ISI2max) = ISI2max;
