@@ -9,11 +9,11 @@ import glob
 # ______________________________________________________________________________
 
 # parameters ___________________________________________________________________
-main_dir = '/Users/h/Dropbox/Projects/socialPain/sandbox/resources/vicariousBackPainVideos/Images'
+main_dir = '/Users/h/Dropbox/projects_dropbox/socialPain/sandbox/resources/vicariousBackPainVideos/Images'
 fps = 24 # frames per second
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 # fourcc_out = cv2.VideoWriter_fourcc(*'avc1')
-new_main_dir = '/Users/h/Dropbox/Projects/socialPain/stimuli/task-vicarious_videofps-' + '%03d' % fps + '_dur-4s'
+new_main_dir = '/Users/h/Documents/projects_local/social_influence/stimuli/task-vicarious_videofps-' + '%03d' % fps + '_dur-4s'
 # ______________________________________________________________________________
 
 
@@ -26,7 +26,7 @@ def generate_video(image_folder, video_name, save_dir, fps, fourcc, subnum_folde
                  img.endswith("png")]
 
 # identify max PSPI
-    PSPI_dir = '/Users/h/Dropbox/Projects/socialPain/sandbox/resources/vicariousBackPainVideos/Frame_Labels/PSPI'
+    PSPI_dir = '/Users/h/Dropbox/projects_dropbox/socialPain/sandbox/resources/vicariousBackPainVideos/Frame_Labels/PSPI'
     PSPI_path = os.path.join(PSPI_dir, subnum_folder, af_fldr)
     path = os.sep.join([PSPI_path, '*.txt'])
 
@@ -47,9 +47,10 @@ def generate_video(image_folder, video_name, save_dir, fps, fourcc, subnum_folde
     # create images with 96 frames around maximum PSPI
     if max_ind  > 48:
         new_images = images[max_ind-48:max_ind+48]
+        new_images.sort()
     elif max_ind  <=48:
         new_images = images[0:96]
-    new_images.sort()
+        new_images.sort()
     # Array images should only consider the image files ignoring others if any
     frame = cv2.imread(os.path.join(image_folder, new_images[0]))
 
@@ -72,11 +73,12 @@ def generate_video(image_folder, video_name, save_dir, fps, fourcc, subnum_folde
 # 1. resizing images______________________________________________________________________________
 # Checking the current directory path
 
-subjects = ['042-ll042','043-jh043','047-jl047','048-aa048','049-bm049',
-'052-dr052','059-fn059','064-ak064','066-mg066','080-bn080','092-ch092',
-'095-tv095','096-bg096','097-gf097','101-mg101','103-jk103','106-nm106',
-'107-hs107','108-th108','109-ib109','115-jy115','120-kz120','121-vw121',
-'123-jh123','124-dn124']
+# subjects = ['042-ll042','043-jh043','047-jl047','048-aa048','049-bm049',
+# '052-dr052','059-fn059','064-ak064','066-mg066','080-bn080','092-ch092',
+# '095-tv095','096-bg096','097-gf097','101-mg101','103-jk103','106-nm106',
+# '107-hs107','108-th108','109-ib109','115-jy115','120-kz120','121-vw121',
+# '123-jh123','124-dn124']
+subjects = ['049-bm049']
 
 for subnum, sub_fldr in enumerate(subjects):
     individual_video_list = os.sep.join([main_dir, sub_fldr]) # individual_video_list example : '~/vicariousBackPainVideos/Images/042-ll042'
