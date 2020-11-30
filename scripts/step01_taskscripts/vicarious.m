@@ -306,8 +306,8 @@ end
 
 
 %% _________________________ 8. End Instructions _______________________________
-end_texture                               = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
-Screen('DrawTexture',p.ptb.window,end_texture,[],[]);
+% end_texture                               = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+Screen('DrawTexture',p.ptb.window,end_tex,[],[]);
 T.param_end_instruct_onset(:)             = Screen('Flip',p.ptb.window);
 T.param_end_biopac(:)                     = biopac_linux_matlab(biopac, channel_trigger, 0);
 WaitKeyPress(p.keys.end);
@@ -332,8 +332,8 @@ psychtoolbox_saveFileName = fullfile(sub_save_dir, [bids_string,'_psychtoolbox_p
 psychtoolbox_repoFileName = fullfile(repo_save_dir, [bids_string,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
-d.close();
-clear p; Screen('Close'); close all; sca;
+if biopac;d.close();end
+clear p; clearvars; Screen('Close'); close all; sca;
 
 %% -----------------------------------------------------------------------------
 %                                   Function
