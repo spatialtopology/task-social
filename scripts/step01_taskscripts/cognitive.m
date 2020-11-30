@@ -300,7 +300,8 @@ for trl = 1:size(countBalMat,1)
         % 5-5. key press _____________________________________________________________
         [~,~,buttonpressed] = GetMouse;
         FlushEvents('keyDown');
-        if buttonpressed(1) % equivalent of elseif keyCode(p.keys.left)
+        count = 0;
+        if buttonpressed(1)% equivalent of elseif keyCode(p.keys.left)
             RT = GetSecs - timing.initialized;
             response = 1;
             biopac_linux_matlab(biopac, channel_administer, 0);
@@ -316,7 +317,8 @@ for trl = 1:size(countBalMat,1)
                 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
             Screen('Flip', p.ptb.window);
             biopac_linux_matlab(biopac, channel_fixation_2, 1);
-            %WaitSecs(remainder_time);
+            WaitSecs('UntilTime', timing.initialized + 6.5)
+            count = count + 1;
 
         elseif buttonpressed(3)%     elseif keyCode(p.keys.right)
             RT = GetSecs - timing.initialized;
@@ -334,7 +336,8 @@ for trl = 1:size(countBalMat,1)
                 p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
             Screen('Flip', p.ptb.window);
             biopac_linux_matlab(biopac, channel_fixation_2, 1);
-            %WaitSecs(remainder_time);
+            WaitSecs('UntilTime', timing.initialized + 6.5);
+            count = count +1;
         end
     end
     biopac_linux_matlab(biopac, channel_administer, 0);
