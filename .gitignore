@@ -7,4 +7,5 @@ scripts/step00_experimentDev/create_socialcues/.ipynb_checkpoints/Untitled-check
 scripts/step00_experimentDev/create_socialcues/.ipynb_checkpoints/create_social_ratings_ver-02-checkpoint.ipynb
 scripts/step02_calculateDegrees/.ipynb_checkpoints/
 design/jitter
-design/counterbalance/
+design/counterbalance
+data
