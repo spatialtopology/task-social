@@ -1,7 +1,22 @@
 function [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(duration, p, scale_tex, rating_type, biopac, channel, channel_type)
 
+%% Phil Kragel 6/20/2019
 % global screenNumber window windowRect xCenter yCenter screenXpixels screenYpixels
 % shows a circular rating scale and records mouse position
+
+% Note - this function call a new instance of PTB
+% you likely wont want to use it this way in a paradigm
+% just copy paste the relevant sections or use this as a subfunction
+% initializing screen
+%
+% You will need PTB installed for this to work.
+%
+% [trajectory, dspl,cursor] = circular_rating(3);
+% figure; comet(trajectory(:,1),trajectory(:,2))
+%
+
+%% edited Heejung Jung 7/26/2019  allows to show different rating scales (expect, actual)
+% edited Heejung Jung 11/25/2020 biopac parameters
 %
 % [ Input ]
 % * duration             - length of response period in seconds)
@@ -16,21 +31,7 @@ function [trajectory, display_onset, RT, response_onset, biopac_display_onset] =
 % * response_onset       - button press reaction time = response_onset - display_onset
 % * biopac_display_onset - the time that the scale_tex was flipped and was registered in Biopac
 %
-% Note - this function call a new instance of PTB
-% you likely wont want to use it this way in a paradigm
-% just copy paste the relevant sections or use this as a subfunction
-% initializing screen
-%
-% You will need PTB installed for this to work.
-%
-% [trajectory, dspl,cursor] = circular_rating(3);
-% figure; comet(trajectory(:,1),trajectory(:,2))
-%
-% Phil Kragel 6/20/2019
-% edited Heejung Jung 7/26/2019  allows to show different rating scales (expect, actual)
-% edited Heejung Jung 11/25/2020 biopac parameters
-%
-% Additions ________________
+% Additions ________________________________________________________________________________
 % 1. duration:    length of rating scale, NOTE that the duration is filled with a fixation
 %                 once the participant incidates a response.
 %                 e.g. * experimenter fixes rating duration to 4 sec.
