@@ -1,9 +1,20 @@
-function [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_output(duration, p, scale_tex, rating_type)
+function [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(duration, p, scale_tex, rating_type, biopac, channel, channel_type)
+
 % global screenNumber window windowRect xCenter yCenter screenXpixels screenYpixels
 % shows a circular rating scale and records mouse position
 %
-% Input: duration - length of response period in seconds)
-% Output: trajectory - n samples x 2 matrix (x coord, y coord)
+% [ Input ]
+% * duration             - length of response period in seconds)
+% * p                    - psychtoolbox window parameters
+% * scale_tex            - rating scale texture (for the social influence task, there are two rating scales
+%                                     "expect" one is the rating scale layered with social cues,
+%                                     "actual" one is an empty rating scale)
+% [ Output ]
+% * trajectory           - n samples x 2 matrix (x coord, y coord)
+% * display_onset        - the time that the scale_tex was flipped
+% * response_onset       - the time that the pariticpant pressed the mouse button
+% * response_onset       - button press reaction time = response_onset - display_onset
+% * biopac_display_onset - the time that the scale_tex was flipped and was registered in Biopac
 %
 % Note - this function call a new instance of PTB
 % you likely wont want to use it this way in a paradigm
@@ -16,7 +27,8 @@ function [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_outp
 % figure; comet(trajectory(:,1),trajectory(:,2))
 %
 % Phil Kragel 6/20/2019
-% edited Heejung Jung 7/26/2019
+% edited Heejung Jung 7/26/2019  allows to show different rating scales (expect, actual)
+% edited Heejung Jung 11/25/2020 biopac parameters
 %
 % Additions ________________
 % 1. duration:    length of rating scale, NOTE that the duration is filled with a fixation
@@ -37,8 +49,14 @@ function [trajectory, rating_onset, RT, buttonPressOnset] = circular_rating_outp
 
 SAMPLERATE = .01; % used in continuous ratings
 TRACKBALL_MULTIPLIER=1;
+
+
+trajectory = NaN;
+display_onset= NaN;
 RT = NaN;
-buttonPressOnset = NaN;
+response_onset = NaN;
+biopac_display_onset = NaN;
+
 
 HideCursor;
 
@@ -74,13 +92,14 @@ cursor.xcenter = ceil(dspl.cscale.rect(1) + (dspl.cscale.rect(3) - dspl.cscale.r
 cursor.ycenter = ceil(dspl.cscale.rect(2) + (dspl.cscale.rect(4)-dspl.cscale.rect(2))*0.847);
 
 RATINGTITLES = {'INTENSITY'};
-
+biopac_linux_matlab(biopac, channel, channel_type, 0);
 
 % initialize
 Screen('TextSize',p.ptb.window,72);
 DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
-timing.initialized = Screen('Flip',p.ptb.window);
-rating_onset = timing.initialized;
+display_onset = Screen('Flip',p.ptb.window);
+biopac_display_onset = biopac_linux_matlab(biopac, channel, channel_type, 1);
+
 
 cursor.x = cursor.xcenter;
 cursor.y = cursor.ycenter;
@@ -92,14 +111,14 @@ buttonpressed  = false;
 rlim = 250;
 xlim = cursor.xcenter;
 ylim = cursor.ycenter;
-while (GetSecs-timing.initialized) <  duration
+while (GetSecs-display_onset) <  duration
 
     loopstart = GetSecs;
 
     % sample at SAMPLERATE
     if loopstart >= nextsample
         ctime(sample) = loopstart; %#ok
-        trajectory(sample,1) = cursor.x; %#ok
+        trajectory(sample,1) = cursor.x;
         trajectory(sample,2) = cursor.y;
         nextsample = nextsample+SAMPLERATE;
         sample = sample+1;
@@ -136,8 +155,9 @@ while (GetSecs-timing.initialized) <  duration
     Screen('Flip',p.ptb.window);
 
     elseif any(buttonpressed)
-       RT = GetSecs - timing.initialized;
-       buttonPressOnset = GetSecs;
+       response_onset = GetSecs;
+       RT = response_onset - display_onset;
+       biopac_linux_matlab(biopac, channel, channel_type, 0);
        buttonpressed = [0 0 0];
        Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
        DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
@@ -150,7 +170,8 @@ while (GetSecs-timing.initialized) <  duration
        Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
        p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
        Screen('Flip',p.ptb.window);
-       WaitSecs(remainder_time);
+       %WaitSecs(remainder_time);
+       WaitSecs('UntilTime', display_onset + duration);
     end
 
 end
