@@ -7,16 +7,10 @@ prompt = 'SESSION (1 or 4): ';
 session = input(prompt);
 prompt = 'PARTICIPANT (in raw number form, e.g. 1, 2,...,98): ';
 sub_num = input(prompt);
-prompt = 'BIOPAC YES=1 NO=0 : ';
+prompt = 'BIOPAC (YES=1, NO=0) : ';
 biopac = input(prompt);
-
-debug = 0; %DEBUG_MODE = 1, Actual_experiment = 0
-% pe = pyenv;
-% if pe.Status == "Loaded"
-%     break
-% else
-%     pe = pyenv;
-% end
+fMRI = 1;
+debug = 0;
 
 % 2. counterbalance version ____________________________________________________
 % random sequence
@@ -41,13 +35,13 @@ bl_ind = rem(sub_num,6);
 if session == 1
     switch bl_ind
         case 0 % p1 v1 c2 c1 v2 p2
-            task1 = 'pain'; task2 = 'vicarious'; task3 = 'cognitive';
+            task1 = 'pain'; task2 = 'vicarous'; task3 = 'cognitive';
             task1_cb = p1; task2_cb = v1; task3_cb = c2;
             task1_order = 1; task2_order = 2; task3_order = 3;
             %             pain(sub,p1,1,1);vicarious(sub,v1,2,1);cognitive(sub,c2,3,1); %cognitive(sub,c1,4);vicarious(sub,v2,5);pain(sub,p2,6);
 
         case 1 % v1 c1 p1 p2 c2 v2
-            task1 = 'vicarious'; task2 = 'cognitive';task3 = 'pain';
+            task1 = 'vicarous'; task2 = 'cognitive';task3 = 'pain';
             task1_cb = v1; task2_cb = c1; task3_cb = p2;
             task1_order = 1; task2_order = 2; task3_order = 3;
             %             vicarious(sub,v1,1,1);cognitive(sub,c1,2,1);pain(sub,p1,3,1); %pain(sub,p2,4);cognitive(sub,c2,5);vicarious(sub,v2,6);
@@ -123,9 +117,6 @@ task3_line = strcat(' .    3)  ', task3 );
 boxTop(1:length(line))='=';
 fprintf('\n%s\n\n %s\n %s\n %s\n %s\n \n%s\n',boxTop,line,task1_line,task2_line,task3_line,boxTop)
 
-% if ~exist('py_env')
-% py_env = pyenv('ExecutionMode', 'InProcess');
-% end
 % B. Directories ______________________________________________________________
 main_dir  = pwd;
 

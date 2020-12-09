@@ -85,7 +85,7 @@ taskname                       = 'pain';
 bids_string                     = [strcat('sub-', sprintf('%04d', sub)), ...
 strcat('_ses-',sprintf('%02d', session)),...
 strcat('_task-social'),...
-strcat('_run-', taskname, sprintf('%02d', run_num))];
+strcat('_run-', sprintf('%02d', run_num),'-', taskname)];
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
 strcat('ses-',sprintf('%02d', session)),...
     'beh'  );
@@ -241,7 +241,7 @@ for trl = 1:size(countBalMat,1)
     Screen('DrawTexture', p.ptb.window, cue_tex{trl}, [], [], 0);
     T.event02_cue_onset(trl)            = Screen('Flip',p.ptb.window);
     T.event02_cue_biopac(trl)             = biopac_linux_matlab(biopac, channel, channel.cue, 1);
-    temp = countBalMat.administer(trl) + 49;
+    temp = countBalMat.administer(trl) + 48;
     main(ip, port, 1, temp);
     WaitSecs('UntilTime', T.event01_fixation_onset(trl) + countBalMat.ISI1(trl) + 1.00);
     biopac_linux_matlab(biopac, channel, channel.cue, 0);

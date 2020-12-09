@@ -83,7 +83,7 @@ taskname                       = 'vicarious';
 bids_string                     = [strcat('sub-', sprintf('%04d', sub)), ...
 strcat('_ses-',sprintf('%02d', session)),...
 strcat('_task-social'),...
-strcat('_run-', taskname, sprintf('%02d', run_num))];
+strcat('_run-', sprintf('%02d', run_num),'-', taskname)];
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
 strcat('ses-',sprintf('%02d', session)),...
     'beh'  );
@@ -180,6 +180,7 @@ DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n0%% complete'),'center','cent
 Screen('Flip',p.ptb.window);
 
 for trl = 1:length(countBalMat.cue_type)
+    % cue texture ______________________________________________
     if string(countBalMat.cue_type{trl}) == 'low'
         cue_low_dir = fullfile(main_dir,'stimuli','cue',['task-',taskname], 'scl');
         cue_image = fullfile(cue_low_dir,countBalMat.cue_image{trl});
@@ -188,10 +189,15 @@ for trl = 1:length(countBalMat.cue_type)
         cue_image = fullfile(cue_high_dir,countBalMat.cue_image{trl});
     end
 
+    % expect image texture ______________________________________________
     cue_tex{trl} = Screen('MakeTexture', p.ptb.window, imread(cue_image));
+
+    % vicarious video texture ______________________________________________
     video_filename  = [countBalMat.video_filename{trl}];
     video_file      = fullfile(dir_video, video_filename);
     [movie{trl}, ~, ~, imgw{trl}, imgh{trl}] = Screen('OpenMovie', p.ptb.window, video_file, [], 1);
+
+    % instruction, actual texture ______________________________________________
     actual_tex      = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
     start_tex       = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
     end_tex         = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
@@ -225,7 +231,7 @@ T.param_start_biopac(:)                   = biopac_linux_matlab(biopac, channel,
 %% ___________________________ Dummy scans ____________________________
 WaitSecs(TR*6);
 
-%% 0. Experimental loop ________________________________________________________
+%% ___________________________ 0. Experimental loop ____________________________
 for trl = 1:size(countBalMat,1)
 
     %% _________________________ 1. Fixtion Jitter 0-4 sec _____________________
@@ -247,8 +253,8 @@ for trl = 1:size(countBalMat,1)
     % WaitSecs(1.00);
     WaitSecs('UntilTime', T.event01_fixation_onset(trl) + countBalMat.ISI1(trl) + 1.00);
     biopac_linux_matlab(biopac, channel, channel.cue, 0);
-    T.event02_cue_type{trl}               = countBalMat.cue_type{trl};
-    T.event02_cue_filename{trl}           = countBalMat.cue_image{trl};
+    %T.event02_cue_type{trl}               = countBalMat.cue_type{trl};
+    %T.event02_cue_filename{trl}           = countBalMat.cue_image{trl};
 
     %% __________________________ 3. expectation rating ________________________
 
@@ -263,7 +269,7 @@ for trl = 1:size(countBalMat,1)
 
 
     %% _________________________ 4. Fixtion Jitter 0-2 sec _____________________
-    %jitter2                               = countBalMat.ISI2(trl);
+
     %     jitter2 = countBalMat.array(trl,"ISI2"); % octave
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
@@ -285,7 +291,7 @@ for trl = 1:size(countBalMat,1)
     T.event05_administer_displayonset(trl)       = movie_time;  % 4sec
     WaitSecs('UntilTime', end_jitter2 + 6.5);
     % WaitSecs((task_duration-video_length)/2);
-    T.event05_administer_type{trl}        = countBalMat.video_filename{trl};
+    %T.event05_administer_type{trl}        = countBalMat.video_filename{trl};
 
     %% ________________________ 6. post evaluation rating ______________________
 
@@ -311,9 +317,8 @@ end
 Screen('DrawTexture',p.ptb.window,end_tex,[],[]);
 T.param_end_instruct_onset(:)             = Screen('Flip',p.ptb.window);
 T.param_end_biopac(:)                     = biopac_linux_matlab(biopac, channel, channel.trigger, 0);
+T.param_experiment_duration(:)            = T.param_end_instruct_onset(1) - T.param_trigger_onset(1);
 WaitKeyPress(p.keys.end);
-T.param_experiment_duration(:) = T.param_end_instruct_onset(1) - T.param_trigger_onset(1);
-
 
 %% _________________________ 9. save parameter _________________________________
 % onset + response file
@@ -333,6 +338,7 @@ psychtoolbox_saveFileName = fullfile(sub_save_dir, [bids_string,'_psychtoolboxpa
 psychtoolbox_repoFileName = fullfile(repo_save_dir, [bids_string,'_psychtoolboxparams.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
+
 if biopac;  channel.d.close();  end
 clear p; clearvars; Screen('Close'); close all; sca;
 
