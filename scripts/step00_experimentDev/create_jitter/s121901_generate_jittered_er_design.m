@@ -80,9 +80,9 @@ doplot = 1;
 % so, 20 trials/condition total across 2 5-min runs
 
 event1duration = 5;    % duration of cue
-event2duration = 8;    % duration of feedback
+event2duration = 12;    % duration of feedback
 
-trialtypes = 6;  %4      % neutral, 2 levels of loss, 2 levels of gain
+trialtypes = 18;  %4      % neutral, 2 levels of loss, 2 levels of gain
 trialspertype = 12;
 ISI1isconstant = 0;    % ITI is constant (as opposed to jittered).
 ISI1constantvalue = 0; % in seconds, used only if ISI2isconstant
@@ -125,7 +125,7 @@ for i = 1:length(varargin)
             case 'noplot', doplot = 0;
 
             case 'event1duration', event1duration = varargin{i+1}; varargin{i+1} = [];
-            case 'event2duration', event2duration = varargin{i+1}; varargin{i+1} = [];
+            case 'event2duration', eve\nt2duration = varargin{i+1}; varargin{i+1} = [];
 
             case 'ISI1isconstant', ISI1isconstant = 1;
             case 'ISI1isvariable', ISI1isconstant = 0;
@@ -288,10 +288,10 @@ ons = [ons ons2];
 % The code for lines below is in the Wagerlab (CANlab) github repository
 % It builds the design and has tools for evaluating it as well.
 
-% X = onsets2fmridesign(ons, TR, ceil(scanlength), 'hrf');
-% %Plot it
-% create_figure('X');
-% h = plot_matrix_cols(zscore(X(:, 1:2)), 'vertical');
+X = onsets2fmridesign(ons, TR, ceil(scanlength), 'hrf');
+%Plot it
+create_figure('X');
+h = plot_matrix_cols(zscore(X(:, 1:2)), 'vertical');
 
 vifs = getvif(X);
 

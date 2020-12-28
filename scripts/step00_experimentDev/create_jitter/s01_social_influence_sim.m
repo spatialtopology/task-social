@@ -52,7 +52,7 @@ versions = 30;
 iter = 10000;
 ISI1mean = 2;
 ISI2mean = 1;
-idealLength = 576;
+idealLength = 1370;
 
 [meanrecipvif, scanduration] = deal(zeros(iter, 1));
 for ver = 1:versions
@@ -100,12 +100,12 @@ plot(scandurunder_idealLength(wh), 1./vifunderIdealLength(wh), 'ro', 'MarkerFace
 % --------------------------------------------------------------------------
 
 % diaryname = sprintf('/Users/h/Dropbox/Projects/social_influence/design/jitter/social_inf_Events_best_design_of_10000_%s.txt', strrep(datestr(datetime), ' ', '_') );
-diaryname = sprintf(['/Users/h/Documents/projects_local/social_influence/design/jitter/social_inf_Events_best_design_of_10000_ver-', num2str(ver,'%03.f'), '.txt'] );
+diaryname = sprintf(['/Users/h/Documents/projects_local/social_influence/design/1219_jitter_type1/social_inf_Events_best_design_of_10000_ver-', num2str(ver,'%03.f'), '.txt'] );
 diary(diaryname)
 print_matrix(best_design_struct.eventlist, best_design_struct.eventlist_names);
 diary off
 
-diaryname = sprintf(['/Users/h/Documents/projects_local/social_influence/design/jitter/social_inf_Events_best_design_of_10000_under_ideal_length_sec_ver-', num2str(ver,'%03.f'),'.txt'] );
+diaryname = sprintf(['/Users/h/Documents/projects_local/social_influence/design/1219_jitter_type1/social_inf_Events_best_design_of_10000_under_ideal_length_sec_ver-', num2str(ver,'%03.f'),'.txt'] );
 diary(diaryname)
 print_matrix(best_design_struct_under_idealLength.eventlist, best_design_struct_under_idealLength.eventlist_names);
 diary off

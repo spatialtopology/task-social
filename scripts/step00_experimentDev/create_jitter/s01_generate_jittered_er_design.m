@@ -83,7 +83,7 @@ event1duration = 5;    % duration of cue
 event2duration = 8;    % duration of feedback
 
 trialtypes = 6;  %4      % neutral, 2 levels of loss, 2 levels of gain
-trialspertype = 6;
+trialspertype = 12;
 ISI1isconstant = 0;    % ITI is constant (as opposed to jittered).
 ISI1constantvalue = 0; % in seconds, used only if ISI2isconstant
 

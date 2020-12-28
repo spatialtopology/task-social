@@ -80,9 +80,9 @@ doplot = 1;
 % so, 20 trials/condition total across 2 5-min runs
 
 event1duration = 5;    % duration of cue
-event2duration = 8;    % duration of feedback
+event2duration = 12;    % duration of feedback
 
-trialtypes = 6;  %4      % neutral, 2 levels of loss, 2 levels of gain
+trialtypes = 18;  %4      % neutral, 2 levels of loss, 2 levels of gain
 trialspertype = 12;
 ISI1isconstant = 0;    % ITI is constant (as opposed to jittered).
 ISI1constantvalue = 0; % in seconds, used only if ISI2isconstant
@@ -174,7 +174,7 @@ switch isidistribution
         % geometric distribution of ISIs
         % -----------------------------------
 
-        x = [ISI1min:ISIstep:ISI1max];
+        x = [ISI1min:ISI1step:ISI1max];
         p = geopdf(0:length(x)-1, .5);
 
         fprintf('Mean ISI is %3.2f\n', x*p');  % mean = 2.24 secs
