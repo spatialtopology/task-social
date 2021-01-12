@@ -28,7 +28,7 @@ cons = table2array(T)';
 % 0	0	0	0	0	0	0	0	0	0	0	0	1	0	-1	1	0	-1;
 % 0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	-1	0	-1];   % StimLvH_stim
 
-load('/Users/h/Documents/projects_local/social_influence/design_interleaved/jitter_type04/best_design_struct.mat');
+load('/Users/h/Documents/projects_local/social_influence/design_interleaved/jitter_type05/best_design_struct.mat');
 
 % con = cons';
 
