@@ -1,4 +1,4 @@
-function [trajectory, display_onset, RT, response_onset, biopac_display_onset]= circular_rating_output(duration, p, scale_tex, rating_type, channel, channel_num)
+function [trajectory, display_onset, RT, response_onset, biopac_display_onset]= circular_rating_output(duration, p, scale_tex, rating_type, biopac, channel)
 % global screenNumber window windowRect xCenter yCenter screenXpixels screenYpixels
 % shows a circular rating scale and records mouse position
 %
@@ -37,10 +37,8 @@ function [trajectory, display_onset, RT, response_onset, biopac_display_onset]= 
 
 SAMPLERATE = .01; % used in continuous ratings
 TRACKBALL_MULTIPLIER=1;
-display_onset = NaN;
 RT = NaN;
-response_onset = NaN;
-biopac_display_onset = NaN;
+buttonPressOnset = NaN;
 
 HideCursor;
 
@@ -83,7 +81,7 @@ Screen('TextSize',p.ptb.window,72);
 DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
 timing.initialized = Screen('Flip',p.ptb.window);
 display_onset = timing.initialized;
-biopac_display_onset = biopac_linux_matlab(channel, channel_num, 1);
+biopac_linux_matlab(channel, channel.actual, 0);
 
 cursor.x = cursor.xcenter;
 cursor.y = cursor.ycenter;
@@ -142,7 +140,6 @@ while (GetSecs-timing.initialized) <  duration
        RT = GetSecs - timing.initialized;
        response_onset = GetSecs;
        buttonpressed = [0 0 0];
-       biopac_linux_matlab(channel, channel_num, 0);
        Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
        DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
        % cursor changes
