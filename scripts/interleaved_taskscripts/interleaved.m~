@@ -421,8 +421,8 @@ function [resp, resp_keyname, resp_onset, RT] = cognitive_resp(p, channel, plate
       elseif buttonpressed(3)%     elseif keyCode(p.keys.right)
           resp = 2;          resp_keyname = 'right';
           biopac_linux_matlab(channel, channel.administer, 0);
-          DrawFormattedText(p.ptb.window, mr.textDiff, p.ptb.xCenter-120-90, mr.textYc, p.ptb.white);
-          DrawFormattedText(p.ptb.window, mr.textSame, p.ptb.xCenter+120, mr.textYc, [255 0 0]);
+          DrawFormattedText(p.ptb.window, textDiff, p.ptb.xCenter-120-90, textYc, p.ptb.white);
+          DrawFormattedText(p.ptb.window, textSame, p.ptb.xCenter+120, textYc, [255 0 0]);
           Screen('DrawTexture', p.ptb.window, rt, [], [], 0);
           Screen('Flip',p.ptb.window);
           WaitSecs(p.resp.remainder);
