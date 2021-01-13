@@ -6,12 +6,6 @@
 4,cognitive,50,low,low,l016.png,3,1,99,1,1,1.1,0.7,19_50.jpg,19,same,NaN,NaN,NaN
 5,cognitive,150,high,high,h042.png,32,6,99,1,1,1,0.6,34_150_R.jpg,34,different,NaN,NaN,NaN
 6,cognitive,50,low,low,l027.png,1,1,99,1,1,2.9,0.6,21_50.jpg,21,same,NaN,NaN,NaN
-0,pain,48,low,low,l014.png,1,1,99,1,1,1,0.5,NaN,NaN,NaN,NaN,NaN,NaN
-1,pain,49,med,high,h015.png,16,4,99,1,1,1.7,3.1,NaN,NaN,NaN,NaN,NaN,NaN
-2,pain,48,low,high,h001.png,8,2,99,1,1,1.7,2.9,NaN,NaN,NaN,NaN,NaN,NaN
-3,pain,48,low,low,l021.png,5,1,99,1,1,0.9,0.6,NaN,NaN,NaN,NaN,NaN,NaN
-4,pain,50,high,low,l032.png,27,5,99,1,1,1.1,0.7,NaN,NaN,NaN,NaN,NaN,NaN
-5,pain,50,high,low,l052.png,35,5,99,1,1,1,0.6,NaN,NaN,NaN,NaN,NaN,NaN
 0,vicarious,high,high,low,l012.png,29,5,99,1,1,1.6,0.5,NaN,NaN,NaN,124-dn124,dn124*H.mp4,dn124t1aiaff_H.mp4
 1,vicarious,med,med,low,l002.png,17,3,99,1,1,1.3,0.7,NaN,NaN,NaN,121-vw121,vw121*M.mp4,vw121t1aiaff_M.mp4
 2,vicarious,high,high,low,l010.png,33,5,99,1,1,1.2,0.8,NaN,NaN,NaN,049-bm049,bm049*H.mp4,bm049t2aeunaff_H.mp4
@@ -24,3 +18,9 @@
 9,vicarious,med,med,high,h038.png,18,4,99,1,1,1.5,0.9,NaN,NaN,NaN,047-jl047,jl047*M.mp4,jl047t1aiunaff_M.mp4
 10,vicarious,high,high,low,l006.png,27,5,99,1,1,3.2,0.6,NaN,NaN,NaN,052-dr052,dr052*H.mp4,dr052t1aiaff_H.mp4
 11,vicarious,med,med,low,l016.png,15,3,99,1,1,3,2.3,NaN,NaN,NaN,049-bm049,bm049*M.mp4,bm049t2aeaff_M.mp4
+0,pain,48,low,low,l014.png,1,1,99,1,1,1,0.5,NaN,NaN,NaN,NaN,NaN,NaN
+1,pain,49,med,high,h015.png,16,4,99,1,1,1.7,3.1,NaN,NaN,NaN,NaN,NaN,NaN
+2,pain,48,low,high,h001.png,8,2,99,1,1,1.7,2.9,NaN,NaN,NaN,NaN,NaN,NaN
+3,pain,48,low,low,l021.png,5,1,99,1,1,0.9,0.6,NaN,NaN,NaN,NaN,NaN,NaN
+4,pain,50,high,low,l032.png,27,5,99,1,1,1.1,0.7,NaN,NaN,NaN,NaN,NaN,NaN
+5,pain,50,high,low,l052.png,35,5,99,1,1,1,0.6,NaN,NaN,NaN,NaN,NaN,NaN
