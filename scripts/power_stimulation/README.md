@@ -30,3 +30,10 @@ RUN_jitter_type01.m >> generate_jitter_type01.m
 * 1 trial per condition
 * 2.5s JITTER1 /  1s cue / 2.5s JITTER2 / 4s expectRating / 2.5s JITTER3 / 6.5s stimuli / 2.5s JITTER4 / 4s judgment
 
+
+## output file from each `RUN_jitter_type##.m`
+* ~/social_influence/design_interleaved/jitter_type##/
+* best_design_struct.mat
+* best_design_struct_under_idealLength.mat
+* social_inf_Events_best_design_of_10000_ver-001.txt
+* social_inf_Events_best_design_of_10000_under_ideal_length_sec_ver-001.txt
