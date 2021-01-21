@@ -1,15 +1,15 @@
 
 function interleaved(sub,input_counterbalance_file, run_num, session, biopac, debug)
-sub=99;
+sub=98;
 input_counterbalance_file = 'design_csv';
 run_num = 2;
 session = 1;
-biopac = 0;
+biopac = 1;
 debug = 1;
 %% -----------------------------------------------------------------------------
 %                                 parameters
 % ------------------------------------------------------------------------------
-
+e
 %% A. Psychtoolbox parameters _________________________________________________
 global p
 Screen('Preference', 'SkipSyncTests', 0);
@@ -106,27 +106,28 @@ design_file                    = readtable(counterbalancefile);
 vnames = {'src_subject_id', 'session_id','param_run_num','param_counterbalance_ver',...
     'param_counterbalance_block_num','param_cue_type','param_administer_type','param_stimulus_intensity',...
     'param_cond_name','param_cond_type','param_trigger_onset','param_start_biopac',...
-    'event01_fixation_onset','event01_fixation_biopac','event01_fixation_duration',...
-    'event02_cue_onset','event02_cue_biopac','event02_cue_type','event02_cue_filename',...
-    'event03_expect_displayonset','event03_expect_biopac','event03_expect_responseonset','event03_expect_RT',...
-    'event04_fixation_onset','event04_fixation_biopac','event04_fixation_duration',...
-    'event05_administer_type','event05_administer_displayonset','event05_administer_biopac',...
-    'event05_administerP_trigger','event05_administerC_response', 'event05_administerC_responsekeyname', 'event05_administerC_reseponseonset', 'event05_administerC_RT',...
-    'event06_actual_displayonset','event06_actual_biopac','event06_actual_responseonset','event06_actual_RT',...
-    'param_end_instruct_onset','param_end_biopac', 'param_experiment_duration'};
+    'jitter01_fixation_onset','jitter01_fixation_biopac','jitter01_fixation_duration',...
+    'event01_cue_onset','event01_cue_biopac','event01_cue_type','event01_cue_filename',...
+    'jitter02_fixation_onset','jitter02_fixation_biopac','jitter02_fixation_duration',...
+    'event02_expect_displayonset','event02_expect_biopac','event02_expect_responseonset','event02_expect_RT',...
+    'jitter03_fixation_onset','jitter03_fixation_biopac','jitter03_fixation_duration',...
+    'event03_administer_type','event03_administer_displayonset','event03_administer_biopac','event03_administerP_trigger',...
+    'event03_adminsiterC_reponse','event03_administerC_responsekeyname','event03_administerC_responseonset','event03_administerC_RT',...
+    'jitter04_fixation_onset','jitter04_fixation_biopac','jitter04_fixation_duration',...
+    'event04_actual_displayonset','event04_actual_biopac','event04_actual_responseonset','event04_actual_RT',...
+    'param_end_instruct_onset','param_end_biopac','param_experiment_duration'};
 
-vtypes = {  'double','double','double','double',...
-    'double','string','string','string'...
-    'string','double','double','double'...
-    'double','double','double'... % event01
-    'double','double','string','string'... % event02
-    'double','double','double','double'... % event03
-    'double','double','double',... % event04
-    'double','double','double',... % event05
-    'double','string','double','double',... % event05
-    'double','double','double','double',... % event06
-    'double','double','double' };
-
+vtypes = {  'double','double','double','double','double','string','string',... % param
+'string','string','double','double','double',... % param
+'double','double','double',... % jitter 01
+'double','double','string','string',... % event 01
+'double','double','double',... % jitter 02
+'double','double','double','double',... % event 02
+'double','double','double',... % jitter 03
+'string','double','double','string','double','string','double','double',... % event 03
+'double','double','double',... % jitter 04
+'double','double','double','double',... % event 04
+'double','double','double'}; % param
 
 T = table('Size', [size(design_file,1), size(vnames,2)], 'VariableNames', vnames, 'VariableTypes', vtypes);
 
@@ -145,7 +146,7 @@ T.event02_cue_type(:) = design_file.cue_type;
 T.event02_cue_filename(:) = design_file.cue_image;
 T.event05_administer_type(:) = design_file.administer;
 T.event05_administerC_response(:) = NaN;
-T.event05_administerC_responsekeyname(:) = 'NA';
+T.event05_administerC_responsekeyname(:) = string('NA');
 T.event05_administerC_reseponseonset(:) = NaN;
 T.event05_administerC_RT(:) = NaN;
 
@@ -179,8 +180,8 @@ mr.textYc = p.ptb.yCenter + Yc + cDist*4;
 mr.textRXc = p.ptb.xCenter + rXc;
 mr.textLXc = p.ptb.xCenter - rXc;
 % TSA parameters
-% ip = '10.64.1.10'; port = 20121;
-ip = '192.168.0.114'; port = 20121;
+ip = '10.64.1.10'; port = 20121;
+% ip = '192.168.0.114'; port = 20121;
 
 %% E. Keyboard information _____________________________________________________
 KbName('UnifyKeyNames');
@@ -261,12 +262,12 @@ end
 %% -----------------------------------------------------------------------------
 %                               experiment start
 % ------------------------------------------------------------------------------
-% """
+%
 % jitter > cue > expect rating > jitter > administered stimuli > jitter > actual rating
 % One trial is composed of 3 jitters, a social cue, expect rating, actual stimuli, actual rating
 % on average, a trial would be 21.5 seconds long
 % The whole experiment is expected to be 774 seconds long, i.e. 12 min and 54 seconds long
-% """
+%
 % fixation (PVC icon) - jitter 2s
 % cue 1s
 % expect rating - 4s
@@ -314,22 +315,22 @@ for trl = 1:size(T,1)
     T.event01_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
     T.event01_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation1, 1);
     WaitSecs('UntilTime', T.event01_fixation_onset(trl) + design_file.ISI1(trl));
-    jitter1_end                           = biopac_linux_matlab(channel, channel.fixation1, 0);
-    T.event01_fixation_duration(trl)      = jitter1_end - T.event01_fixation_onset(trl);
+    jitter01_end                           = biopac_linux_matlab(channel, channel.fixation1, 0);
+    T.event01_fixation_duration(trl)      = jitter01_end - T.event01_fixation_onset(trl);
 
 
-    %% ________________________________ 2. cue 1s __________________________________
+    %% ___________________________ 2. event 01 cue 1s __________________________
     if string(design_file.condition_name{trl}) == 'pain';
         temp = str2num(string(design_file.administer{trl})) + 49;
         main(ip, port, 1, temp);
     end
     biopac_linux_matlab(channel, channel.cue, 0);
     Screen('DrawTexture', p.ptb.window, cue_tex{trl}, [], [], 0);
-    T.event02_cue_onset(trl)              = Screen('Flip',p.ptb.window);
-    T.event02_cue_biopac(trl)             = biopac_linux_matlab(channel, channel.cue, 1);
+    T.event01_cue_onset(trl)              = Screen('Flip',p.ptb.window);
+    T.event01_cue_biopac(trl)             = biopac_linux_matlab(channel, channel.cue, 1);
 
     WaitSecs('UntilTime', T.event01_fixation_onset(trl) + design_file.ISI1(trl) + 1.00);
-    biopac_linux_matlab(channel,  channel.cue, 0);
+    end_event01 = biopac_linux_matlab(channel,  channel.cue, 0);
 
 
     %% _________________________ 3. Fixtion Jitter 0-2 sec _____________________
@@ -338,56 +339,52 @@ for trl = 1:size(T,1)
     %Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
     %    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     fixation_cross(p);
-    T.event04_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
-    T.event04_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation2, 1);
+    T.jitter02_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
+    T.jitter02_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation2, 1);
     % WaitSecs(jitter2);
-    WaitSecs('UntilTime', T.event04_fixation_onset(trl)  + design_file.ISI2(trl));
-    end_jitter2                           = biopac_linux_matlab(channel, channel.fixation2, 0);
-    T.event04_fixation_duration(trl)      = end_jitter2 - T.event04_fixation_onset(trl) ;
+    WaitSecs('UntilTime', T.jitter02_fixation_onset(trl)  + design_file.ISI2(trl));
+    end_jitter02                           = biopac_linux_matlab(channel, channel.fixation2, 0);
+    T.jitter02_fixation_duration(trl)      = end_jitter02 - T.jitter02_fixation_onset(trl) ;
 
-    %% __________________________ 3. expectation rating ____________________________
-    % different rating loaded depending on condition
+    %% ______________________ 4. event 02 expectation rating ____________________________
+    % [ ] different rating loaded depending on condition
     Screen('TextSize', p.ptb.window, 36);
     [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(4, p, cue_tex{trl},'expect', channel, channel.expect);
     biopac_linux_matlab(channel, channel.expect, 0);
     rating_trajectory{trl,1}              = trajectory;
-    T.event03_expect_displayonset(trl)    = display_onset;
-    T.event03_expect_RT(trl)              = RT;
-    T.event03_expect_responseonset(trl)   = response_onset;
-    T.event03_expect_biopac(trl)          = biopac_display_onset;
+    T.event02_expect_displayonset(trl)    = display_onset;
+    T.event02_expect_RT(trl)              = RT;
+    T.event02_expect_responseonset(trl)   = response_onset;
+    T.event02_expect_biopac(trl)          = biopac_display_onset;
 
 
-    %% _________________________ 4. Fixtion Jitter 0-2 sec _____________________
+    %% _________________________ 5. Fixtion Jitter 0-2 sec _____________________
 
-    %     jitter2 = design_file.array(trl,"ISI2"); % octave
-    % Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-    %     p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     fixation_cross(p);
-    T.event04_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
-    T.event04_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation2, 1);
-    % WaitSecs(jitter2);
-    WaitSecs('UntilTime', T.event04_fixation_onset(trl)  + design_file.ISI2(trl));
-    end_jitter2                           = biopac_linux_matlab(channel, channel.fixation2, 0);
-    T.event04_fixation_duration(trl)      = end_jitter2 - T.event04_fixation_onset(trl) ;
+    T.jitter03_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
+    T.jitter03_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation2, 1);
 
-    %% ______________________________ 5. administer - 9 s _______________________________
+    WaitSecs('UntilTime', T.jitter03_fixation_onset(trl)  + design_file.ISI2(trl));
+    end_jitter03                           = biopac_linux_matlab(channel, channel.fixation2, 0);
+    T.jitter03_fixation_duration(trl)      = end_jitter03 - T.jitter03_fixation_onset(trl) ;
+
+
+    %% _________________________ 6. event 03 administer - 9 s __________________________
     administer = string(design_file.condition_name{trl});
     switch administer
         case 'pain'
             temp          = str2num(string(design_file.administer{trl})) + 49;
             tsa2_response = main(ip, port, 4, temp);
             fixation_cross(p);
-            T.event05_administer_displayonset(trl) = GetSecs;
-            T.event05_administer_biopac(trl)      = biopac_linux_matlab(channel, channel.administer, 1);
-            T.event05_administerP_trigger(trl)    = string(tsa2_response{6});
-            WaitSecs('UntilTime', end_jitter2 + task_dur)
-            biopac_linux_matlab(channel, channel.administer, 0);
+            T.event03_administer_displayonset(trl) = GetSecs;
+            T.event03_administer_biopac(trl)      = biopac_linux_matlab(channel, channel.administer, 1);
+            T.event03_administerP_trigger(trl)    = string(tsa2_response{6});
+            WaitSecs('UntilTime', end_jitter03 + task_dur)
+            end_event03 = biopac_linux_matlab(channel, channel.administer, 0);
 
-            % elseif  string(design_file.condition_name{trl}) == 'cognitive' % ______________________________________________________________
-            % match plateau
         case 'cognitive'
             fixation_cross(p);
-            WaitSecs('UntilTime', end_jitter2 + wait_time); % equivalent to ramp-up time
+            WaitSecs('UntilTime', end_jitter03 + wait_time); % equivalent to ramp-up time
             mr.initialized = [];
             % 5-1. present rotate image and text ____________________________________________________
             cog_image_filepath = fullfile(main_dir,'stimuli','cognitive');
@@ -402,48 +399,47 @@ for trl = 1:size(T,1)
             DrawFormattedText(p.ptb.window, mr.textSame, p.ptb.xCenter+120, mr.textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
             mr.initialized = Screen('Flip',p.ptb.window);
             % wait for response
-            [resp, resp_keyname, resp_onset, RT] = cognitive_resp(p, channel, plateau, mr, mr.cognitive_tex)
-            T.event05_administer_displayonset(trl) = mr.initialized;
-            T.event05_administer_biopac(trl)      = biopac_linux_matlab(channel, channel.administer, 1);
-            %             Screen('DrawTexture',p.ptb.window, fixTex);
+            [resp, resp_keyname, resp_onset, RT] = cognitive_resp(p, channel, plateau, mr, mr.cognitive_tex);
+            T.event03_administer_displayonset(trl) = mr.initialized;
+            T.event03_administer_biopac(trl)      = biopac_linux_matlab(channel, channel.administer, 1);
+
             fixation_cross(p);
-            WaitSecs('UntilTime', end_jitter2 + task_dur);
+            WaitSecs('UntilTime', end_jitter03 + task_dur);
+            end_event03 = biopac_linux_matlab(channel, channel.administer, 0);
+
             % record response
-            T.event05_administerC_response(trl)       = resp;
-            T.event05_administerC_responsekeyname(trl)= resp_keyname;
-            T.event05_administerC_reseponseonset(trl) = resp_onset;
-            T.event05_administerC_RT(trl)             = RT;
+            T.event03_administerC_response(trl)       = resp;
+            T.event03_administerC_responsekeyname(trl)= resp_keyname;
+            T.event03_administerC_reseponseonset(trl) = resp_onset;
+            T.event03_administerC_RT(trl)             = RT;
 
         case 'vicarious'
-            % elseif  string(design_file.condition_name{trl}) == 'vicarious' % ______________________________________________________________
             video_filename                        = [design_file.video_filename{trl}];
-            % video texture
-            %ideo_filename  = [design_file.video_filename{trl}];
             video_file      = fullfile(dir_video, video_filename);
             [movie, ~, ~, imgw, imgh] = Screen('OpenMovie', p.ptb.window, video_file, [], 1);
             fixation_cross(p);
-            WaitSecs('UntilTime', end_jitter2 + wait_time);
-            T.event05_administer_biopac(trl)      = biopac_linux_matlab(channel, channel.administer, 1);
+            WaitSecs('UntilTime', end_jitter03 + wait_time);
+            T.event03_administer_biopac(trl)      = biopac_linux_matlab(channel, channel.administer, 1);
             video_file                            = fullfile(dir_video, video_filename);
             movie_time                            = video_play(video_file , p , movie, imgw*2, imgh*2);
-            biopac_linux_matlab(channel, channel.administer, 0);
-            T.event05_administer_displayonset(trl)       = movie_time;  % 5sec
+            end_event03 = biopac_linux_matlab(channel, channel.administer, 0);
+            T.event03_administer_displayonset(trl)       = movie_time;  % 5sec
 
             fixation_cross(p);
-            WaitSecs('UntilTime', end_jitter2 + task_dur);
+            WaitSecs('UntilTime', end_jitter03 + task_dur);
     end
-    %% _________________________ 6. Fixtion Jitter 0-2 sec _____________________
+    %% _________________________ 7. jitter 04 Fixtion Jitter 0-2 sec _____________________
 
     fixation_cross(p);
-    T.event04_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
-    T.event04_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation2, 1);
+    T.jitter04_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
+    T.jitter04_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation2, 1);
     % WaitSecs(jitter2);
-    WaitSecs('UntilTime', T.event04_fixation_onset(trl)  + design_file.ISI2(trl));
-    end_jitter2                           = biopac_linux_matlab(channel, channel.fixation2, 0);
-    T.event04_fixation_duration(trl)      = end_jitter2 - T.event04_fixation_onset(trl) ;
+    WaitSecs('UntilTime', end_jitter03 + 9.00 + design_file.ISI2(trl));
+    end_jitter04                           = biopac_linux_matlab(channel, channel.fixation2, 0);
+    T.jitter04_fixation_duration(trl)      = end_jitter04 - T.jitter04_fixation_onset(trl) ;
 
 
-    %% ________________________ 7. post evaluation rating __________________________
+    %% ________________________ 8. event 04 actual judgment __________________________
 
     image_filepath                  = fullfile(main_dir, 'stimuli', 'ratingscale');
     image_scale_filename            = ['task-', taskname, '_scale.png'];
@@ -453,10 +449,10 @@ for trl = 1:size(T,1)
     biopac_linux_matlab(channel, channel.actual, 0);
 
     rating_trajectory{trl,2}              = trajectory;
-    T.event06_actual_displayonset(trl)    = display_onset;
-    T.event06_actual_RT(trl)              = RT;
-    T.event06_actual_responseonset(trl)   = response_onset;
-    T.event06_actual_biopac(trl)          = biopac_display_onset;
+    T.event04_actual_displayonset(trl)    = display_onset;
+    T.event04_actual_RT(trl)              = RT;
+    T.event04_actual_responseonset(trl)   = response_onset;
+    T.event04_actual_biopac(trl)          = biopac_display_onset;
 
 
     %% ________________________ 7. temporarily save file _______________________
