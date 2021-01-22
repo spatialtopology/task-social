@@ -101,6 +101,9 @@ plot(scandurunder_idealLength(wh), 1./vifunderIdealLength(wh), 'ro', 'MarkerFace
 % Save best results
 % --------------------------------------------------------------------------
 output_dir = '/Users/h/Documents/projects_local/social_influence/design_interleaved/jitter_type02';
+if ~exist(output_dir, 'dir')
+   mkdir(output_dir)
+end
 % diaryname = sprintf('/Users/h/Dropbox/Projects/social_influence/design/jitter/social_inf_Events_best_design_of_10000_%s.txt', strrep(datestr(datetime), ' ', '_') );
 diaryname = sprintf([output_dir,'/social_inf_Events_best_design_of_10000_ver-', num2str(ver,'%03.f'), '.txt'] );
 diary(diaryname)

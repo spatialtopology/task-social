@@ -61,7 +61,7 @@ for ver = 1:versions
 for i = 1:iter
 
 %         [meanrecipvif(i, 1), vifs, design_struct] = generate_jittered_er_design_HJ('noplot', 'ISImean', ISImean);
-        [meanrecipvif(i, 1), vifs, design_struct] = generate_jitter_type01('noplot', 'ISI1mean', ISI1mean, 'ISI2mean', ISI2mean, 'ISI3mean', ISI3mean, 'ISI4mean', ISI4mean);
+        [meanrecipvif(i, 1), vifs, design_struct, X] = generate_jitter_type01('noplot', 'ISI1mean', ISI1mean, 'ISI2mean', ISI2mean, 'ISI3mean', ISI3mean, 'ISI4mean', ISI4mean);
 
         scanduration(i, 1) = design_struct.scanlength;
 
@@ -100,7 +100,10 @@ plot(scandurunder_idealLength(wh), 1./vifunderIdealLength(wh), 'ro', 'MarkerFace
 
 % Save best results
 % --------------------------------------------------------------------------
-output_dir = '/Users/h/Documents/projects_local/social_influence/design_interleaved/jitter_type01';
+output_dir = '/Users/h/Documents/projects_local/social_influence/design_interleaved/jitter_type01_0115';
+if ~exist(output_dir, 'dir')
+   mkdir(output_dir)
+end
 % diaryname = sprintf('/Users/h/Dropbox/Projects/social_influence/design/jitter/social_inf_Events_best_design_of_10000_%s.txt', strrep(datestr(datetime), ' ', '_') );
 diaryname = sprintf([output_dir,'/social_inf_Events_best_design_of_10000_ver-', num2str(ver,'%03.f'), '.txt'] );
 diary(diaryname)

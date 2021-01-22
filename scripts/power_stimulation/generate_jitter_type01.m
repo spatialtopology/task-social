@@ -1,4 +1,4 @@
-function [meanrecipvif, vifs, design_struct] = generate_jitter_type01(varargin)
+function [meanrecipvif, vifs, design_struct, X] = generate_jitter_type01(varargin)
 % Generate an fMRI design with two temporally dependent events and random
 % 'jitter' between event1 and event2 (ISI1) and/or between event2 and
 % event1 on the subsequent trial (ISI2).
@@ -138,6 +138,14 @@ for i = 1:length(varargin)
             case 'ISI3mean', ISI3mean = varargin{i+1}; varargin{i+1} = [];
             case 'ISI4mean', ISI4mean = varargin{i+1}; varargin{i+1} = [];
 
+            case 'trialtypes', trialtypes = varargin{i+1}; varargin{i+1} = [];
+            case 'trialspertype', trialspertype = varargin{i+1}; varargin{i+1} = [];
+
+            case 'HPlength', HPlength = varargin{i+1}; varargin{i+1} = [];
+            case 'TR', TR = varargin{i+1}; varargin{i+1} = [];
+
+            case 'contrasts' % do nothing, handle later after we know trial types
+
             otherwise, warning(['Unknown input string option:' varargin{i}]);
         end
     end
@@ -172,11 +180,11 @@ switch isidistribution
         ISI4 = ISI4min + exprnd(ISI4mean - ISI4min, ntrials, 1);  % one column for fixed ISI, two cols for variable
         ISI4(ISI4 > ISI4max) = ISI4max;
 
-        if ~ISI1constantvalue  % variable ITI/ISI2
-            ISI1 = ISI1min + exprnd(ISI1mean - ISI1min, ntrials, 1);
-            ISI1(ISI1 > ISI1max) = ISI1max;
-
-        end
+        % if ~ISI1constantvalue  % variable ITI/ISI2
+        %     ISI1 = ISI1min + exprnd(ISI1mean - ISI1min, ntrials, 1);
+        %     ISI1(ISI1 > ISI1max) = ISI1max;
+        %
+        % end
 
         if doplot
             figure(f1);
@@ -199,7 +207,7 @@ switch isidistribution
             set(gca, 'XTick', 1:10);
             xlabel('ISI'), axis tight
             title('Empirical distribution of ISI3');
-            
+
             figure(f4);
             [h, x] = hist(ISI4);
             bar(x, h);
@@ -267,16 +275,13 @@ for i = 1:trialtypes
     finalISI3{i} = ISI3(1:trialspertype);
     finalISI4{i} = ISI4(1:trialspertype);
 
-    if ISI1isconstant
-
-        finalISI1{i} = ISI1constantvalue * ones(size(finalISI1{i}));
-    end
+    % if ISI1isconstant
+    %
+    %     finalISI1{i} = ISI1constantvalue * ones(size(finalISI1{i}));
+    % end
 
     trialtype{i} = i * ones(trialspertype, 1);
-    trialduration{i} = finalISI1{i} + event1duration
-    + finalISI2{i} + event2duration
-    + finalISI3{i}+ event3duration
-    + finalISI4{i}+ event4duration;
+    trialduration{i} =  event1duration  finalISI1{i} + event2duration   + finalISI2{i} +  event3duration  finalISI3{i}+ event4duration  + finalISI4{i};
 
 end
 
@@ -347,10 +352,11 @@ design_struct.ons = ons;
 
 % Save table
 % ons2{i} + event2duration + finalISI3(trialtype == i);
-eventlist = [onsets+finalISI1,...
-onsets+event1duration+finalISI2,...
-onsets+event1duration+finalISI2+event2duration+finalISI3,...
-onsets+event1duration+finalISI2+event2duration+finalISI3+event3duration+finalISI4,...
+eventlist = [onsets ,...
+onsets+event1duration+finalISI1,...
+onsets+event1duration+finalISI1+event2duration+finalISI2,...
+onsets+event1duration+finalISI1+event2duration+finalISI2+event3duration+finalISI3,...
+onsets+event1duration+finalISI1+event2duration+finalISI2+event3duration+finalISI3,...
 trialtype finalISI1 finalISI2 finalISI3 finalISI4];
 eventlist(:, end+1) = event1duration;
 eventlist(:, end+1) = event2duration;
