@@ -1,4 +1,4 @@
-function [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(duration, p, scale_tex, rating_type, biopac, channel, channel_type)
+function [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(duration, p, scale_tex, rating_type, channel, channel_type)
 
 %% Phil Kragel 6/20/2019
 % global screenNumber window windowRect xCenter yCenter screenXpixels screenYpixels
@@ -93,13 +93,13 @@ cursor.xcenter = ceil(dspl.cscale.rect(1) + (dspl.cscale.rect(3) - dspl.cscale.r
 cursor.ycenter = ceil(dspl.cscale.rect(2) + (dspl.cscale.rect(4)-dspl.cscale.rect(2))*0.847);
 
 RATINGTITLES = {'INTENSITY'};
-biopac_linux_matlab(biopac, channel, channel_type, 0);
+biopac_linux_matlab( channel, channel_type, 0);
 
 % initialize
 Screen('TextSize',p.ptb.window,72);
 DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
 display_onset = Screen('Flip',p.ptb.window);
-biopac_display_onset = biopac_linux_matlab(biopac, channel, channel_type, 1);
+biopac_display_onset = biopac_linux_matlab( channel, channel_type, 1);
 
 
 cursor.x = cursor.xcenter;
@@ -158,7 +158,7 @@ while (GetSecs-display_onset) <  duration
     elseif any(buttonpressed)
        response_onset = GetSecs;
        RT = response_onset - display_onset;
-       biopac_linux_matlab(biopac, channel, channel_type, 0);
+       biopac_linux_matlab( channel, channel_type, 0);
        buttonpressed = [0 0 0];
        Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
        DrawFormattedText(p.ptb.window,rating_type,'center',dspl.screenHeight/2+150,255);
