@@ -9,12 +9,11 @@ function vicarious(sub,input_counterbalance_file, run_num, session, biopac, debu
 %                           Parameters
 % ------------------------------------------------------------------------------
 
-
-%% 0. Biopac parameters _________________________________________________
-script_dir = pwd;
-
-channel = struct;
+%% B. Biopac parameters ________________________________________________________
 % biopac channel
+channel = struct;
+channel.biopac = biopac;
+
 channel.trigger    = 0;
 channel.fixation1  = 1;
 channel.cue        = 2;
@@ -23,7 +22,7 @@ channel.fixation2  = 4;
 channel.administer = 5;
 channel.actual     = 6;
 
-if biopac == 1
+if channel.biopac == 1
     script_dir = pwd;
     cd('/home/spacetop/repos/labjackpython');
     pe = pyenv;
@@ -32,8 +31,6 @@ if biopac == 1
     catch
         warning("u3 already imported!");
     end
-
-    % py.importlib.import_module('u3');
     % Check to see if u3 was imported correctly
     % py.help('u3')
     channel.d = py.u3.U3();
@@ -226,7 +223,7 @@ Screen('Flip', p.ptb.window);
 WaitKeyPress(p.keys.trigger);
 % T.param_trigger_onset(:)                = KbTriggerWait(p.keys.trigger, trigger_inputDevice);
 T.param_trigger_onset(:)                  = GetSecs;
-T.param_start_biopac(:)                   = biopac_linux_matlab(biopac, channel, channel.trigger, 1);
+T.param_start_biopac(:)                   = biopac_linux_matlab(channel, channel.trigger, 1);
 
 %% ___________________________ Dummy scans ____________________________
 WaitSecs(TR*6);
@@ -239,20 +236,20 @@ for trl = 1:size(countBalMat,1)
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     T.event01_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
-    T.event01_fixation_biopac(trl)        = biopac_linux_matlab(biopac, channel, channel.fixation1, 1);
+    T.event01_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation1, 1);
     % WaitSecs(jitter1);
     WaitSecs('UntilTime', T.event01_fixation_onset(trl) + countBalMat.ISI1(trl));
-    jitter1_end                           = biopac_linux_matlab(biopac, channel, channel.fixation1, 0);
+    jitter1_end                           = biopac_linux_matlab(channel, channel.fixation1, 0);
     T.event01_fixation_duration(trl)      = jitter1_end - T.event01_fixation_onset(trl);
 
     %% ________________________________ 2. cue 1s ______________________________
-    biopac_linux_matlab(biopac, channel, channel.cue, 0);
+    biopac_linux_matlab(channel, channel.cue, 0);
     Screen('DrawTexture', p.ptb.window, cue_tex{trl}, [], [], 0);
     T.event02_cue_onset(trl)              = Screen('Flip',p.ptb.window);
-    T.event02_cue_biopac(trl)             = biopac_linux_matlab(biopac, channel, channel.cue, 1);
+    T.event02_cue_biopac(trl)             = biopac_linux_matlab(channel, channel.cue, 1);
     % WaitSecs(1.00);
     WaitSecs('UntilTime', T.event01_fixation_onset(trl) + countBalMat.ISI1(trl) + 1.00);
-    biopac_linux_matlab(biopac, channel, channel.cue, 0);
+    biopac_linux_matlab(channel, channel.cue, 0);
     %T.event02_cue_type{trl}               = countBalMat.cue_type{trl};
     %T.event02_cue_filename{trl}           = countBalMat.cue_image{trl};
 
@@ -260,7 +257,7 @@ for trl = 1:size(countBalMat,1)
 
     Screen('TextSize', p.ptb.window, 36);
     [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(4, p, cue_tex{trl},'expect', biopac, channel, channel.expect);
-    biopac_linux_matlab(biopac, channel, channel.expect, 0);
+    biopac_linux_matlab( channel, channel.expect, 0);
     rating_trajectory{trl,1}              = trajectory;
     T.event03_expect_displayonset(trl)    = display_onset;
     T.event03_expect_RT(trl)              = RT;
@@ -274,20 +271,20 @@ for trl = 1:size(countBalMat,1)
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     T.event04_fixation_onset(trl)         = Screen('Flip', p.ptb.window);
-    T.event04_fixation_biopac(trl)        = biopac_linux_matlab(biopac, channel, channel.fixation2, 1);
+    T.event04_fixation_biopac(trl)        = biopac_linux_matlab( channel, channel.fixation2, 1);
     % WaitSecs(jitter2);
     WaitSecs('UntilTime', T.event04_fixation_onset(trl)  + countBalMat.ISI2(trl));
-    end_jitter2                           = biopac_linux_matlab(biopac, channel, channel.fixation2, 0);
+    end_jitter2                           = biopac_linux_matlab( channel, channel.fixation2, 0);
     T.event04_fixation_duration(trl)      = end_jitter2 - T.event04_fixation_onset(trl) ;
 
     %% ____________________________ 5. vicarious _______________________________
     video_filename                        = [countBalMat.video_filename{trl}];
     WaitSecs('UntilTime', end_jitter2 + 1.25);
     %WaitSecs((task_duration-video_length)/2);
-    T.event05_administer_biopac(trl)      = biopac_linux_matlab(biopac, channel, channel.administer, 1);
+    T.event05_administer_biopac(trl)      = biopac_linux_matlab( channel, channel.administer, 1);
     video_file                            = fullfile(dir_video, video_filename);
     movie_time                            = video_play(video_file , p , movie{trl}, imgw{trl}*2, imgh{trl}*2);
-    biopac_linux_matlab(biopac, channel, channel.administer, 0);
+    biopac_linux_matlab( channel, channel.administer, 0);
     T.event05_administer_displayonset(trl)       = movie_time;  % 4sec
     WaitSecs('UntilTime', end_jitter2 + 6.5);
     % WaitSecs((task_duration-video_length)/2);
@@ -296,7 +293,7 @@ for trl = 1:size(countBalMat,1)
     %% ________________________ 6. post evaluation rating ______________________
 
     [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(4, p, actual_tex,'actual', biopac, channel, channel.actual);
-    biopac_linux_matlab(biopac, channel, channel.actual, 0);
+    biopac_linux_matlab( channel, channel.actual, 0);
 
     rating_trajectory{trl,2}              = trajectory;
     T.event06_actual_displayonset(trl)    = display_onset;
@@ -316,7 +313,7 @@ end
 % end_texture                               = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 Screen('DrawTexture',p.ptb.window,end_tex,[],[]);
 T.param_end_instruct_onset(:)             = Screen('Flip',p.ptb.window);
-T.param_end_biopac(:)                     = biopac_linux_matlab(biopac, channel, channel.trigger, 0);
+T.param_end_biopac(:)                     = biopac_linux_matlab( channel, channel.trigger, 0);
 T.param_experiment_duration(:)            = T.param_end_instruct_onset(1) - T.param_trigger_onset(1);
 WaitKeyPress(p.keys.end);
 
@@ -339,7 +336,7 @@ psychtoolbox_repoFileName = fullfile(repo_save_dir, [bids_string,'_psychtoolboxp
 save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
 
-if biopac;  channel.d.close();  end
+if channel.biopac;  channel.d.close();  end
 clear p; clearvars; Screen('Close'); close all; sca;
 
 %% -----------------------------------------------------------------------------
