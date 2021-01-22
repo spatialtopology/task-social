@@ -280,7 +280,7 @@ elseif cognitive % _____________________________________________________________
   DrawFormattedText(p.ptb.window, mr.textSame, p.ptb.xCenter+120, mr.textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
   mr.initialized = Screen('Flip',p.ptb.window);
   % wait for response
-  [resp, resp_onset, RT] = cognitive_resp(p, channel, plateau, mr, cognitive_tex{trl})
+  [resp, resp_onset, RT] = cognitive_resp(p, channel, plateau, mr, mr.cognitive_tex{trl});
   T.event05_administer_displayonset(trl) = mr.initialized;
   T.event05_administer_biopac(trl)      = biopac_linux_matlab(channel, channel.administer, 1);
   Screen('DrawTexture',p.ptb.window, fixTex);
@@ -364,7 +364,7 @@ function [resp, resp_keyname, resp_onset, RT] = cognitive_resp(p, channel, plate
 
   % NOTE output
   % * resp: 1 = left, 2 = right
-  % * resp_keyname: 'left', 'right'
+  % * resp_keyname: 'left', 'right
   % * resp_onset: The moment the button was pressed (GetMouse does not return timing, therefore, GetSecs immediately after the button is pressed)
 
   resp = NaN; resp_keyname = 'NaN'; resp_onset = NaN; RT = NaN;
@@ -416,4 +416,6 @@ function [resp, resp_keyname, resp_onset, RT] = cognitive_resp(p, channel, plate
       end
       biopac_linux_matlab(channel, channel.administer, 0);
       biopac_linux_matlab(channel, channel.fixation2, 0);
+end
+end
 end
