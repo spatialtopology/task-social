@@ -166,7 +166,7 @@ keyboard_inputDevice           = id(keyboard_index);
 
 %% F. fmri Parameters __________________________________________________________
 TR                             = 0.46;
-task_duration                  = 6.50;
+task_duration                  = 9.00;
 
 %% G. instructions _____________________________________________________
 instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
