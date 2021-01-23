@@ -297,9 +297,9 @@ for trl = 1:size(design_file,1)
     T.event03_administer_biopac(trl)      = biopac_linux_matlab( channel, channel.administer, 1);
     video_file                            = fullfile(dir_video, video_filename);
     movie_time                            = video_play(video_file , p , movie{trl}, imgw{trl}*2, imgh{trl}*2);
+    end_event03_stimulus = WaitSecs('UntilTime', end_jitter03 + task_dur);
     biopac_linux_matlab( channel, channel.administer, 0);
     T.event03_administer_displayonset(trl)       = movie_time;  % 4sec
-    end_event03_stimulus = WaitSecs('UntilTime', end_jitter03 + task_dur);
 
     %% ___________________ 7. jitter 04 Fixtion Jitter 0-2 sec _________________________
 

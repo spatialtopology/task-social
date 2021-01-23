@@ -145,7 +145,7 @@ T.param_cond_type              = design_file.cond_type;
 T.event02_cue_type             = design_file.cue_type;
 T.event02_cue_filename         = design_file.cue_image;
 T.event05_administer_type      = design_file.administer;
-T.event05_administer_filename  = design_file.video_filename;
+
 
 
 %% E. Keyboard information _____________________________________________________
@@ -299,7 +299,6 @@ for trl = 1:size(design_file,1)
     %% ____________________ 4. event 02 expectation rating 4 s _____________________
 
     Screen('TextSize', p.ptb.window, 36);
-    %T.event02_expect_biopac(trl)         = biopac_linux_matlab(channel, channel_expect, 1);
     [trajectory, display_onset, RT, response_onset, biopac_display_onset]  = circular_rating_output(4,p,cue_tex{trl},'expect', channel, channel.expect);
     end_event02                           = biopac_linux_matlab(channel, channel.expect, 0);
     rating_Trajectory{trl,1}              = trajectory;
@@ -341,10 +340,11 @@ for trl = 1:size(design_file,1)
     % wait for response
     [resp, resp_keyname, resp_onset, RT]  = cognitive_resp(p, channel, plateau, mr, rotation_tex{trl});
     T.event03_administer_displayonset(trl) = mr.initialized;
-    T.event03_administer_biopac(trl)      = biopac_linux_matlab(channel, channel.administer, 1);
+    %T.event03_administer_biopac(trl)      = biopac_linux_matlab(channel, channel.administer, 1);
     fixation_cross(p);
     %Screen('DrawTexture',p.ptb.window, fixTex);
     end_event03_stimulus = WaitSecs('UntilTime', end_jitter03 + task_dur);
+    biopac_linux_matlab(channel, channel.administer, 0);
     % record response
     T.event03_administerC_response(trl)       = resp;
     T.event03_administerC_responsekeyname(trl) = resp_keyname;
@@ -471,6 +471,7 @@ clear p; clearvars; Screen('Close'); close all; sca;
       % * resp_onset: The moment the button was pressed (GetMouse does not return timing, therefore, GetSecs immediately after the button is pressed)
 
       resp = NaN; resp_keyname = 'NaN'; resp_onset = NaN; RT = NaN;
+      biopac_linux_matlab(channel, channel.administer, 1);
       while GetSecs - mr.initialized < plateau % 5s
           response = 99;
 

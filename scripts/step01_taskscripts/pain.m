@@ -143,7 +143,6 @@ T.param_cond_type              = design_file.cond_type;
 T.event02_cue_type             = design_file.cue_type;
 T.event02_cue_filename         = design_file.cue_image;
 T.event05_administer_type      = design_file.administer;
-T.event05_administer_filename  = design_file.video_filename;
 
 %% E. Keyboard information _____________________________________________________
 KbName('UnifyKeyNames');
@@ -239,7 +238,7 @@ for trl = 1:size(design_file,1)
     jitter1 = design_file.ISI1(trl);
     T.jitter01_fixation_onset(trl)         = fixation_cross(p);
     T.jitter01_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation, 1);
-    WaitSecs('UntilTime', T.jitter01_fixation_onset(trl) + design_file.ISI1(trl));
+    WaitSecs('UntilTime', T.jitter01_fixation_onset(trl) + design_file.ISI1(trl)); % CHANGE
     end_jitter01                           = biopac_linux_matlab(channel, channel.fixation, 0);
     T.jitter01_fixation_duration(trl)      = end_jitter01 - T.jitter01_fixation_onset(trl);
 
@@ -251,7 +250,6 @@ for trl = 1:size(design_file,1)
     T.event01_cue_biopac(trl)             = biopac_linux_matlab(channel, channel.cue, 1);
     temp = design_file.administer(trl) + 49;
     main(ip, port, 1, temp);
-    %WaitSecs('UntilTime', T.event01_fixation_onset(trl) + design_file.ISI1(trl) + 1.00);
     end_event01 = WaitSecs('UntilTime', end_jitter01 + 1.00);
     biopac_linux_matlab(channel, channel.cue, 0);
 
@@ -260,7 +258,7 @@ for trl = 1:size(design_file,1)
 
     T.jitter02_fixation_onset(trl)         = fixation_cross(p);
     T.jitter02_fixation_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation, 1);
-    end_jitter02                           = WaitSecs('UntilTime', end_event01 + design_file.ISI1(trl));
+    end_jitter02                           = WaitSecs('UntilTime', end_event01 + design_file.ISI1(trl)); % CHANGE
     biopac_linux_matlab(channel, channel.fixation, 0);
     T.jitter02_fixation_duration(trl)      = end_jitter02 - T.jitter02_fixation_onset(trl);
 
@@ -281,12 +279,12 @@ for trl = 1:size(design_file,1)
 
     T.jitter03_fixation_onset(trl)        = fixation_cross(p);
     T.jitter03_fixation_biopac(trl)       = biopac_linux_matlab(channel, channel.fixation, 1);
-    end_jitter03                          = WaitSecs('UntilTime', end_event02 + design_file.ISI1(trl));
+    end_jitter03                          = WaitSecs('UntilTime', end_event02 + design_file.ISI1(trl)); % CHANGE
     biopac_linux_matlab(channel, channel.fixation, 0);
     T.jitter03_fixation_duration(trl)     = end_jitter03 - T.jitter03_fixation_onset(trl);
 
 
-    %% ____________________ 6. event 03 stimulus - vicarious _______________________
+    %% ____________________ 6. event 03 stimulus - pain _______________________
 
     main(ip, port, 4, temp); %start trigger
     T.delay_between_medoc(trl) = GetSecs - end_jitter03 ;
@@ -302,7 +300,7 @@ for trl = 1:size(design_file,1)
 
     T.jitter04_fixation_onset(trl)        = fixation_cross(p);
     T.jitter04_fixation_biopac(trl)       = biopac_linux_matlab(channel, channel.fixation, 1);
-    end_jitter04                          = WaitSecs('UntilTime', end_event03_stimulus + design_file.ISI1(trl));
+    end_jitter04                          = WaitSecs('UntilTime', end_event03_stimulus + design_file.ISI1(trl)); % CHANGE
     biopac_linux_matlab(channel, channel.fixation, 0);
     T.jitter04_fixation_duration(trl)     = end_jitter04 - T.jitter04_fixation_onset(trl);
 
