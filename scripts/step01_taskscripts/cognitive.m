@@ -77,15 +77,15 @@ main_dir                        = fileparts(fileparts(task_dir));
 repo_dir                        = fileparts(fileparts(fileparts(task_dir)));
 taskname                        = 'cognitive';
 % bids_string ___________  example: sub-0001_ses-01_task-social_run-cognitive-01
-bids_string                     = [ strcat('sub-', sprintf('%04d', sub)), ...
-    strcat('_ses-',sprintf('%02d', session)),...
-    strcat('_task-social'),...
-    '_run-',taskname];
+bids_string                     = [strcat('sub-', sprintf('%04d', sub)), ...
+strcat('_ses-',sprintf('%02d', session)),...
+strcat('_task-social'),...
+strcat('_run-', sprintf('%02d', run_num),'-', taskname)];
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
-    'beh' , strcat('ses-',sprintf('%02d', session)));
+strcat('ses-',sprintf('%02d', session)),...
+    'beh'  );
 repo_save_dir = fullfile(repo_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
-    'task-social');
-
+    'task-social', strcat('ses-',sprintf('%02d', session)));
 if ~exist(sub_save_dir, 'dir');    mkdir(sub_save_dir);     end
 if ~exist(repo_save_dir, 'dir');    mkdir(repo_save_dir);   end
 
@@ -345,6 +345,7 @@ for trl = 1:size(design_file,1)
     %Screen('DrawTexture',p.ptb.window, fixTex);
     end_event03_stimulus = WaitSecs('UntilTime', end_jitter03 + task_dur);
     biopac_linux_matlab(channel, channel.administer, 0);
+    biopac_linux_matlab(channel, channel.fixation, 0);
     % record response
     T.event03_administerC_response(trl)       = resp;
     T.event03_administerC_responsekeyname(trl) = resp_keyname;
@@ -373,7 +374,7 @@ for trl = 1:size(design_file,1)
     T.event04_actual_biopac(trl)          = biopac_display_onset;
 
     %% _________________________ 7. temporarily save file _______________________
-    tmp_file_name = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), '_task-',taskname,'_TEMPbeh.csv' ]);
+    tmp_file_name = fullfile(sub_save_dir,strcat(bids_string,'_TEMPbeh.csv' ));
     writetable(T,tmp_file_name);
 end
 
@@ -471,7 +472,7 @@ clear p; clearvars; Screen('Close'); close all; sca;
       % * resp_onset: The moment the button was pressed (GetMouse does not return timing, therefore, GetSecs immediately after the button is pressed)
 
       resp = NaN; resp_keyname = 'NaN'; resp_onset = NaN; RT = NaN;
-      biopac_linux_matlab(channel, channel.administer, 1);
+      %biopac_linux_matlab(channel, channel.administer, 1);
       while GetSecs - mr.initialized < plateau % 5s
           response = 99;
 
