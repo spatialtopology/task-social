@@ -3,7 +3,7 @@ function vicarious(sub,input_counterbalance_file, run_num, session, biopac, debu
 
 % code by Heejung Jung
 % heejung.jung@colorado.edu
-% Feb.09.2020
+% Jan.21.2020
 % updated May.17.2020 for octave compatible code
 %% -----------------------------------------------------------------------------
 %                           Parameters
@@ -75,8 +75,7 @@ task_dir                       = pwd;
 main_dir                       = fileparts(fileparts(task_dir));
 repo_dir                       = fileparts(fileparts(fileparts(task_dir)));
 taskname                       = 'vicarious';
-% bids_string
-% example: sub-0001_ses-01_task-social_run-cognitive-01
+% bids_string ___________  example: sub-0001_ses-01_task-social_run-cognitive-01
 bids_string                     = [strcat('sub-', sprintf('%04d', sub)), ...
 strcat('_ses-',sprintf('%02d', session)),...
 strcat('_task-social'),...
@@ -160,6 +159,13 @@ p.keys.trigger                 = KbName('5%');
 p.keys.start                   = KbName('s');
 p.keys.end                     = KbName('e');
 
+[id, name]                     = GetKeyboardIndices;
+trigger_index                  = find(contains(name, 'Current Designs'));
+trigger_inputDevice            = id(trigger_index);
+
+keyboard_index                 = find(contains(name, 'AT Translated Set 2 Keyboard'));
+keyboard_inputDevice           = id(keyboard_index);
+
 %% F. fmri Parameters __________________________________________________________
 TR                             = 0.46;
 task_duration                  = 9.00;
@@ -167,6 +173,7 @@ video_length                   = 4.00;
 task_dur = 9;
 plateau = 5;
 wait_time = (task_dur - plateau)/2;
+
 %% G. instructions _____________________________________________________
 instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
 instruct_start_name            = ['task-', taskname, '_start.png'];
@@ -202,6 +209,7 @@ for trl = 1:length(design_file.cue_type)
     actual_tex      = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
     start_tex       = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
     end_tex         = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
+
     DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(design_file.cue_type))),'center','center',p.ptb.white);
     Screen('Flip',p.ptb.window);
 end
@@ -212,7 +220,7 @@ end
 % ------------------------------------------------------------------------------
 
 %% ______________________________ Instructions _________________________________
-
+HideCursor;
 Screen('TextSize',p.ptb.window,72);
 Screen('DrawTexture',p.ptb.window,start_tex,[],[]);
 Screen('Flip',p.ptb.window);
@@ -221,9 +229,7 @@ Screen('Flip',p.ptb.window);
 % 1) wait for 's' key, once pressed, automatically flips to fixation
 % 2) wait for trigger '5'
 WaitKeyPress(p.keys.start);
-Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-Screen('Flip', p.ptb.window);
+fixation_cross(p);
 WaitKeyPress(p.keys.trigger);
 % T.param_trigger_onset(:)                = KbTriggerWait(p.keys.trigger, trigger_inputDevice);
 T.param_trigger_onset(:)                  = GetSecs;
@@ -310,10 +316,10 @@ for trl = 1:size(design_file,1)
     biopac_linux_matlab( channel, channel.actual, 0);
 
     rating_trajectory{trl,2}              = trajectory;
-    T.event06_actual_displayonset(trl)    = display_onset;
-    T.event06_actual_RT(trl)              = RT;
-    T.event06_actual_responseonset(trl)   = response_onset;
-    T.event06_actual_biopac(trl)          = biopac_display_onset;
+    T.event04_actual_displayonset(trl)    = display_onset;
+    T.event04_actual_RT(trl)              = RT;
+    T.event04_actual_responseonset(trl)   = response_onset;
+    T.event04_actual_biopac(trl)          = biopac_display_onset;
 
     %% ________________________ 7. temporarily save file _______________________
     tmp_file_name = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), ...
@@ -323,7 +329,12 @@ for trl = 1:size(design_file,1)
 end
 
 
-%% _________________________ 8. End Instructions _______________________________
+%% -----------------------------------------------------------------------------
+%                              End of Experiment
+% ------------------------------------------------------------------------------
+
+%% _________________________ A. End Instructions _______________________________
+
 % end_texture                               = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 Screen('DrawTexture',p.ptb.window,end_tex,[],[]);
 T.param_end_instruct_onset(:)             = Screen('Flip',p.ptb.window);
@@ -331,7 +342,7 @@ T.param_end_biopac(:)                     = biopac_linux_matlab( channel, channe
 T.param_experiment_duration(:)            = T.param_end_instruct_onset(1) - T.param_trigger_onset(1);
 WaitKeyPress(p.keys.end);
 
-%% _________________________ 9. save parameter _________________________________
+%% _________________________ B. Save files _____________________________________
 % onset + response file
 saveFileName = fullfile(sub_save_dir,[bids_string,'_beh.csv' ]);
 repoFileName = fullfile(repo_save_dir,[bids_string,'_beh.csv' ]);
@@ -349,6 +360,8 @@ psychtoolbox_saveFileName = fullfile(sub_save_dir, [bids_string,'_psychtoolboxpa
 psychtoolbox_repoFileName = fullfile(repo_save_dir, [bids_string,'_psychtoolboxparams.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
+
+%% _________________________ C. Clear parameters _______________________________
 
 if channel.biopac;  channel.d.close();  end
 clear p; clearvars; Screen('Close'); close all; sca;
@@ -408,7 +421,7 @@ function [Tm] = video_play(moviename,p, movie, imgw, imgh)
                 else keyCode(kID)
                     break;
                 end
-                % make sure key's released
+                % make sure key is released
                 while KbCheck(-3); end
             end
         end
