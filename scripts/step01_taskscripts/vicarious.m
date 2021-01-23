@@ -322,10 +322,8 @@ for trl = 1:size(design_file,1)
     T.event04_actual_biopac(trl)          = biopac_display_onset;
 
     %% ________________________ 7. temporarily save file _______________________
-    tmp_file_name = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), ...
-    strcat('_ses-', sprintf('%02d',session)), '_task-',taskname,'_TEMPbeh.csv' ]);
+    tmp_file_name = fullfile(sub_save_dir,strcat(bids_string,'_TEMPbeh.csv' ));
     writetable(T,tmp_file_name);
-    % Screen('Close', cue_tex{trl});
 end
 
 
