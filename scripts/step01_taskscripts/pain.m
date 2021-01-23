@@ -100,28 +100,28 @@ image_scale                    = fullfile(image_filepath, image_scale_filename);
 
 
 %% D. making output table ________________________________________________________
-vnames = {'src_subject_id', 'session_id','param_run_num','param_counterbalance_ver',...
+vnames = {'src_subject_id', 'session_id','param_task_name','param_run_num','param_counterbalance_ver',...
     'param_counterbalance_block_num','param_cue_type','param_administer_type','param_stimulus_intensity',...
-    'param_cond_name','param_cond_type','param_trigger_onset','param_start_biopac',...
+    'param_cond_type','param_trigger_onset','param_start_biopac',...
     'jitter01_fixation_onset','jitter01_fixation_biopac','jitter01_fixation_duration',...
     'event01_cue_onset','event01_cue_biopac','event01_cue_type','event01_cue_filename',...
     'jitter02_fixation_onset','jitter02_fixation_biopac','jitter02_fixation_duration',...
-    'event02_expect_displayonset','event02_expect_biopac','event02_expect_responseonset','event02_expect_RT',...
+    'event02_expect_displayonset','event02_expect_RT','event02_expect_responseonset','event02_expect_biopac',...
     'jitter03_fixation_onset','jitter03_fixation_biopac','jitter03_fixation_duration',...
-    'event03_administer_type','event03_administer_displayonset','event03_administer_biopac','event03_administerP_trigger',...
-    'event03_adminsiterC_reponse','event03_administerC_responsekeyname','event03_administerC_responseonset','event03_administerC_RT',...
+    'event03_administer_type','event03_administer_displayonset','event03_administer_biopac',...
+    'event03_administerP_trigger','event03_administerP_delay_between_medoc',...
     'jitter04_fixation_onset','jitter04_fixation_biopac','jitter04_fixation_duration',...
-    'event04_actual_displayonset','event04_actual_biopac','event04_actual_responseonset','event04_actual_RT',...
+    'event04_actual_displayonset','event04_actual_RT','event04_actual_responseonset','event04_actual_biopac',...
     'param_end_instruct_onset','param_end_biopac','param_experiment_duration'};
 
-vtypes = {  'double','double','double','double','double','string','string',... % param
-'string','string','double','double','double',... % param
+vtypes = { 'double','double','string','double','double','double','string','string',...
+'string','double','double','double',... % param
 'double','double','double',... % jitter 01
 'double','double','string','string',... % event 01
 'double','double','double',... % jitter 02
 'double','double','double','double',... % event 02
 'double','double','double',... % jitter 03
-'string','double','double','string','double','string','double','double',... % event 03
+'string','double','double','string','double',... % event 03
 'double','double','double',... % jitter 04
 'double','double','double','double',... % event 04
 'double','double','double'}; % param
@@ -140,9 +140,9 @@ T.param_counterbalance_block_num(:) = str2double(block_chunk{1});
 T.param_cue_type               = design_file.cue_type;
 T.param_administer_type        = design_file.administer;
 T.param_cond_type              = design_file.cond_type;
-T.event02_cue_type             = design_file.cue_type;
-T.event02_cue_filename         = design_file.cue_image;
-T.event05_administer_type      = design_file.administer;
+T.event01_cue_type             = design_file.cue_type;
+T.event01_cue_filename         = design_file.cue_image;
+T.event03_administer_type      = design_file.administer;
 
 %% E. Keyboard information _____________________________________________________
 KbName('UnifyKeyNames');
@@ -293,8 +293,8 @@ for trl = 1:size(design_file,1)
     %    p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
     T.event03_administer_displayonset(trl) = GetSecs;
     T.event03_administer_biopac(trl)      = biopac_linux_matlab( channel, channel.administer, 1);
-    biopac_linux_matlab( channel, channel.administer, 0);
     end_event03_stimulus = WaitSecs('UntilTime', end_jitter03 + task_dur);
+    biopac_linux_matlab( channel, channel.administer, 0);
 
     %% ___________________ 7. jitter 04 Fixtion Jitter 0-2 sec _________________________
 
@@ -317,10 +317,8 @@ for trl = 1:size(design_file,1)
 
 
     %% ________________________ 7. temporarily save file _______________________
-    tmp_file_name = fullfile(sub_save_dir,[strcat('sub-', sprintf('%04d', sub)), ...
-    strcat('_ses-', sprintf('%02d',session)), '_task-',taskname,'_TEMPbeh.csv' ]);
+    tmp_file_name = fullfile(sub_save_dir,strcat(bids_string,'_TEMPbeh.csv' ));
     writetable(T,tmp_file_name);
-
 end
 
 %% -----------------------------------------------------------------------------
