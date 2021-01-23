@@ -1,6 +1,5 @@
 function cognitive(sub,input_counterbalance_file, run_num, session, biopac, debug)
 
-
 % code by Heejung Jung
 % heejung.jung@colorado.edu
 % Jan.21.2021
@@ -77,9 +76,10 @@ task_dir                        = pwd;
 main_dir                        = fileparts(fileparts(task_dir));
 repo_dir                        = fileparts(fileparts(fileparts(task_dir)));
 taskname                        = 'cognitive';
-bids_string                     = [strcat('spacetop_task-social'),...
+% bids_string ___________  example: sub-0001_ses-01_task-social_run-cognitive-01
+bids_string                     = [ strcat('sub-', sprintf('%04d', sub)), ...
     strcat('_ses-',sprintf('%02d', session)),...
-    strcat('_sub-', sprintf('%04d', sub)), ...
+    strcat('_task-social'),...
     '_run-',taskname];
 sub_save_dir = fullfile(main_dir, 'data', strcat('sub-', sprintf('%04d', sub)),...
     'beh' , strcat('ses-',sprintf('%02d', session)));
@@ -140,10 +140,12 @@ T.param_cog_stim_num           = design_file.stimuli_num;
 T.param_cog_stim_match         = design_file.match;
 T.param_cog_stim_filename      = design_file.image_filename;
 T.param_cue_type               = design_file.cue_type;
+T.param_administer_type        = design_file.administer;
 T.param_cond_type              = design_file.cond_type;
 T.event02_cue_type             = design_file.cue_type;
 T.event02_cue_filename         = design_file.cue_image;
 T.event05_administer_type      = design_file.administer;
+T.event05_administer_filename  = design_file.video_filename;
 
 
 %% E. Keyboard information _____________________________________________________
@@ -376,7 +378,11 @@ for trl = 1:size(design_file,1)
 end
 
 
-%% _________________________ 8. End Instructions _______________________________
+%% -----------------------------------------------------------------------------
+%                              End of Experiment
+% ------------------------------------------------------------------------------
+
+%% _________________________ A. End Instructions _______________________________
 
 Screen('DrawTexture',p.ptb.window,end_tex,[],[]);
 T.param_end_instruct_onset(:)                = Screen('Flip',p.ptb.window);
@@ -386,7 +392,7 @@ WaitKeyPress(p.keys.end);
 T.param_experiment_duration(:)               = T.param_end_instruct_onset(1) - T.param_trigger_onset(1);
 
 
-%% _________________________ 8. save parameter _________________________________
+%% _________________________ B. Save files _____________________________________
 % onset + response file
 saveFileName = fullfile(sub_save_dir,[bids_string,'_beh.csv' ]);
 repoFileName = fullfile(repo_save_dir,[bids_string,'_beh.csv' ]);
@@ -404,6 +410,8 @@ psychtoolbox_saveFileName = fullfile(sub_save_dir, [bids_string,'_psychtoolbox_p
 psychtoolbox_repoFileName = fullfile(repo_save_dir, [bids_string,'_psychtoolbox_params.mat' ]);
 save(psychtoolbox_saveFileName, 'p');
 save(psychtoolbox_repoFileName, 'p');
+
+%% _________________________ C. Clear parameters _______________________________
 
 if channel.biopac;  channel.d.close();  end
 clear p; clearvars; Screen('Close'); close all; sca;
