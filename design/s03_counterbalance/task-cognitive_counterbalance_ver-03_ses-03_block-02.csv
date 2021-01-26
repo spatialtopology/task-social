@@ -1,13 +1,13 @@
-,index,block,Trial type,cue,stimulus_intensity,ISI1,ISI2,ISI3,ITI,Event1Dur,Event2Dur,Event3Dur,Event4Dur,cue_image,stim_num,same_diff
-18,36,4,4.0,high_cue,low_stim,1.2,6.0,1.2,2.2,1.0,4.0,9.0,4.0,h037.png,42,diff
-19,37,4,4.0,high_cue,low_stim,2.2,1.7,4.3,8.2,1.0,4.0,9.0,4.0,h035.png,4,same
-30,38,4,5.0,high_cue,med_stim,1.0,1.7,3.9,6.7,1.0,4.0,9.0,4.0,h019.png,21,same
-66,39,4,2.0,low_cue,med_stim,1.0,1.7,1.2,8.2,1.0,4.0,9.0,4.0,l025.png,20,same
-6,40,4,6.0,high_cue,high_stim,2.9,11.6,5.2,2.2,1.0,4.0,9.0,4.0,h022.png,21,same
-42,41,4,3.0,low_cue,high_stim,2.2,5.2,1.8,0.8,1.0,4.0,9.0,4.0,l050.png,20,same
-7,42,4,6.0,high_cue,high_stim,1.0,6.4,4.8,5.4,1.0,4.0,9.0,4.0,h016.png,25,same
-31,43,4,5.0,high_cue,med_stim,2.2,5.2,4.3,6.3,1.0,4.0,9.0,4.0,h053.png,42,diff
-54,44,4,1.0,low_cue,low_stim,2.2,3.0,1.2,1.8,1.0,4.0,9.0,4.0,l028.png,13,diff
-43,45,4,3.0,low_cue,high_stim,0.9,4.4,4.3,3.5,1.0,4.0,9.0,4.0,l035.png,23,diff
-55,46,4,1.0,low_cue,low_stim,0.7,3.6,16.8,6.7,1.0,4.0,9.0,4.0,l029.png,20,same
-67,47,4,2.0,low_cue,med_stim,0.6,3.6,5.0,2.2,1.0,4.0,9.0,4.0,l021.png,27,same
+,index,block,Trial type,cue,stimulus_intensity,ITI,Event1Dur,ISI1,Event2Dur,ISI2,Event3Dur,ISI3,Event4Dur,cue_image,stim_num,same_diff,image_filename
+18,36,4,4.0,high_cue,low_stim,2.2,1.0,1.2,4.0,6.0,9.0,1.2,4.0,h025.png,44,diff,44_50_R.jpg
+19,37,4,4.0,high_cue,low_stim,8.2,1.0,2.2,4.0,1.7,9.0,4.3,4.0,h006.png,9,diff,9_50_R.jpg
+30,38,4,5.0,high_cue,med_stim,6.7,1.0,1.0,4.0,1.7,9.0,3.9,4.0,h035.png,24,same,24_100.jpg
+66,39,4,2.0,low_cue,med_stim,8.2,1.0,1.0,4.0,1.7,9.0,1.2,4.0,l018.png,48,diff,48_100_R.jpg
+6,40,4,6.0,high_cue,high_stim,2.2,1.0,2.9,4.0,11.6,9.0,5.2,4.0,h013.png,48,same,48_150.jpg
+42,41,4,3.0,low_cue,high_stim,0.8,1.0,2.2,4.0,5.2,9.0,1.8,4.0,l056.png,34,same,34_150.jpg
+7,42,4,6.0,high_cue,high_stim,5.4,1.0,1.0,4.0,6.4,9.0,4.8,4.0,h026.png,17,diff,17_150_R.jpg
+31,43,4,5.0,high_cue,med_stim,6.3,1.0,2.2,4.0,5.2,9.0,4.3,4.0,h047.png,48,same,48_100.jpg
+54,44,4,1.0,low_cue,low_stim,1.8,1.0,2.2,4.0,3.0,9.0,1.2,4.0,l004.png,44,same,44_50.jpg
+43,45,4,3.0,low_cue,high_stim,3.5,1.0,0.9,4.0,4.4,9.0,4.3,4.0,l047.png,45,diff,45_150_R.jpg
+55,46,4,1.0,low_cue,low_stim,6.7,1.0,0.7,4.0,3.6,9.0,16.8,4.0,l008.png,23,diff,23_50_R.jpg
+67,47,4,2.0,low_cue,med_stim,2.2,1.0,0.6,4.0,3.6,9.0,5.0,4.0,l022.png,10,diff,10_100_R.jpg
