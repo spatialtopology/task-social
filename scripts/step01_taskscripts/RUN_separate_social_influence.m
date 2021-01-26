@@ -2,15 +2,16 @@ clear all;
 Screen('Close');
 clearvars;
 sca;
+
 % 1. grab participant number ___________________________________________________
-prompt = 'SESSION (1 or 4): ';
+prompt = 'SESSION (1 , 3, or 4): ';
 session = input(prompt);
 prompt = 'PARTICIPANT (in raw number form, e.g. 1, 2,...,98): ';
 sub_num = input(prompt);
 prompt = 'BIOPAC (YES=1, NO=0) : ';
 biopac = input(prompt);
 fMRI = 1;
-debug = 0;
+debug = 1;
 
 % 2. counterbalance version ____________________________________________________
 % random sequence
