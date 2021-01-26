@@ -1,0 +1,13 @@
+,index,block,Trial type,cue,stimulus_intensity,ISI1,ISI2,ISI3,ITI,Event1Dur,Event2Dur,Event3Dur,Event4Dur,cue_image,stim_num,same_diff
+26,12,2,5.0,high_cue,med_stim,0.8,7.9,3.7,1.1,1.0,4.0,9.0,4.0,h045.png,45,same
+62,13,2,2.0,low_cue,med_stim,1.5,0.9,3.7,1.9,1.0,4.0,9.0,4.0,l037.png,15,diff
+14,14,2,4.0,high_cue,low_stim,1.5,5.7,6.1,3.3,1.0,4.0,9.0,4.0,h010.png,5,same
+63,15,2,2.0,low_cue,med_stim,1.5,6.9,5.9,8.6,1.0,4.0,9.0,4.0,l036.png,7,same
+2,16,2,6.0,high_cue,high_stim,2.9,8.6,5.8,3.2,1.0,4.0,9.0,4.0,h028.png,42,same
+50,17,2,1.0,low_cue,low_stim,1.4,4.5,1.6,16.3,1.0,4.0,9.0,4.0,l014.png,45,diff
+38,18,2,3.0,low_cue,high_stim,0.8,4.4,5.1,3.1,1.0,4.0,9.0,4.0,l013.png,45,diff
+27,19,2,5.0,high_cue,med_stim,0.6,3.4,2.9,5.1,1.0,4.0,9.0,4.0,h017.png,15,same
+15,20,2,4.0,high_cue,low_stim,0.6,0.9,9.9,4.2,1.0,4.0,9.0,4.0,h053.png,24,same
+39,21,2,3.0,low_cue,high_stim,2.9,8.6,4.3,1.1,1.0,4.0,9.0,4.0,l034.png,4,same
+3,22,2,6.0,high_cue,high_stim,0.7,0.7,4.1,2.8,1.0,4.0,9.0,4.0,h013.png,4,diff
+51,23,2,1.0,low_cue,low_stim,2.9,1.7,1.1,3.3,1.0,4.0,9.0,4.0,l015.png,15,diff

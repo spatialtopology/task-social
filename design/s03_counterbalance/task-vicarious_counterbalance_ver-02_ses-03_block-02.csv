@@ -1,0 +1,13 @@
+,index,block,Trial type,cue,stimulus_intensity,ISI1,ISI2,ISI3,ITI,Event1Dur,Event2Dur,Event3Dur,Event4Dur,cue_image,video_subject,image_glob,video_filename
+12,0,2,4.0,high_cue,low_stim,1.4,4.6,2.4,1.9,1.0,4.0,9.0,4.0,h003.png,049-bm049,bm049*L.mp4,bm049t1afaff_L.mp4
+13,1,2,1.0,low_cue,low_stim,0.8,1.1,4.2,1.9,1.0,4.0,9.0,4.0,l016.png,080-bn080,bn080*L.mp4,bn080t1afunaff_L.mp4
+14,2,2,2.0,low_cue,med_stim,1.1,2.6,2.6,0.9,1.0,4.0,9.0,4.0,l053.png,049-bm049,bm049*M.mp4,bm049t2aeaff_M.mp4
+15,3,2,3.0,low_cue,high_stim,2.1,9.4,2.3,1.1,1.0,4.0,9.0,4.0,l009.png,049-bm049,bm049*H.mp4,bm049t2aeunaff_H.mp4
+16,4,2,5.0,high_cue,med_stim,1.4,1.4,2.3,0.6,1.0,4.0,9.0,4.0,h050.png,124-dn124,dn124*M.mp4,dn124t1aeunaff_M.mp4
+17,5,2,6.0,high_cue,high_stim,1.1,5.5,1.4,0.7,1.0,4.0,9.0,4.0,h010.png,080-bn080,bn080*H.mp4,bn080t1afaff_H.mp4
+18,6,2,4.0,high_cue,low_stim,1.1,6.8,12.2,2.0,1.0,4.0,9.0,4.0,h042.png,097-gf097,gf097*L.mp4,gf097t2aiunaff_L.mp4
+19,7,2,6.0,high_cue,high_stim,1.1,5.1,5.6,7.7,1.0,4.0,9.0,4.0,h046.png,042-ll042,ll042*H.mp4,ll042t1aiaff_H.mp4
+20,8,2,1.0,low_cue,low_stim,2.1,4.6,4.3,0.9,1.0,4.0,9.0,4.0,l046.png,108-th108,th108*L.mp4,th108t1aaunaff_L.mp4
+21,9,2,2.0,low_cue,med_stim,2.1,1.1,4.2,2.0,1.0,4.0,9.0,4.0,l026.png,108-th108,th108*M.mp4,th108t2aaunaff_M.mp4
+22,10,2,3.0,low_cue,high_stim,1.4,5.6,2.7,17.1,1.0,4.0,9.0,4.0,l005.png,052-dr052,dr052*H.mp4,dr052t1aiaff_H.mp4
+23,11,2,5.0,high_cue,med_stim,2.1,6.1,9.6,17.0,1.0,4.0,9.0,4.0,h029.png,052-dr052,dr052*M.mp4,dr052t2aaaff_M.mp4
