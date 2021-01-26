@@ -1,4 +1,4 @@
-,Unnamed: 0,index,block,Trial type,cue,stimulus_intensity,ITI,Event1Dur,ISI1,Event2Dur,ISI2,Event3Dur,ISI3,Event4Dur,cue_image,stim_num,same_diff,image_filename,onset_ITI,onset_ev01,onset_ISI1,onset_ev02,onset_ISI2,onset_ev03,onset_ISI3,onset_ev04
+,Unnamed: 0,index,block,trial_type,cue,stimulus_intensity,ITI,Event1Dur,ISI1,Event2Dur,ISI2,Event3Dur,ISI3,Event4Dur,cue_image,stim_num,same_diff,image_filename,onset_ITI,onset_ev01,onset_ISI1,onset_ev02,onset_ISI2,onset_ev03,onset_ISI3,onset_ev04
 0,64,24,3,2.0,low_cue,med_stim,2.7,1.0,1.0,4.0,4.7,9.0,2.9,4.0,l029.png,43,diff,43_100_R.jpg,2.7,3.7,4.7,8.7,13.399999999999999,22.4,25.299999999999997,29.299999999999997
 1,52,25,3,1.0,low_cue,low_stim,1.7,1.0,1.3,4.0,7.5,9.0,1.9,4.0,l025.png,48,diff,48_50_R.jpg,30.999999999999996,31.999999999999996,33.3,37.3,44.8,53.8,55.699999999999996,59.699999999999996
 2,40,26,3,3.0,low_cue,high_stim,11.7,1.0,1.3,4.0,4.8,9.0,2.1,4.0,l039.png,33,same,33_150.jpg,71.39999999999999,72.39999999999999,73.69999999999999,77.69999999999999,82.5,91.5,93.6,97.6

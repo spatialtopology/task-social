@@ -1,4 +1,4 @@
-,Unnamed: 0,index,block,Trial type,cue,stimulus_intensity,ISI1,ISI2,ISI3,ITI,Event1Dur,Event2Dur,Event3Dur,Event4Dur,cue_image,video_subject,image_glob,video_filename,onset_ITI,onset_ev01,onset_ISI1,onset_ev02,onset_ISI2,onset_ev03,onset_ISI3,onset_ev04
+,Unnamed: 0,index,block,trial_type,cue,stimulus_intensity,ISI1,ISI2,ISI3,ITI,Event1Dur,Event2Dur,Event3Dur,Event4Dur,cue_image,video_subject,image_glob,video_filename,onset_ITI,onset_ev01,onset_ISI1,onset_ev02,onset_ISI2,onset_ev03,onset_ISI3,onset_ev04
 0,12,0,2,4.0,high_cue,low_stim,1.2,4.7,5.2,5.1,1.0,4.0,9.0,4.0,h040.png,121-vw121,vw121*L.mp4,vw121t1aeaff_L.mp4,5.1,6.1,7.3,11.3,16.0,25.0,30.2,34.2
 1,13,1,2,2.0,low_cue,med_stim,1.4,1.4,3.1,0.6,1.0,4.0,9.0,4.0,l054.png,043-jh043,jh043*M.mp4,jh043t2aeunaff_M.mp4,34.800000000000004,35.800000000000004,37.2,41.2,42.6,51.6,54.7,58.7
 2,14,2,2,4.0,high_cue,low_stim,1.2,7.0,1.5,5.2,1.0,4.0,9.0,4.0,h003.png,109-ib109,ib109*L.mp4,ib109t1aiunaff_L.mp4,63.900000000000006,64.9,66.10000000000001,70.10000000000001,77.1,86.1,87.6,91.6

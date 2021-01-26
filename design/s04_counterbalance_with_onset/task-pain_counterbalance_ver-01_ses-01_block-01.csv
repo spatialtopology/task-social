@@ -1,4 +1,4 @@
-,Unnamed: 0,Event1 onset,Event2 onset,Event3 onset,Event4 onset,Trial type,ISI1,ISI2,ISI3,ITI,Event1Dur,Event2Dur,Event3Dur,Event4Dur,cue,stimulus_intensity,cue_image,onset_ITI,onset_ev01,onset_ISI1,onset_ev02,onset_ISI2,onset_ev03,onset_ISI3,onset_ev04
+,Unnamed: 0,Event1 onset,Event2 onset,Event3 onset,Event4 onset,trial_type,ISI1,ISI2,ISI3,ITI,Event1Dur,Event2Dur,Event3Dur,Event4Dur,cue,stimulus_intensity,cue_image,onset_ITI,onset_ev01,onset_ISI1,onset_ev02,onset_ISI2,onset_ev03,onset_ISI3,onset_ev04
 0,0,0.0,3.2109,7.8348,20.8438,1.0,0.8,4.7,4.0,11.4,1.0,4.0,9.0,4.0,low_cue,low_stim,l011.png,11.4,12.4,13.200000000000001,17.200000000000003,21.900000000000002,30.900000000000002,34.900000000000006,38.900000000000006
 1,1,35.4753,41.9733,46.5972,60.4263,2.0,2.0,4.7,4.8,2.1,1.0,4.0,9.0,4.0,low_cue,med_stim,l052.png,41.00000000000001,42.00000000000001,44.00000000000001,48.00000000000001,52.7,61.7,66.5,70.5
 2,2,65.6977,72.1957,76.9562,88.7881,5.0,2.0,0.8,2.8,4.5,1.0,4.0,9.0,4.0,high_cue,med_stim,h049.png,75.0,76.0,78.0,82.0,82.8,91.8,94.6,98.6
