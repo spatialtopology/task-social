@@ -20,16 +20,17 @@ main_dir                       = fileparts(fileparts(task_dir));
 repo_dir                       = fileparts(fileparts(fileparts(task_dir)));
 counterbalancefile     = fullfile(main_dir, 'design', 'latin_square_sequence.csv');
 cb                     = readtable(counterbalancefile);
-index = rem(sub_num,10);
-cb_ver                 = cb{index,'cb_ver'};
+index = rem(sub_num,20);
+cb_ver_PV              = cb{index,'cb_ver'};
+cb_ver_C               = cb{index,'cb_ver_C'};
 latin                  = cb{index,{strcat('ses0', num2str(session))}};
 
-c1 = strcat('task-cognitive_counterbalance_ver-', sprintf('%02d',cb_ver),'_ses-',sprintf('%02d', session), '_block-01');
-c2 = strcat('task-cognitive_counterbalance_ver-' , sprintf('%02d',cb_ver),'_ses-',sprintf('%02d', session),'_block-02');
-p1 = strcat('task-pain_counterbalance_ver-' , sprintf('%02d',cb_ver),'_ses-',sprintf('%02d', session), '_block-01');
-p2 = strcat('task-pain_counterbalance_ver-' , sprintf('%02d',cb_ver),'_ses-',sprintf('%02d', session), '_block-02');
-v1 = strcat('task-vicarious_counterbalance_ver-' , sprintf('%02d',cb_ver),'_ses-',sprintf('%02d', session), '_block-01');
-v2 = strcat('task-vicarious_counterbalance_ver-' , sprintf('%02d',cb_ver),'_ses-',sprintf('%02d', session), '_block-02');
+c1 = strcat('task-cognitive_counterbalance_ver-', sprintf('%02d',cb_ver_C),'_ses-',sprintf('%02d', session), '_block-01');
+c2 = strcat('task-cognitive_counterbalance_ver-' , sprintf('%02d',cb_ver_C),'_ses-',sprintf('%02d', session),'_block-02');
+p1 = strcat('task-pain_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', session), '_block-01');
+p2 = strcat('task-pain_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', session), '_block-02');
+v1 = strcat('task-vicarious_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', session), '_block-01');
+v2 = strcat('task-vicarious_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', session), '_block-02');
 
 % 2. counterbalance version ____________________________________________________
 
