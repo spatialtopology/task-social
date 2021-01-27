@@ -3,7 +3,7 @@ Screen('Close');
 clearvars;
 sca;
 % 1. grab participant number ___________________________________________________
-prompt = 'SESSION (1 or 4): ';
+prompt = 'SESSION (1, 3, 4): ';
 session = input(prompt);
 prompt = 'PARTICIPANT (in raw number form, e.g. 1, 2,...,98): ';
 sub_num = input(prompt);
@@ -15,10 +15,14 @@ debug = 0;
 
 % 2. counterbalance version ____________________________________________________
 % random sequence
+task_dir                       = pwd;
+main_dir                       = fileparts(fileparts(task_dir));
+repo_dir                       = fileparts(fileparts(fileparts(task_dir)));
 counterbalancefile     = fullfile(main_dir, 'design', 'latin_square_sequence.csv');
 cb                     = readtable(counterbalancefile);
-cb_ver                 = cb{sub_num,'cb_ver'}
-latin                  = cb{sub_num,{strcat('ses0', num2str(session))}}
+index = rem(sub_num,10);
+cb_ver                 = cb{index,'cb_ver'};
+latin                  = cb{index,{strcat('ses0', num2str(session))}};
 
 c1 = strcat('task-cognitive_counterbalance_ver-', sprintf('%02d',cb_ver),'_ses-',sprintf('%02d', session), '_block-01');
 c2 = strcat('task-cognitive_counterbalance_ver-' , sprintf('%02d',cb_ver),'_ses-',sprintf('%02d', session),'_block-02');
@@ -31,26 +35,25 @@ v2 = strcat('task-vicarious_counterbalance_ver-' , sprintf('%02d',cb_ver),'_ses-
 
 % 3. block order _______________________________________________________________
 % latinsquare
-%
-latin = 1
+
 switch latin
   case 1 % p1; v1; c2; c1; v2; p2 - A B F C E D
-    task1 = 'P'; task2 = 'V'; task3 = 'C'; task4 = 'C'; task5 = 'V'; task6 = 'P';
+    task1 = 'pain'; task2 = 'vicarious'; task3 = 'cognitive'; task4 = 'cognitive'; task5 = 'vicarious'; task6 = 'pain';
     t1_cb = p1;  t2_cb = v1;  t3_cb = c2;  t4_cb = c1;  t5_cb = v2;  t6_cb = p2;
   case 2 % v1; c1; p1; p2; c2; v2 - B C A A' C' B'
-    task1 = 'V'; task2 = 'C'; task3 = 'P'; task4 = 'P'; task5 = 'C'; task6 = 'V';
+    task1 = 'vicarious'; task2 = 'cognitive'; task3 = 'pain'; task4 = 'pain'; task5 = 'cognitive'; task6 = 'vicarious';
     t1_cb = v1;  t2_cb = c1;  t3_cb = p1;  t4_cb = p2;  t5_cb = c2;  t6_cb = v2;
   case 3 % c1; p2; v1; v2; p1; c2 - C A' B B' A C'
-    task1 = 'C'; task2 = 'P'; task3 = 'V'; task4 = 'V'; task5 = 'P'; task6 = 'C';
+    task1 = 'cognitive'; task2 = 'pain'; task3 = 'vicarious'; task4 = 'vicarious'; task5 = 'pain'; task6 = 'cognitive';
     t1_cb = c1;  t2_cb = p2;  t3_cb = v1;  t4_cb = v2;  t5_cb = p1;  t6_cb = c2;
   case 4 % p2; v2; c1; c2; v1; p1 - D E C F B A
-    task1 = 'V'; task2 = 'P'; task3 = 'C'; task4 = 'P'; task5 = 'V'; task6 = 'C';
+    task1 = 'vicarious'; task2 = 'pain'; task3 = 'cognitive'; task4 = 'pain'; task5 = 'vicarious'; task6 = 'cognitive';
     t1_cb = v2;  t2_cb = p2;  t3_cb = c1;  t4_cb = p1;  t5_cb = v1;  t6_cb = c2;
   case 5 % v2; c2; p2; p1; c1; v1 - E F D A C B
-    task1 = 'C'; task2 = 'V'; task3 = 'P'; task4 = 'V'; task5 = 'C'; task6 = 'P';
+    task1 = 'cognitive'; task2 = 'vicarious'; task3 = 'pain'; task4 = 'vicarious'; task5 = 'cognitive'; task6 = 'pain';
     t1_cb = c2;  t2_cb = v2;  t3_cb = p2;  t4_cb = v1;  t5_cb = c1;  t6_cb = p1;
   case 6 % c2; p1; v2; v1; p2; c1 - F A E B D C
-    task1 = 'P'; task2 = 'C'; task3 = 'V'; task4 = 'C'; task5 = 'P'; task6 = 'V';
+    task1 = 'pain'; task2 = 'cognitive'; task3 = 'vicarious'; task4 = 'cognitive'; task5 = 'pain'; task6 = 'vicarious';
     t1_cb = p2;  t2_cb = c2;  t3_cb = v2;  t4_cb = c1;  t5_cb = p1;  t6_cb = v1;
 end
 
