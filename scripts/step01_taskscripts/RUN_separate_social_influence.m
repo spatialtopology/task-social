@@ -6,7 +6,7 @@ sca;
 % 1. grab participant number ___________________________________________________
 prompt = 'SESSION (1 , 3, or 4): ';
 session = input(prompt);
-prompt = 'PARTICIPANT (in raw number form, e.g. 1, 2,...,98): ';
+prompt = 'PARTICIePANT (in raw number form, e.g. 1, 2,...,98): ';
 sub_num = input(prompt);
 prompt = 'BIOPAC (YES=1, NO=0) : ';
 biopac = input(prompt);
@@ -17,12 +17,13 @@ debug = 1;
 % random sequence
 r_seq =  [1,3,2,3,5,1,2,4,4,5];
 index = rem(sub_num,10);
-c1 = ['task-cognitive_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-01'];
-c2 = ['task-cognitive_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-02'];
-p1 = ['task-pain_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-01'];
-p2 = ['task-pain_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-02'];
-v1 = ['task-vicarious_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-01'];
-v2 = ['task-vicarious_counterbalance_ver-0' num2str(r_seq(index+1)) '_block-02'];
+
+c1 = ['task-cognitive_counterbalance_ver-0', num2str(r_seq(index+1)) , strcat('_ses-', sprintf('%02d', session)), '_block-01'];
+c2 = ['task-cognitive_counterbalance_ver-0', num2str(r_seq(index+1)) , strcat('_ses-', sprintf('%02d', session)),'_block-02'];
+p1 = ['task-pain_counterbalance_ver-0', num2str(r_seq(index+1)) , strcat('_ses-', sprintf('%02d', session)),'_block-01'];
+p2 = ['task-pain_counterbalance_ver-0' ,num2str(r_seq(index+1)), strcat('_ses-', sprintf('%02d', session)), '_block-02'];
+v1 = ['task-vicarious_counterbalance_ver-0' ,num2str(r_seq(index+1)) , strcat('_ses-', sprintf('%02d', session)),'_block-01'];
+v2 = ['task-vicarious_counterbalance_ver-0' ,num2str(r_seq(index+1)), strcat('_ses-', sprintf('%02d', session)),'_block-02'];
 
 % 2. counterbalance version ____________________________________________________
 
