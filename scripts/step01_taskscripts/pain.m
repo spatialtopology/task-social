@@ -103,32 +103,35 @@ vnames = {'src_subject_id', 'session_id','param_task_name','param_run_num','para
     'param_counterbalance_block_num','param_cue_type','param_stimulus_type',...
     'param_cond_type','param_trigger_onset','param_start_biopac',...
     'ITI_onset','ITI_biopac','ITI_duration',...
-    'event01_cue_onset','event01_cue_biopac','event01_cue_type','event01_cue_filename',...
-    'ISI01_onset','ISI01_biopac','ISI01_duration',...
+    'event01_cue_onset','event01_cue_biopac','event01_cue_type','event01_cue_filename',... % event 01
+    'ISI01_onset','ISI01_biopac','ISI01_duration',... % ISI 01
     'event02_expect_displayonset','event02_expect_biopac','event02_expect_responseonset','event02_expect_RT',...
-    'ISI02_onset','ISI02_biopac','ISI02_duration',...
+    'event02_expect_angle','event02_expect_angle_label',... % event 02
+    'ISI02_onset','ISI02_biopac','ISI02_duration',... % ISI 02
     'event03_stimulus_type','event03_stimulus_displayonset','event03_stimulus_biopac',...
-    'event03_C_stim_match', ...
+    'event03_stimulus_C_stim_match', ...
     'event03_stimulusC_response','event03_stimulusC_responsekeyname','event03_stimulusC_reseponseonset','event03_stimulusC_RT',...
-    'ISI03_onset','ISI03_biopac','ISI03_duration',...
+    'ISI03_onset','ISI03_biopac','ISI03_duration',... % ISI 03
     'event04_actual_displayonset','event04_actual_biopac','event04_actual_responseonset','event04_actual_RT',...
-    'param_end_instruct_onset','param_end_biopac','param_experiment_duration'};
-    'event03_P_trigger', 'event03_P_delay_between_medoc', 'event03_C_stim_num', 'event03_C_stim_filename',
+    'event04_actual_angle','event04_actual_angle_label',... % event 04
+    'param_end_instruct_onset','param_end_biopac','param_experiment_duration',...
+    'event03_stimulus_P_trigger','event03_stimulus_P_delay_between_medoc',...
+    'event03_stimulus_V_patientid','event03_stimulus_V_filename',...
+    'event03_stimulus_C_stim_num', 'event03_stimulus_C_stim_filename'};
 
 
-vtypes = {  'double','double','string','double','double','double','string','string',... % param
+vtypes = { 'double','double','string','double','double','double','string','string',...
 'double','double','double',... % param
-'double','double','double',... % ITI
+  'double','double','double',... % ITI
 'double','double','string','string',... % event 01
 'double','double','double',... % ISI 01
-'double','double','double','double',... % event 02
+'double','double','double','double','double','string',... % event 02
 'double','double','double',... % ISI 02
-'string','double','double',... % event 03
-'string',...
-'double','string','double','double',... % event 03
+'string','double','double','string','double','string','double','double', ... % event 03
 'double','double','double',... % ISI 03
-'double','double','double','double',... % event 04
-'double','double','double'}; % param
+'double','double','double','double','double','string',... % event 04
+'double','double','double',... % param
+'string','double','string','string','double','string'};
 T = table('Size', [size(design_file,1), size(vnames,2)], 'VariableNames', vnames, 'VariableTypes', vtypes);
 
 a                              = split(counterbalancefile,filesep); % full path filename components
@@ -243,7 +246,7 @@ for trl = 1:size(design_file,1)
 
     %% ____________________ 1. jitter 01 - 0-4 sec _________________________________
 
-    T.ITI_onset(trl)         = fixation_cross(p);
+    T.ITI_onset(trl)         = trial_fixation(p);
     T.ITI_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation, 1);
     WaitSecs('UntilTime', anchor + design_file.onset_ITI(trl));
     %WaitSecs('UntilTime', T.jitter01_fixation_onset(trl) + design_file.ISI1(trl)); % CHANGE
@@ -377,6 +380,11 @@ clear p; clearvars; Screen('Close'); close all; sca;
 function [time] = fixation_cross(p)
     Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
         p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+    time = Screen('Flip', p.ptb.window);
+end
+function [time] = trial_fixation(p)
+    Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+        p.fix.lineWidthPix, [0 255 255], [p.ptb.xCenter p.ptb.yCenter], 2);
     time = Screen('Flip', p.ptb.window);
 end
 

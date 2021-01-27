@@ -251,7 +251,7 @@ for trl = 1:size(design_file,1)
 
   %% ____________________ 1. jitter 01 - 0-4 sec _________________________________
   jitter1 = design_file.ISI1(trl);
-  T.ITI_onset(trl)         = fixation_cross(p);
+  T.ITI_onset(trl)         = trial_fixation(p);
   T.ITI_biopac(trl)        = biopac_linux_matlab(channel, channel.fixation, 1);
   end_jitter01 = WaitSecs('UntilTime', anchor + design_file.onset_ITI(trl));
   biopac_linux_matlab(channel, channel.fixation, 0);
@@ -411,6 +411,12 @@ function [Tm] = video_play(moviename,p, movie, imgw, imgh)
     function [time] = fixation_cross(p)
         Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
             p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
+        time = Screen('Flip', p.ptb.window);
+    end
+
+    function [time] = trial_fixation(p)
+        Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
+            p.fix.lineWidthPix, [0 255 255], [p.ptb.xCenter p.ptb.yCenter], 2);
         time = Screen('Flip', p.ptb.window);
     end
 
