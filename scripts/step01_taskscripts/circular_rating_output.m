@@ -117,7 +117,7 @@ while (GetSecs-display_onset) <  duration
 
     loopstart = GetSecs;
 
-    % sample at SAMPLERATE
+    % sample at SAMPLERATE    T.event03_stimulus_displayonset(trl)       = mr.initialized;
     if loopstart >= nextsample
         ctime(sample) = loopstart; %#ok
         trajectory(sample,1) = cursor.x;
@@ -137,7 +137,7 @@ while (GetSecs-display_onset) <  duration
     [cursor.x, cursor.y, xlim, ylim] = limit(cursor.x, cursor.y, cursor.xcenter, cursor.ycenter, rlim, xlim, ylim);
 
     % check bounds
-    if cursor.x > cursor.xmax
+    if cursor.x > cursor.xmax    T.event03_stimulus_displayonset(trl)       = mr.initialized;
         cursor.x = cursor.xmax;
     elseif cursor.x < cursor.xmin
         cursor.x = cursor.xmin;
@@ -167,12 +167,13 @@ while (GetSecs-display_onset) <  duration
        Screen('FillOval',p.ptb.window,[255 0 255],[[cursor.x cursor.y]-cursor.size [cursor.x cursor.y]+cursor.size]);
        Screen('Flip',p.ptb.window);
        WaitSecs(0.500);
-       %remainder_time = duration-0.5-RT;
+
 
        Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
        p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
        Screen('Flip',p.ptb.window);
        %WaitSecs(remainder_time);
+       %WaitSecs('UntilTime', end_time);
        WaitSecs('UntilTime', display_onset + duration);
     end
 
