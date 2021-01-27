@@ -117,7 +117,7 @@ while (GetSecs-display_onset) <  duration
 
     loopstart = GetSecs;
 
-    % sample at SAMPLERATE    T.event03_stimulus_displayonset(trl)       = mr.initialized;
+    % sample at SAMPLERATE    %T.event03_stimulus_displayonset(trl)       = mr.initialized;
     if loopstart >= nextsample
         ctime(sample) = loopstart; %#ok
         trajectory(sample,1) = cursor.x;
@@ -137,7 +137,7 @@ while (GetSecs-display_onset) <  duration
     [cursor.x, cursor.y, xlim, ylim] = limit(cursor.x, cursor.y, cursor.xcenter, cursor.ycenter, rlim, xlim, ylim);
 
     % check bounds
-    if cursor.x > cursor.xmax    T.event03_stimulus_displayonset(trl)       = mr.initialized;
+    if cursor.x > cursor.xmax   % T.event03_stimulus_displayonset(trl)       = mr.initialized;
         cursor.x = cursor.xmax;
     elseif cursor.x < cursor.xmin
         cursor.x = cursor.xmin;
