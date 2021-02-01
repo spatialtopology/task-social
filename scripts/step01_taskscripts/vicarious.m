@@ -281,13 +281,15 @@ for trl = 1:size(design_file,1)
     %% ____________________ 4. event 02 expectation rating 4 s _____________________
 
     Screen('TextSize', p.ptb.window, 36);
-    [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(4, p, cue_tex{trl},'expect',  channel, channel.expect);
+    [trajectory, display_onset, RT, response_onset, biopac_display_onset, angle] = circular_rating_output(4, p, cue_tex{trl},'expect',  channel, channel.expect);
     end_event02 = biopac_linux_matlab( channel, channel.expect, 0);
     rating_trajectory{trl,1}              = trajectory;
     T.event02_expect_displayonset(trl)    = display_onset;
     T.event02_expect_RT(trl)              = RT;
     T.event02_expect_responseonset(trl)   = response_onset;
     T.event02_expect_biopac(trl)          = biopac_display_onset;
+    T.event02_expect_angle(trl)           = angle;
+    T.event02_expect_angle_label(trl)     = 'FIX';
 
     %% ____________________ 5. jitter 03 Fixtion Jitter 0-2 sec ____________________
 
@@ -321,7 +323,7 @@ for trl = 1:size(design_file,1)
 
     %% ___________________ 8. event 04 post evaluation rating 4 s __________________________
 
-    [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(4, p, actual_tex,'actual', channel, channel.actual);
+    [trajectory, display_onset, RT, response_onset, biopac_display_onset, angle] = circular_rating_output(4, p, actual_tex,'actual', channel, channel.actual);
     biopac_linux_matlab( channel, channel.actual, 0);
 
     rating_trajectory{trl,2}              = trajectory;
@@ -329,6 +331,8 @@ for trl = 1:size(design_file,1)
     T.event04_actual_RT(trl)              = RT;
     T.event04_actual_responseonset(trl)   = response_onset;
     T.event04_actual_biopac(trl)          = biopac_display_onset;
+    T.event04_actual_angle(trl)           = angle;
+    T.event04_actual_angle_label(trl)     = 'FIX';
 
     %% ________________________ 7. temporarily save file _______________________
     tmp_file_name = fullfile(sub_save_dir,strcat(bids_string,'_TEMPbeh.csv' ));

@@ -1,4 +1,4 @@
-function [trajectory, display_onset, RT, response_onset, biopac_display_onset] = circular_rating_output(duration, p, scale_tex, rating_type, channel, channel_type)
+function [trajectory, display_onset, RT, response_onset, biopac_display_onset, angle] = circular_rating_output(duration, p, scale_tex, rating_type, channel, channel_type)
 
 %% Phil Kragel 6/20/2019
 % global screenNumber window windowRect xCenter yCenter screenXpixels screenYpixels
@@ -30,6 +30,7 @@ function [trajectory, display_onset, RT, response_onset, biopac_display_onset] =
 % * response_onset       - the time that the pariticpant pressed the mouse button
 % * response_onset       - button press reaction time = response_onset - display_onset
 % * biopac_display_onset - the time that the scale_tex was flipped and was registered in Biopac
+% * angle                - the angle of the semi-circular rating
 %
 % Additions ________________________________________________________________________________
 % 1. duration:    length of rating scale, NOTE that the duration is filled with a fixation
@@ -159,6 +160,7 @@ while (GetSecs-display_onset) <  duration
     elseif any(buttonpressed)
        response_onset = GetSecs;
        RT = response_onset - display_onset;
+       angle = calc_angle(cursor.x, cursor.y, cursor.xcenter, cursor.ycenter, p.ptb.window, rlim)
        biopac_linux_matlab(channel, channel_type, 0);
        buttonpressed = [0 0 0];
        Screen('CopyWindow',dspl.cscale.w,p.ptb.window);
@@ -201,4 +203,25 @@ elseif y>ycenter && (((x-xcenter)^2 + (y-ycenter)^2) > r^2)
    x = xlim;
    y = ycenter;
 end
+end
+
+function angle = calc_angle(x, y, xcenter, ycenter, win, r)
+angle = NaN;
+if x >= xcenter
+   angle = atan((ycenter-y)/(x-xcenter));
+  % yaim = ycenter - r*sin(angle);
+  % xaim = xcenter + r*cos(angle);
+  % yaim2 = ycenter - (r-50)*sin(angle);
+  % xaim2 = xcenter + (r-50)*cos(angle);
+   angle = pi - angle;
+else
+   angle = atan((ycenter-y)/(xcenter-x));
+  % yaim = ycenter - r*sin(angle);
+  % xaim = xcenter - r*cos(angle);
+  % yaim2 = ycenter - (r-50)*sin(angle);
+  % xaim2 = xcenter - (r-50)*cos(angle);
+end
+angle = 180*angle/pi;
+%Screen('DrawLines', win, [xaim, xcenter; yaim, ycenter], 4, [255 1 1]);
+%Screen('DrawLines', win, [xaim2, xcenter; yaim2, ycenter], 5, [0 0 0]);
 end
