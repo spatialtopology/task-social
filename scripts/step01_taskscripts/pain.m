@@ -311,7 +311,7 @@ for trl = 1:size(design_file,1)
     T.event03_stimulus_biopac(trl)      = biopac_linux_matlab( channel, channel.administer, 1);
     end_event03_stimulus = WaitSecs('UntilTime', anchor + design_file.onset_ev03(trl));
     biopac_linux_matlab( channel, channel.administer, 0);
-    %T.event03_stimulusP_trigger(trl) = strcat(response{3}, '_',response{6});
+    T.event03_stimulus_P_trigger(trl) = strcat(response{3}, '_AND_', response{6});
 
     %% ___________________ 7. jitter 04 Fixtion Jitter 0-2 sec _________________________
 
