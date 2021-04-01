@@ -52,6 +52,7 @@
 ---
 
 # Analysis
+[git repo](https://github.com/jungheejung/social_influence_analysis)
 
 ---
 
