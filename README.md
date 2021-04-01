@@ -3,7 +3,12 @@
 ## run code from scripts > step01_taskscripts
 
 ![socialinfluence](https://github.com/spacetop-admin/figures/blob/master/fig_socialinfluence.png)
-## pain
+
+
+--- 
+
+# Stimuli description
+## I. pain
 * code from github: https://github.com/canlab/Paradigms_Private/blob/master/PAINGEN_paradigms/TriggerThermode.m
 * ATS. @Boulder rm173 socialinfluence48, socialinfluence49, socialinfluence50
 * temperature can go up by 10 degrees per second, Thus plateau must vary.
@@ -11,7 +16,7 @@
 * 49 C: baseline 36, rate 10, 1.4 sec plateau
 * 50 C: baseline 36, rate 10, 1.2 sec plateau
 
-## vicarious-pain
+## II. vicarious-pain
 1. original dataset
 	* UNBC-McMaster Shoulder Pain Expression Archive Database
 	* http://www.pitt.edu/~emotion/um-spread.htm
@@ -32,21 +37,28 @@
 	2. stimuli in CANlab google drive
 		* https://drive.google.com/open?id=1w6wBWPvWoPUGIM22g2jW7ynzeiy3S5oB
 
-## cognitive
+## III. cognitive
 * Mental rotation task
 * **Reference**: Ganis, G., & Kievit, R. A. (2015). A New Set of Three-Dimensional Shapes for Investigating Mental Rotation Processes: Validation Data and Stimulus Set. Journal of Open Psychology Data, 3(1), e3. DOI: http://doi.org/10.5334/jopd.ai
 * Repository: https://figshare.com/articles/A_new_set_of_three_dimensional_stimuli_for_investigating_mental_rotation_processes/1045385
 
+---
+
+# Data storage
+* behavioral: 
+* biopac: 
+* imaging: 
+
+---
+
+# Analysis
+
+---
+
 ## To Dos
-- [x] Overall: Extract jitters from ABCD code
-- [x] Overall: cue type "high" low"
-- [x] Overall: limit rating to semi-circle
-- [x] Pain: pilot pain stimuli using actual ATS (Aug. 15th)
 - [x] Pain: 4s duration
-- [x] Vicarious: Select new videos. code is in >> social_influence/scripts/experimentDev/create_videos/
-- [x] Vicarious: Identify video scheme
-- [x] Vicarious: Counterbalance re-do. Split videos into two for the two blocks
-- [x] Vicarious: Use one for block 1, use the other for block 2
-- [x] Cognitive: Change cognitive task duration to 4 sec (currently, it is self-paced)
 - [ ] Documentation: update code description
 - [ ] Documentation: update spatialtopology.github.io
+
+
+
