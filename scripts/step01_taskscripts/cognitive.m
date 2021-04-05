@@ -18,8 +18,17 @@ channel.fixation  = 1;
 channel.cue        = 2;
 channel.expect     = 3;
 %channel.fixation  = 4;
-channel.administer = 5;
-channel.actual     = 6;
+channel.administer = 4;
+channel.actual     = 5;
+
+
+% channel.trigger    = 8;
+% channel.fixation  = 9;
+% channel.cue        = 10;
+% channel.expect     = 11;
+% %channel.fixation  = 4;
+% channel.administer = 12;
+% channel.actual     = 13;
 
 if channel.biopac == 1
     script_dir = pwd;
@@ -35,7 +44,7 @@ if channel.biopac == 1
     channel.d = py.u3.U3();
     % set every channel to 0
     channel.d.configIO(pyargs('FIOAnalog', int64(0), 'EIOAnalog', int64(0)));
-    for FIONUM = 0:7
+    for FIONUM = 0:15
         channel.d.setFIOState(pyargs('fioNum', int64(FIONUM), 'state', int64(0)));
     end
     cd(script_dir);
@@ -181,8 +190,10 @@ task_duration                  = 9.00;
 %% G. instructions _____________________________________________________
 instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
 instruct_start_name            = ['task-', taskname, '_start.png'];
+instruct_trigger_name          = ['task-', taskname, '_trigger.png'];
 instruct_end_name              = ['task-', taskname, '_end.png'];
 instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
+instruct_trigger               = fullfile(instruct_filepath, instruct_trigger_name);
 instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 HideCursor;
 % H. Make Images Into Textures ________________________________________________
@@ -210,6 +221,7 @@ for trl = 1:length(design_file.cue)
     % instruction, actual texture
     actual_tex = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
     start_tex = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+    trigger_tex     = Screen('MakeTexture',p.ptb.window, imread(instruct_trigger));
     end_tex  = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
     DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(design_file.cue))),'center','center',p.ptb.white);
     Screen('Flip',p.ptb.window);
@@ -267,6 +279,8 @@ T.param_trigger_onset(:)                  = GetSecs;
 T.param_start_biopac(:)                   = biopac_linux_matlab(channel, 0, 1);
 
 %% ___________________________ Dummy scans ____________________________
+Screen('DrawTexture',p.ptb.window,trigger_tex,[],[]);
+Screen('Flip',p.ptb.window);
 WaitSecs(TR*6);
 anchor = GetSecs;
 
@@ -505,11 +519,13 @@ clear p; clearvars; Screen('Close'); close all; sca;
 
           % 5-5. key press _____________________________________________________________
           [~,~,buttonpressed] = GetMouse;
-          resp_onset = GetSecs;
-          RT = resp_onset - mr.initialized;
+
+
           FlushEvents('keyDown');
           count = 0;
           if buttonpressed(1)% equivalent of elseif keyCode(p.keys.left)
+              resp_onset = GetSecs;
+              RT = resp_onset - mr.initialized;
               resp = 1;          resp_keyname = 'left';
               biopac_linux_matlab(channel, channel.administer, 0);
               DrawFormattedText(p.ptb.window, mr.textSame, p.ptb.xCenter+120, mr.textYc, p.ptb.white); % Text output of mouse position draw in the centre of the screen
@@ -518,17 +534,14 @@ clear p; clearvars; Screen('Close'); close all; sca;
               Screen('Flip',p.ptb.window);
               WaitSecs(p.resp.remainder);
 
-              %remainder_time = task_duration-0.5-RT;
-              % Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-              %     p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-              % Screen('Flip', p.ptb.window);
-              %Screen('DrawTexture',p.ptb.window, fixTex);
               fixation_cross(p);
               biopac_linux_matlab(channel, channel.fixation, 1);
               WaitSecs('UntilTime', end_time)
               count = count + 1;
 
           elseif buttonpressed(3)%     elseif keyCode(p.keys.right)
+              resp_onset = GetSecs;
+              RT = resp_onset - mr.initialized;
               resp = 2;          resp_keyname = 'right';
               biopac_linux_matlab(channel, channel.administer, 0);
               DrawFormattedText(p.ptb.window, mr.textDiff, p.ptb.xCenter-120-90,  mr.textYc, p.ptb.white);
@@ -537,12 +550,6 @@ clear p; clearvars; Screen('Close'); close all; sca;
               Screen('Flip',p.ptb.window);
               WaitSecs(p.resp.remainder);
 
-              % fill in with fixation cross
-              %remainder_time = task_duration-0.5-RT;
-              % Screen('DrawLines', p.ptb.window, p.fix.allCoords,...
-              %     p.fix.lineWidthPix, p.ptb.white, [p.ptb.xCenter p.ptb.yCenter], 2);
-              % Screen('Flip', p.ptb.window);
-              % Screen('DrawTexture',p.ptb.window, fixTex);
               fixation_cross(p);
               biopac_linux_matlab(channel,  channel.fixation, 1);
               WaitSecs('UntilTime',end_time);
