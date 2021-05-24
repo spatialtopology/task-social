@@ -19,8 +19,8 @@ channel.fixation  = 1;
 channel.cue        = 2;
 channel.expect     = 3;
 %channel.fixation  = 4;
-channel.administer = 5;
-channel.actual     = 6;
+channel.administer = 4;
+channel.actual     = 5;
 
 if channel.biopac == 1
     script_dir = pwd;
@@ -143,6 +143,7 @@ block_chunk                    = split(extractAfter(a(end),"block-"),["-", "."])
 T.src_subject_id(:)            = sub;
 T.session_id(:)                = session;
 if session == 4;       run_num = run_num-3; end
+T.param_task_name(:)           = taskname;
 T.param_run_num(:)             = run_num;
 T.param_counterbalance_ver(:)  = str2double(version_chunk{1});
 T.param_counterbalance_block_num(:) = str2double(block_chunk{1});
@@ -184,8 +185,10 @@ wait_time = (task_dur - plateau)/2;
 %% G. instructions _____________________________________________________
 instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
 instruct_start_name            = ['task-', taskname, '_start.png'];
+instruct_trigger_name          = ['task-', taskname, '_trigger.png'];
 instruct_end_name              = ['task-', taskname, '_end.png'];
 instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
+instruct_trigger               = fullfile(instruct_filepath, instruct_trigger_name);
 instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 
 HideCursor;
@@ -215,6 +218,7 @@ for trl = 1:length(design_file.cue)
     % instruction, actual texture ______________________________________________
     actual_tex      = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
     start_tex       = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+    trigger_tex     = Screen('MakeTexture',p.ptb.window, imread(instruct_trigger));
     end_tex         = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 
     DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(design_file.cue))),'center','center',p.ptb.white);
@@ -243,6 +247,8 @@ T.param_trigger_onset(:)                  = GetSecs;
 T.param_start_biopac(:)                   = biopac_linux_matlab(channel, channel.trigger, 1);
 
 %% ___________________________ Dummy scans ____________________________
+Screen('DrawTexture',p.ptb.window,trigger_tex,[],[]);
+Screen('Flip',p.ptb.window);
 WaitSecs(TR*6);
 anchor = GetSecs;
 
