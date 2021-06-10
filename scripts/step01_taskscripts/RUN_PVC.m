@@ -4,7 +4,7 @@ clearvars;
 sca;
 % 1. grab participant number ___________________________________________________
 prompt = 'SESSION (1, 3, 4): ';
-session = input(prompt);
+ses_num = input(prompt);
 prompt = 'PARTICIPANT (in raw number form, e.g. 1, 2,...,98): ';
 sub_num = input(prompt);
 prompt = 'BIOPAC (YES=1, NO=0) : ';
@@ -14,23 +14,26 @@ debug = 0;
 
 
 % 2. counterbalance version ____________________________________________________
-% random sequence
+% random sequence30
 task_dir                       = pwd;
 main_dir                       = fileparts(fileparts(task_dir));
 repo_dir                       = fileparts(fileparts(fileparts(task_dir)));
-counterbalancefile     = fullfile(main_dir, 'design', 'latin_square_sequence.csv');
+counterbalancefile           = fullfile(main_dir, 'design', 'latin_square_sequence.csv');
 cb                     = readtable(counterbalancefile);
 index = rem(sub_num,20);
+if index == 0
+    index = sub_num./20;
+end
 cb_ver_PV              = cb{index,'cb_ver'};
 cb_ver_C               = cb{index,'cb_ver_C'};
-latin                  = cb{index,{strcat('ses0', num2str(session))}};
+latin                  = cb{index,{strcat('ses0', num2str(ses_num))}};
 
-c1 = strcat('task-cognitive_counterbalance_ver-', sprintf('%02d',cb_ver_C),'_ses-',sprintf('%02d', session), '_block-01');
-c2 = strcat('task-cognitive_counterbalance_ver-' , sprintf('%02d',cb_ver_C),'_ses-',sprintf('%02d', session),'_block-02');
-p1 = strcat('task-pain_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', session), '_block-01');
-p2 = strcat('task-pain_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', session), '_block-02');
-v1 = strcat('task-vicarious_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', session), '_block-01');
-v2 = strcat('task-vicarious_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', session), '_block-02');
+c1 = strcat('task-cognitive_counterbalance_ver-', sprintf('%02d',cb_ver_C),'_ses-',sprintf('%02d', ses_num), '_block-01');
+c2 = strcat('task-cognitive_counterbalance_ver-' , sprintf('%02d',cb_ver_C),'_ses-',sprintf('%02d', ses_num),'_block-02');
+p1 = strcat('task-pain_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', ses_num), '_block-01');
+p2 = strcat('task-pain_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', ses_num), '_block-02');
+v1 = strcat('task-vicarious_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', ses_num), '_block-01');
+v2 = strcat('task-vicarious_counterbalance_ver-' , sprintf('%02d',cb_ver_PV),'_ses-',sprintf('%02d', ses_num), '_block-02');
 
 % 2. counterbalance version ____________________________________________________
 
@@ -72,16 +75,47 @@ fprintf('\n%s\n\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n \n%s\n',boxTop,line,task1_l
 % B. Directories ______________________________________________________________
 main_dir  = pwd;
 
-run_t1 = strcat(task1,'(',num2str(sub_num),",'",char(t1_cb), "',",num2str(1),',',num2str(session), ',',num2str(biopac),',',num2str(debug),')');
-run_t2 = strcat(task2,'(',num2str(sub_num),",'",char(t2_cb), "',",num2str(2),',',num2str(session), ',',num2str(biopac),',',num2str(debug),')');
-run_t3 = strcat(task3,'(',num2str(sub_num),",'",char(t3_cb), "',",num2str(3),',',num2str(session), ',',num2str(biopac),',',num2str(debug),')');
-run_t4 = strcat(task4,'(',num2str(sub_num),",'",char(t4_cb), "',",num2str(4),',',num2str(session), ',',num2str(biopac),',',num2str(debug),')');
-run_t5 = strcat(task5,'(',num2str(sub_num),",'",char(t5_cb), "',",num2str(5),',',num2str(session), ',',num2str(biopac),',',num2str(debug),')');
-run_t6 = strcat(task6,'(',num2str(sub_num),",'",char(t6_cb), "',",num2str(6),',',num2str(session), ',',num2str(biopac),',',num2str(debug),')');
+run_t1 = strcat(task1,'(',num2str(sub_num),",'",char(t1_cb), "',",num2str(1),',',num2str(ses_num), ',',num2str(biopac),',',num2str(debug),')');
+run_t2 = strcat(task2,'(',num2str(sub_num),",'",char(t2_cb), "',",num2str(2),',',num2str(ses_num), ',',num2str(biopac),',',num2str(debug),')');
+run_t3 = strcat(task3,'(',num2str(sub_num),",'",char(t3_cb), "',",num2str(3),',',num2str(ses_num), ',',num2str(biopac),',',num2str(debug),')');
+run_t4 = strcat(task4,'(',num2str(sub_num),",'",char(t4_cb), "',",num2str(4),',',num2str(ses_num), ',',num2str(biopac),',',num2str(debug),')');
+run_t5 = strcat(task5,'(',num2str(sub_num),",'",char(t5_cb), "',",num2str(5),',',num2str(ses_num), ',',num2str(biopac),',',num2str(debug),')');
+run_t6 = strcat(task6,'(',num2str(sub_num),",'",char(t6_cb), "',",num2str(6),',',num2str(ses_num), ',',num2str(biopac),',',num2str(debug),')');
 
 % prompt session number
+%%
+%
+%  PREFORMATTED
+%  TEXT
+%
 prompt = 'RUN number (1, 2, 3, 4, 5, 6): ';
 run_num = input(prompt);
+
+% DOUBLE CHECK MSG ______________________________________________________________
+task_dir                        = pwd;
+main_dir                        = fileparts(fileparts(task_dir));
+repo_dir                        = fileparts(fileparts(fileparts(task_dir)));
+
+repo_save_dir = fullfile(repo_dir, 'data', strcat('sub-', sprintf('%04d', sub_num)),...
+    'task-social', strcat('ses-',sprintf('%02d', ses_num)));
+bids_string                     = [strcat('sub-', sprintf('%04d', sub_num)), ...
+    strcat('_ses-',sprintf('%02d', ses_num)),...
+    strcat('_task-*'),...
+    strcat('_run-', sprintf('%02d', run_num))];
+repoFileName = fullfile(repo_save_dir,[bids_string,'*_beh.csv' ]);
+
+% 3. if so, "this run exists. Are you sure?" ___________________________________
+if isempty(dir(repoFileName)) == 0
+    RA_response = input(['\n\n---------------ATTENTION-----------\nThis file already exists in: ', repo_save_dir, '\nDo you want to overwrite?: (YES = 999; NO = 0): ']);
+    if RA_response ~= 999 || isempty(RA_response) == 1
+        error('Aborting!');
+    end
+end
+
+
+% ______________________________________________________________
+
+
 
 if run_num == 1
     eval(run_t1);eval(run_t2);eval(run_t3);eval(run_t4);eval(run_t5);eval(run_t6);
