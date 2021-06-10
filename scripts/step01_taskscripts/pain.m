@@ -11,7 +11,8 @@ function pain(sub,input_counterbalance_file, run_num, session, biopac, debug)
 %% A. Psychtoolbox parameters _________________________________________________
 % ip_address = '192.168.0.114'; %ROOM 406 Medoc
 ip_address = '10.64.1.10'; % DBIC MRI MEDOC
-
+% ip_address = '192.168.0.211';
+% ip_address = '169.254.216.43';
 global p
 Screen('Preference', 'SkipSyncTests', 0);
 PsychDefaultSetup(2);
@@ -44,11 +45,11 @@ channel = struct;
 channel.biopac = biopac;
 
 channel.trigger    = 0;
-channel.fixation  = 1;
+channel.fixation   = 1;
 channel.cue        = 2;
 channel.expect     = 3;
-channel.administer = 5;
-channel.actual     = 6;
+channel.administer = 4;
+channel.actual     = 5;
 
 if channel.biopac == 1
     script_dir = pwd;
@@ -182,8 +183,10 @@ port = 20121;
 %% G. instructions _____________________________________________________
 instruct_filepath              = fullfile(main_dir, 'stimuli', 'instructions');
 instruct_start_name            = ['task-', taskname, '_start.png'];
+instruct_trigger_name          = ['task-', taskname, '_trigger.png'];
 instruct_end_name              = ['task-', taskname, '_end.png'];
 instruct_start                 = fullfile(instruct_filepath, instruct_start_name);
+instruct_trigger               = fullfile(instruct_filepath, instruct_trigger_name);
 instruct_end                   = fullfile(instruct_filepath, instruct_end_name);
 
 HideCursor;
@@ -206,6 +209,7 @@ for trl = 1:length(design_file.cue)
     % instruction, actual texture ______________________________________________
     actual_tex      = Screen('MakeTexture', p.ptb.window, imread(image_scale)); % pure rating scale
     start_tex       = Screen('MakeTexture',p.ptb.window, imread(instruct_start));
+    trigger_tex     = Screen('MakeTexture',p.ptb.window, imread(instruct_trigger));
     end_tex         = Screen('MakeTexture',p.ptb.window, imread(instruct_end));
 
     DrawFormattedText(p.ptb.window,sprintf('LOADING\n\n%d%% complete', ceil(100*trl/length(design_file.cue))),'center','center',p.ptb.white);
@@ -237,6 +241,8 @@ key_set = {'low_stim', 'med_stim', 'high_stim'};
 bit8_set = [97, 98, 99];
 M = containers.Map(key_set, bit8_set);
 %% ___________________________ Dummy scans ____________________________
+Screen('DrawTexture',p.ptb.window,trigger_tex,[],[]);
+Screen('Flip',p.ptb.window);
 WaitSecs(TR*6);
 anchor = GetSecs;
 %% ___________________________ 0. Experimental loop ____________________________
